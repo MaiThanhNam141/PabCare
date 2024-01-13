@@ -47,8 +47,9 @@ interface TimerPart {
 const timerParts: TimerPart[] = [
   { image: require('./assets/pikachu-mega.png'), label: 'Part 1' },
   { image: require('./assets/pikachu.png'), label: 'Part 2' },
-  { image: require('./assets/egg1rift.png'), label: 'Part 3' },
-  { image: require('./assets/egg.png'), label: 'Part 4' },
+  { image: require('./assets/egg2rift.png'), label: 'Part 3' },
+  { image: require('./assets/egg1rift.png'), label: 'Part 4' },
+  { image: require('./assets/egg.png'), label: 'Part 5' },
 ];
 
 export default class App extends Component<{}, AppState>  {
