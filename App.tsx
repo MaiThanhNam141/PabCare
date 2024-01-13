@@ -1,5 +1,5 @@
 
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
 import {
   Dimensions,
@@ -8,9 +8,11 @@ import {
   View,
   StatusBar,
   TouchableOpacity,
-  Platform
+  Platform,
+  Image
 } from 'react-native';
 
+// const [image, setImage] = useState(egg)
 const screen = Dimensions.get("window")
 const formatNumber = (number : number) => `0${number}`.slice(-2)
 const getRemaining = (time : number) => {
@@ -36,6 +38,18 @@ interface AppState {
   selectMinute: string;
   selectSecond: string;
 }
+
+interface TimerPart {
+  image: any;
+  label: string;
+}
+
+const timerParts: TimerPart[] = [
+  { image: require('./assets/pikachu-mega.png'), label: 'Part 1' },
+  { image: require('./assets/pikachu.png'), label: 'Part 2' },
+  { image: require('./assets/egg1rift.png'), label: 'Part 3' },
+  { image: require('./assets/egg.png'), label: 'Part 4' },
+];
 
 export default class App extends Component<{}, AppState>  {
   state: AppState = {
@@ -116,15 +130,37 @@ export default class App extends Component<{}, AppState>  {
     </View>
   )
   
+  getCurrentTimerPart = (totalTime: number, currentTime: number) => {
+    const partDuration = totalTime / timerParts.length;
+    return Math.floor(currentTime / partDuration);
+  };
+
+  renderTimer = () => {
+    const { hours, minutes, seconds } = getRemaining(
+      this.state.remainingSeconds
+    );
+    const totalTime = parseInt(this.state.selectHour, 10) * 3600 + parseInt(this.state.selectMinute, 10) * 60 + parseInt(this.state.selectSecond, 10);
+    const currentPart = Math.min(timerParts.length - 1, this.getCurrentTimerPart(totalTime, this.state.remainingSeconds))
+
+    console.log("currentPart:", currentPart);
+    return (
+      <View style={styles.timerContainer}>
+        {timerParts[currentPart] && (
+          <Image source={timerParts[currentPart].image} style={styles.timerImage} />
+        )}
+        <Text style={styles.timerText}>{hours}:{minutes}:{seconds}</Text>
+      </View>
+    );
+  };
+  
 
   render(): React.ReactNode {
-    const { hours, minutes, seconds } = getRemaining(this.state.remainingSeconds);
     return(
       <View style={styles.container}>
           <StatusBar barStyle={"light-content"}/>
           {
             this.state.isRunning ? (
-              <Text style={styles.timerText}>{`${hours}:${minutes}:${seconds}`}</Text>
+              this.renderTimer()
             ) : (
               this.renderPickers()
             )
@@ -211,6 +247,17 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center"
-  }
+  },
+  timerContainer: {
+    flexDirection: 'column', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+
+  },
+  
+  timerImage: {
+    width: 80, 
+    height: 80,
+},
 });
 
