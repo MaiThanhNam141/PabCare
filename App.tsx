@@ -12,7 +12,7 @@ import {
   Image
 } from 'react-native';
 
-// const [image, setImage] = useState(egg)
+
 const screen = Dimensions.get("window")
 const formatNumber = (number : number) => `0${number}`.slice(-2)
 const getRemaining = (time : number) => {
