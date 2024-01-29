@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from '../screens/HomeScreen'
 import ProfileScreen from'../screens/ProfileScreen'
-import ChatAI from "../screens/ChatAI";
+import QuizzScreen from "../screens/QuizzScreen";
 import MiniApp from "../screens/MiniApp";
 import React from "react";
 
@@ -41,14 +41,14 @@ const ProfileStackNavigator = () =>{
 const ChatAIStackNavigator = () => {
     return(
         <Stack.Navigator 
-            initialRouteName="chatAI"
+            initialRouteName="QuizzScreen"
             screenOptions={{
                 headerStyle:{
                     backgroundColor:"#91c4f8"
                 },
                 headerShown:false
             }}>
-            <Stack.Screen name="chatAI" component={ChatAI} />
+            <Stack.Screen name="QuizzScreen" component={QuizzScreen} />
         </Stack.Navigator>
     )
 }
@@ -68,4 +68,4 @@ const MiniAppStackNavigator = () => {
     )
 }
 
-export  {MainStackNavigator, ProfileStackNavigator, ChatAI, MiniApp}
+export  {MainStackNavigator, ProfileStackNavigator, QuizzScreen, MiniApp}

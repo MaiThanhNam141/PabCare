@@ -1,10 +1,11 @@
 import { Text, View } from "react-native"
 import React from "react"
+import ChatAI from "../component/ChatAI"
 
 const HomeScreen = () => {
     return(
         <View>
-            <Text>HomeScreen</Text>
+            <ChatAI></ChatAI>
         </View>
     )
 }

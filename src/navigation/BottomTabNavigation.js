@@ -1,10 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import HomeScreen from "../screens/HomeScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import MiniApp from "../screens/MiniApp";
-import ChatAI from "../screens/ChatAI";
+import { MainStackNavigator, ProfileStackNavigator, QuizzScreen, MiniApp } from "./StackNavigator";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+
 const Tab = createBottomTabNavigator()
 
 const BottomTabNavigation = () => {
@@ -24,13 +22,13 @@ const BottomTabNavigation = () => {
                 height:60
             },
         }}>
-            <Tab.Screen name='HomeScreen' component={HomeScreen}
+            <Tab.Screen name='HomeScreen' component={MainStackNavigator}
                 options={{
                   tabBarIcon: ({ size, color}) => (
                     <MaterialIcons name="home" size={size} color={color} />
                   ),
                 }} />
-            <Tab.Screen name='ChatAI' component={ChatAI}
+            <Tab.Screen name='QuizzScreen' component={QuizzScreen}
                 options={{
                     tabBarIcon: ({ size, color }) => (
                       <MaterialIcons name="chat-bubble-outline" size={size} color={color} />
@@ -42,7 +40,7 @@ const BottomTabNavigation = () => {
                       <MaterialIcons name="list-alt" size={size} color={color} />
                     ),
                   }}/>
-            <Tab.Screen name='ProfileScreen' component={ProfileScreen}
+            <Tab.Screen name='ProfileScreen' component={ProfileStackNavigator}
                 options={{
                     tabBarIcon: ({ size, color }) => (
                       <MaterialIcons name="account-circle" size={size} color={color} />
