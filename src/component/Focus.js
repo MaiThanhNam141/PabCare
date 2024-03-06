@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#07121B",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "space-between"
   },
   button: {
     borderWidth: 10,
@@ -187,7 +187,8 @@ const styles = StyleSheet.create({
     borderRadius: screen.width / 2,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 50
+    marginTop: 50,
+    paddingTop:30,
   },
   buttonStop: {
     borderColor: "#FF851B"

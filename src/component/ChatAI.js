@@ -2,14 +2,29 @@ import { Text, View, TextInput, Button, ToastAndroid, ScrollView, ActivityIndica
 import React, { useState } from "react"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { GoogleGenerativeAI  } from "@google/generative-ai"
+import auth from '@react-native-firebase/auth';
 import {API_KEY} from '@env'
 
 const ChatAI = () => {
     const [prompt,setPrompt] = useState('')
     const [text, setText] = useState('')
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false)
     const genAI = new GoogleGenerativeAI(API_KEY);
+
+    const checkUserExist = () => {
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        setEmail(currentUser.email.split('@')[0]);
+        // User is signed in
+      } else {
+        // No user is signed in
+        navigation.navigate('loginscreen');
+      }
+    };
+    
     const handleGenerateContent = async () => { 
+        checkUserExist()
         try {
             if(!prompt.trim()){
                 ToastAndroid.show('Hãy nhập prompt', ToastAndroid.SHORT)
@@ -17,12 +32,21 @@ const ChatAI = () => {
             }
             setLoading(true)
             const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-            const result = await model.generateContent(prompt+". Hãy trả lời như một người bạn và trả lời 1 cách ngắn gọn");
+            const result = await model.generateContent("You're a Mental Health Counselor at Pabcare Counseling Center " 
+                                                        +"(Trung tâm hỗ trợ Pabcare) in Vietnamese."
+                                                        +" Use friendly, funny and simple Vietnamese language to respond." 
+                                                        +" Using 'tớ' to refer yourself and 'cậu' to refer me "
+                                                        +" This is a promt: " + prompt);
             setText(result.response.text());
             setPrompt("");
         }
         catch (e){
-            setText(e.message || e.toString());
+          if (e.code === "SAFETY") {
+            setText("Lỗi: Có vẻ tin nhắn của bạn đã vi phạm chính sách an toàn của PABCARE. Vui lòng thử lại với nội dung khác.");
+          } else {
+              setText(e.message || e.toString());
+              console.error(e.message);
+          }
         }
         finally{
             setLoading(false)
@@ -32,7 +56,7 @@ const ChatAI = () => {
         <ScrollView>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Chat with AI</Text>
+            <Text style={styles.title}>Chat with AI {email}</Text>
           </View>
   
           <View style={styles.messageContainer}>

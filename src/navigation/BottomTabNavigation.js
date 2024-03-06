@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { MainStackNavigator, ProfileStackNavigator, QuizzScreen, MiniApp } from "./StackNavigator";
+import { MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator } from "./StackNavigator";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 const Tab = createBottomTabNavigator()
@@ -28,13 +28,13 @@ const BottomTabNavigation = () => {
                     <MaterialIcons name="home" size={size} color={color} />
                   ),
                 }} />
-            <Tab.Screen name='QuizzScreen' component={QuizzScreen}
+            <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
                 options={{
                     tabBarIcon: ({ size, color }) => (
                       <MaterialIcons name="chat-bubble-outline" size={size} color={color} />
                     ),
                   }}/>
-            <Tab.Screen name='MiniApp' component={MiniApp}
+            <Tab.Screen name='MiniApp' component={MiniAppStackNavigator}
                 options={{
                     tabBarIcon: ({ size, color }) => (
                       <MaterialIcons name="list-alt" size={size} color={color} />
