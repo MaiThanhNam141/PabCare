@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "361686552357",
+    "project_id": "pabcare-9633d",
+    "storage_bucket": "pabcare-9633d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361686552357:android:2268b612b34249316c54cc",
+        "android_client_info": {
+          "package_name": "com.focusapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361686552357-928af4m5hnmcprddpku2sie4011bm90g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.focusapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "361686552357-umi4m8v296443h5t790hpib4eo2idrtk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTc6MZrxsh6hs7iT2rGYUwijVWhb9598w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361686552357-umi4m8v296443h5t790hpib4eo2idrtk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

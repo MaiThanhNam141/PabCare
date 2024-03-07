@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import firestore from '@react-native-firebase/firestore';
 
 const ProfileScreen = ({ navigation }) => {
+  const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
+  const [displayName, setDisplayName] = useState('');
+  const [avatar, setAvatar] = useState('')
 
-  const [email, setEmail] = useState('');
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(user => {
+    const unsubscribe = auth().onAuthStateChanged(async user => {
       if (user) {
-        // User is signed in
-        setEmail(user.email.split('@')[0])
-        console.log(user.email);
+        const userDoc = await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .get();
+        if (userDoc.exists) {
+          setDisplayName(userDoc.data().displayName);
+          setAvatar(userDoc.data().photoURL)
+        }
       } else {
-        // User is NOT signed in
         navigation.navigate('loginscreen');
       }
     });
@@ -36,6 +43,7 @@ const ProfileScreen = ({ navigation }) => {
   const googleSignOut = async () => {
     try {
       await GoogleSignin.signOut();
+      await auth().signOut();
       navigation.navigate('loginscreen');
     } catch (error) {
       console.error(error);
@@ -44,13 +52,15 @@ const ProfileScreen = ({ navigation }) => {
 
   const facebookSignOut = async () => {
     console.log('Logging out from Facebook');
-    // Your Facebook logout logic here
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello, {email}</Text>
-      <Button title="Logout" onPress={handleLogout} />
+      <Text style={styles.title}>Hello, {displayName}</Text>
+      <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
+      <View style={styles.buttonContainer}>
+        <Button title="Logout" onPress={handleLogout} style={styles.button} />
+      </View>
     </View>
   );
 };
@@ -65,6 +75,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  image: {
+    width: 200, 
+    height: 200, 
+    marginBottom: 20,
+    borderRadius:100,
+  },
+  buttonContainer: {
+    width: '80%',
+  },
+  button: {
+    marginTop: 10,
+    borderRadius:50
   },
 });
 
