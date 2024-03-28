@@ -1,46 +1,29 @@
-import { Text, View, TextInput, Button, ToastAndroid, ActivityIndicator, StyleSheet, FlatList, Image} from "react-native"
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, FlatList, Image, KeyboardAvoidingView} from "react-native"
 import React, { useState, useEffect } from "react"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { GoogleGenerativeAI  } from "@google/generative-ai"
-import auth from '@react-native-firebase/auth';
 import {API_KEY} from '@env'
+import useAuthCheck from "../feature/firebase/useAuthCheck";
 
-import firestore from '@react-native-firebase/firestore';
-
-
-const ChatAI = () => {
-    const [text, setText] = useState('')
-
+const ChatAI = ({navigation}) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
     const [displayName, setDisplayName] = useState('');
     const [avatar, setAvatar] = useState('')
+    const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
 
     const [loadingResponse, setLoadingResponse] = useState(false);
 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const AIImage = 'https://play-lh.googleusercontent.com/DDIUuR0XwdSLnuuyOTn3STuoemW_M1qCSLHs8HE6DJq0NrwUNxYafZ2qG-78Uxj76Q=w240-h480-rw'
+    
     useEffect(() => {
-      const fetchData = async () => {
-        if (user) {
-          const userDoc = await firestore()
-            .collection('users')
-            .doc(user.uid)
-            .get();
-          if (userDoc.exists) {
-            setDisplayName(userDoc.data().displayName);
-            setAvatar(userDoc.data().photoURL)
-          }
-        }
-        else{
-          navigation.navigate('loginscreen');
-        }
-      };
-  
-      fetchData();
-    }, []);
-
+      const { onAuthStateChanged } = useAuthCheck();
+      const unsubscribe = onAuthStateChanged(setDisplayName, setAvatar);
+      return () => unsubscribe();
+  }, []);
+    
     const handleGenerateContent = async () => { 
         try {       
           setLoadingResponse(true);
@@ -54,10 +37,10 @@ const ChatAI = () => {
         }
         catch (e){
           if (e.code === "SAFETY") {
-            setText("Lỗi: Có vẻ tin nhắn của bạn đã vi phạm chính sách an toàn của PABCARE. Vui lòng thử lại với nội dung khác.");
+            setMessages("Lỗi: Có vẻ tin nhắn của bạn đã vi phạm chính sách an toàn của PABCARE. Vui lòng thử lại với nội dung khác.");
           } else {
-              setText(e.message || e.toString());
-              console.error(e.message);
+            setMessages(e.message || e.toString());
+            console.error(e.message);
           }
         }
         finally{
@@ -67,22 +50,27 @@ const ChatAI = () => {
     
   
     const sendMessage = async () => {
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { id: Math.random().toString(), text: newMessage, sender: displayName, avatar: avatar } 
-      ]);
-      setNewMessage('');
-      const aiResponse = await handleGenerateContent(newMessage);
-      
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { id: Math.random().toString(), text: aiResponse, sender: 'Gemini', avatar: AIImage } 
-      ]);
+      try {
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { id: Math.random().toString(), text: newMessage, sender: displayName, avatar: avatar } 
+        ]);
+        setNewMessage('');
+        const aiResponse = await handleGenerateContent(newMessage);
+        
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { id: Math.random().toString(), text: aiResponse, sender: 'Gemini', avatar: AIImage } 
+        ]);
+      } catch (error) {
+        console.error("Lỗi khi gửi tin nhắn:", error);
+      }
     };
+    
   
     const isCurrentUser = (sender) => sender === displayName;
     return(
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         <FlatList
           data={messages}
           keyExtractor={item => item.id}
@@ -110,59 +98,68 @@ const ChatAI = () => {
             onChangeText={setNewMessage}
             placeholder="Type your message here"
           />
-          <Button title="Send" onPress={sendMessage} />
+          {/* <Button style={styles.btnSend} title="Send" onPress={sendMessage} /> */}
+          <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
+              <MaterialIcons name="send" color="#1341e8" size={30}/>
+          </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     )
 }
 export default ChatAI
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    messageContainer: {
-      padding: 10,
-      marginHorizontal: 10,
-      marginVertical: 5,
-      backgroundColor: '#e0e0e0',
-      borderRadius: 10,
-      maxWidth: '80%',
-    },
-    currentUserMessage: {
-      alignSelf: 'flex-end',
-      backgroundColor: '#b3e5fc',
-    },
-    senderInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    avatar: {
-      width: 30,
-      height: 30,
-      borderRadius: 100,
-      marginRight: 5,
-    },
-    senderName: {
-      fontWeight: 'bold',
-      marginBottom: 5,
-    },
-    inputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 10,
-      borderTopWidth: 1,
-      borderTopColor: '#ccc',
-    },
-    input: {
-      flex: 1,
-      marginRight: 10,
-      padding: 10,
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 20,
-    },
-    loadingContainer: {
-      alignItems: 'center',
+  container: {
+    flex: 1,
+    minWidth:150
   },
-  });
+  messageContainer: {
+    padding: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    maxWidth: '80%',
+  },
+  currentUserMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#b3e5fc',
+  },
+  senderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    marginRight: 5,
+  },
+  senderName: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+  },
+  input: {
+    flex: 1,
+    marginRight: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    minWidth:300,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+  },
+  btnSend:{
+    borderRadius: 45,
+  }
+});

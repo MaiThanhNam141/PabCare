@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import firestore from '@react-native-firebase/firestore';
+import useAuthCheck from '../feature/firebase/useAuthCheck';
 
 const ProfileScreen = ({ navigation }) => {
   const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
@@ -10,23 +10,12 @@ const ProfileScreen = ({ navigation }) => {
   const [avatar, setAvatar] = useState('')
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async user => {
-      if (user) {
-        const userDoc = await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .get();
-        if (userDoc.exists) {
-          setDisplayName(userDoc.data().displayName);
-          setAvatar(userDoc.data().photoURL)
-        }
-      } else {
-        navigation.navigate('loginscreen');
-      }
-    });
-
-    return unsubscribe;
-  }, []);
+    const { onAuthStateChanged } = useAuthCheck();
+    const unsubscribe = onAuthStateChanged(setDisplayName, setAvatar);
+    if(!displayName)
+      navigation.navigate('loginscreen')
+    return () => unsubscribe();
+}, []);
 
   const handleLogout = async () => {
     const currentUser = auth().currentUser;
@@ -44,7 +33,7 @@ const ProfileScreen = ({ navigation }) => {
     try {
       await GoogleSignin.signOut();
       await auth().signOut();
-      navigation.navigate('loginscreen');
+      //navigation.navigate('loginscreen');
     } catch (error) {
       console.error(error);
     }

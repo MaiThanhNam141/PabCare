@@ -1,28 +1,31 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import { View, Text, StyleSheet, Dimensions, ImageBackground, ToastAndroid } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
+import {GOOGLE_API_CLIENT} from '@env'
 
 const LoginScreen = ({navigation}) => {
   GoogleSignin.configure({
-    webClientId: '361686552357-umi4m8v296443h5t790hpib4eo2idrtk.apps.googleusercontent.com',
+    webClientId: GOOGLE_API_CLIENT,
   });
   const {heightS, widthS} = Dimensions.get("window")
   const imageLink = require('..//..//assets//bg-image.jpg')
   
 
   useEffect(()=>{
-    const unsubcribe = auth().onAuthStateChanged(user => {
-      if (user){
+    const unsubscribe = auth().onAuthStateChanged(user=>{
+      if(user){
         navigation.navigate('profilescreen')
       }
     })
-    return () => unsubcribe()
+    return ()=> unsubscribe
   },[])
 
   async function onGoogleButtonPress(){
     try {
+      //await GoogleSignin.signOut();
+      // await auth().signOut();
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       // Get the users ID token
       const { idToken } = await GoogleSignin.signIn();
@@ -30,7 +33,7 @@ const LoginScreen = ({navigation}) => {
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       // Sign-in the user with the credential
       await auth().signInWithCredential(googleCredential);
-
+      ToastAndroid.show("Đăng nhập thành công", ToastAndroid.SHORT)
       const user = auth().currentUser;
       await firestore()
         .collection('users')
@@ -40,6 +43,7 @@ const LoginScreen = ({navigation}) => {
           displayName: user.displayName,
           photoURL: user.photoURL,
         });
+      navigation.navigate('profilescreen')
     } catch (error) {
       if (error.code === statusCodes.IN_PROGRESS) {
         ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT)

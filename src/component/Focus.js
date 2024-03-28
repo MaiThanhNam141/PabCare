@@ -182,13 +182,12 @@ const styles = StyleSheet.create({
   button: {
     borderWidth: 10,
     borderColor: "#89AAFF",
-    width: screen.width / 2.2,
-    height: screen.width / 2.2,
+    width: screen.width / 2,
+    height: screen.width / 2,
     borderRadius: screen.width / 2,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 50,
-    paddingTop:30,
+    margin:50,
   },
   buttonStop: {
     borderColor: "#FF851B"
@@ -238,12 +237,14 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    marginTop:50
   },
   timerContainer: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop:50
   },
 
   timerImage: {

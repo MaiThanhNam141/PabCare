@@ -15,11 +15,12 @@ const BottomTabNavigation = () => {
             tabBarActiveTintColor: "black",
             tabBarInactiveTintColor: "gray",
             tabBarStyle:{
-                borderTopLeftRadius:20,
-                borderTopRightRadius:20,
+                borderTopLeftRadius:10,
+                borderTopRightRadius:10,
                 overflow:"hidden",
                 backgroundColor:"#fff",
-                height:60
+                height:60,
+                
             },
         }}>
             <Tab.Screen name='HomeScreen' component={MainStackNavigator}

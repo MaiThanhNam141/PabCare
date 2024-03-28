@@ -10,7 +10,8 @@ import Focus from "../component/Focus";
 import Todo from "../component/Todo";
 import Diary from "../component/Diary";
 
-import React from "react";
+import React, {useState, useEffect} from "react";
+import auth from '@react-native-firebase/auth'
 
 const Stack = createStackNavigator()
 
@@ -26,23 +27,38 @@ const MainStackNavigator = () =>{
             }}>
             <Stack.Screen name="homescreen" component={HomeScreen}/>
             <Stack.Screen name="chatai" component={ChatAI} />
+                
         </Stack.Navigator>
     )
 }
 
 
 const ProfileStackNavigator = () =>{
+    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    useEffect(() => {
+        const unsubscribe = auth().onAuthStateChanged(user => {
+            if (user) {
+                setUserLoggedIn(true);
+            } else {
+                setUserLoggedIn(false);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
     return(
         <Stack.Navigator
-            initialRouteName='loginscreen'
             screenOptions={{
-                headerStyle:{
-                    backgroundColor:"#91c4f8"
+                headerStyle: {
+                    backgroundColor: "#91c4f8"
                 },
-                headerShown:false
+                headerShown: false
             }}>
-            <Stack.Screen name="profilescreen" component={ProfileScreen}/>
-            <Stack.Screen name="loginscreen" component={LoginScreen}/>
+            {userLoggedIn ? (
+                <Stack.Screen name="profilescreen" component={ProfileScreen} />
+            ) : (
+                <Stack.Screen name="loginscreen" component={LoginScreen} />
+            )}
         </Stack.Navigator>
     )
 }
