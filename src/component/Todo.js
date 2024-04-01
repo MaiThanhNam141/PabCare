@@ -1,141 +1,125 @@
+import React, { useState, useEffect } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ToastAndroid } from 'react-native';
-import React, { Component } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TodoList from './TodoList.js';
 import AddListModal from './AddListModal.js';
-import addListFireStore from '../feature/firebase/addListFireStore.js';
-import {getAuth} from "@react-native-firebase/auth"
+import useFirestoreList from '../feature/firebase/useFirestoreList.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export class Todo extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      addTodoVisible: false,
-      lists: [],
-      user: null,
-      loading: true,
+const Todo = () => {
+  const [addTodoVisible, setAddTodoVisible] = useState(false);
+  const [lists, setLists] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const { addList, updateList, getLists} = useFirestoreList()
+
+  useEffect(() => {
+    const initializeFirebase = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData)
+          setUser(user.displayName)
+          getListsFromFirestore();  
+        }
+      } catch (error) {
+        console.error("Error initializing Firestore in Todo:", error);
+      }
     };
-    this.firebase = new addListFireStore((error, user) => {
-      if (error) {
-        console.error("Error initializing Firestore:", error);
-      } else {
-        this.setState({ user });
-        this.getListsFromFirestore();
-      }
-    });
-  }
-  
-  async componentDidMount() {
+
+    initializeFirebase();
+  }, []);
+
+  const getListsFromFirestore = async () => {
     try {
-      const firestoreInstance = new addListFireStore();
-      const user = await firestoreInstance.init();
-  
-      if (user) {
-        this.setState({ user: user.displayName }, () => {
-          this.getListsFromFirestore();
-        }); 
-      }
+      const lists = await getLists();
+      setLists(lists);
+      setLoading(false);
     } catch (error) {
-      console.error("Error initializing Firestore:", error);
+      console.error("Error fetching lists in Todo:", error);
     }
-  }
+  };
 
-  async getListsFromFirestore() {
-    try {
-      const firebase = new addListFireStore()
-      const lists = await firebase.getLists();
-      this.setState({ lists, loading: false });
-    } catch (error) {
-      console.error("Error fetching lists:", error);
-    }
-  }
+  const toggleAddTodoModal = () => {
+    setAddTodoVisible(!addTodoVisible);
+  };
 
-
-  toggleAddTodoModal() {
-    this.setState({ addTodoVisible: !this.state.addTodoVisible })
-  }
-
-  renderList = list => {
+  const renderList = ({ item }) => {
     return (
-      <TodoList list={list} updateList={this.updateList} />
-    )
-  }
+      <TodoList list={item} updateList={updateListFireStore} />
+    );
+  };
 
-  addList = async list => {
+  const addListFireStore = async (list) => {
     try {
-      this.setState({ lists: [...this.state.lists, { ...list, id: this.state.lists.length + 1, todos: [] }] });
-      const firebase = new addListFireStore()
-      await firebase.addList({
+      setLists([...lists, { ...list, id: lists.length + 1, todos: [] }]);
+      
+      await addList({
         name: list.name,
         color: list.color,
-        todos: []});
+        todos: []
+      });
     } catch (error) {
-      console.error("Error adding list:", error);
+      console.error("Error adding list Todo:", error);
+      ToastAndroid.show("Thêm todo thất bại", ToastAndroid.SHORT)
     }
-  }
+  };
 
-
-  updateList = async list => {
+  const updateListFireStore = async (list) => {
     try {
-      this.setState({
-        lists: this.state.lists.map(item => {
-          return item.id === list.id ? list : item;
-        })
-      })
-      const firebase = new addListFireStore()
-      await firebase.updateList(list)
-
+      setLists(lists.map(item => (item.id === list.id ? list : item)));
+      await updateList(list);
     } catch (error) {
-      
+      console.error("Error updating list:", error);
+      ToastAndroid.show("Cập nhật todo thất bại", ToastAndroid.SHORT)
     }
-  }
+  };
 
-  render() {
-    if (this.state.loading) {
-      return (
-        <View style={styles.container}>
-          <ActivityIndicator size={'large'} color={'#24A6D9'}></ActivityIndicator>
-        </View>
-      )
-    }
+  if (loading) {
     return (
       <View style={styles.container}>
-        <Modal animationType='slide' visible={this.state.addTodoVisible} onRequestClose={() => this.toggleAddTodoModal()}>
-          <AddListModal closeModal={() => this.toggleAddTodoModal()} addList={this.addList} />
-        </Modal>
-        <View>
-          <Text>User: {this.state.user ? this.state.user : 'Guest'}</Text>
-        </View>
-        <View style={{ flexDirection: 'row'}}>
-          <View style={styles.divider} />
-            <Text style={styles.title}>
-              Todo<Text style={{ fontWeight: "300", color: '#24A6D9' }}> Lists</Text>
-            </Text>
-          <View style={styles.divider} />
-        </View>
-        <View style={{ marginVertical: 48 }}>
-          <TouchableOpacity style={styles.addList} onPress={() => this.toggleAddTodoModal()}>
-            <MaterialIcons name="add" size={16} color={'#24A6D9'} />
-          </TouchableOpacity>
-          <Text style={styles.add}>Add List</Text>
-        </View>
-        <View style={{ height: 300, paddingLeft: 32 }}>
-          <FlatList
-            data={this.state.lists}
-            keyExtractor={item => item.id.toString()}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => this.renderList(item)}
-            keyboardShouldPersistTaps="always"
-          />
-        </View>
+        <ActivityIndicator size={'large'} color={'#24A6D9'}></ActivityIndicator>
       </View>
-    )
+    );
   }
-}
+
+  return (
+    <View style={styles.container}>
+      <Modal animationType='slide' visible={addTodoVisible} onRequestClose={toggleAddTodoModal}>
+        <AddListModal closeModal={toggleAddTodoModal} addList={addListFireStore} />
+      </Modal>
+      <View>
+        <Text>User: {user ? user : 'Guest'}</Text>
+      </View>
+      <View style={{ flexDirection: 'row'}}>
+        <View style={styles.divider} />
+          <Text style={styles.title}>
+            Todo<Text style={{ fontWeight: "300", color: '#24A6D9' }}> Lists</Text>
+          </Text>
+        <View style={styles.divider} />
+      </View>
+      <View style={{ marginVertical: 48 }}>
+        <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
+          <MaterialIcons name="add" size={16} color={'#24A6D9'} />
+        </TouchableOpacity>
+        <Text style={styles.add}>Add List</Text>
+      </View>
+      <View style={{ height: 300, paddingLeft: 32 }}>
+        <FlatList
+          data={lists}
+          keyExtractor={item => item.id.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          renderItem={renderList}
+          keyboardShouldPersistTaps="always"
+        />
+      </View>
+    </View>
+  );
+};
 
 export default Todo;
-
 
 const styles = StyleSheet.create({
   container: {

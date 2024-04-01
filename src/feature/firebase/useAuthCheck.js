@@ -31,18 +31,27 @@ const useAuthCheck = () => {
   };
 
   const onAuthStateChanged = (setDisplayName, setAvatar) => {
-    const unsubscribe = auth().onAuthStateChanged(async user => {
-      if (!user) {
-        return ToastAndroid.show('Người dùng đã đăng xuất', ToastAndroid.SHORT);
-      }
-      fetchData(setDisplayName, setAvatar);
+    return new Promise((resolve, reject) => {
+        const unsubscribe = auth().onAuthStateChanged(async user => {
+            if (!user) {
+                //ToastAndroid.show('Người dùng đã đăng xuất', ToastAndroid.SHORT);
+                reject(new Error('Người dùng đã đăng xuất'));
+            } else {
+                try {
+                    await fetchData(setDisplayName, setAvatar);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
     });
-
-    return () => {
-      unsubscribe();
-    };
-  };
-
+};
+  
   return {onAuthStateChanged};
 };
 

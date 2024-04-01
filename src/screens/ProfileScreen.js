@@ -1,23 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, Button, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import useAuthCheck from '../feature/firebase/useAuthCheck';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../feature/context/UserContext';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({navigation}) => {
   const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
   const [displayName, setDisplayName] = useState('');
   const [avatar, setAvatar] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
 
   useEffect(() => {
-    const { onAuthStateChanged } = useAuthCheck();
-    const unsubscribe = onAuthStateChanged(setDisplayName, setAvatar);
-    if(!displayName)
-      navigation.navigate('loginscreen')
-    return () => unsubscribe();
-}, []);
+    const fetchDataAndSetLoading = async () => {
+        try {
+            const userData = await AsyncStorage.getItem('user');
+            if (userData){
+              const user = JSON.parse(userData)
+              setDisplayName(user.displayName)
+              setAvatar(user.photoURL)
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error("Lỗi khi fetch dữ liệu và set loading:", error);
+        }
+    };
+
+    fetchDataAndSetLoading();
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchDataAndSetLoading();
+    });
+
+    return unsubscribe;
+}, [navigation]);
 
   const handleLogout = async () => {
+    setLoading(true)
     const currentUser = auth().currentUser;
     const providerData = currentUser.providerData;
     providerData.forEach(profile => {
@@ -33,7 +54,9 @@ const ProfileScreen = ({ navigation }) => {
     try {
       await GoogleSignin.signOut();
       await auth().signOut();
-      //navigation.navigate('loginscreen');
+      await AsyncStorage.removeItem('user')
+      setUserLoggedIn(false)
+      setLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -43,9 +66,16 @@ const ProfileScreen = ({ navigation }) => {
     console.log('Logging out from Facebook');
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size={'large'} color={'#00ff00'}></ActivityIndicator>
+      </View>
+    )
+  }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello, {displayName}</Text>
+      <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
       <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
       <View style={styles.buttonContainer}>
         <Button title="Logout" onPress={handleLogout} style={styles.button} />

@@ -10,8 +10,10 @@ import Focus from "../component/Focus";
 import Todo from "../component/Todo";
 import Diary from "../component/Diary";
 
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
+
+import { UserContext } from "../feature/context/UserContext";
 
 const Stack = createStackNavigator()
 
@@ -34,18 +36,15 @@ const MainStackNavigator = () =>{
 
 
 const ProfileStackNavigator = () =>{
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const {userLoggedIn, setUserLoggedIn} = useContext(UserContext);
+
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(user => {
-            if (user) {
-                setUserLoggedIn(true);
-            } else {
-                setUserLoggedIn(false);
-            }
+            setUserLoggedIn(!!user);
         });
 
         return unsubscribe;
-    }, []);
+    }, [setUserLoggedIn]);
     return(
         <Stack.Navigator
             screenOptions={{

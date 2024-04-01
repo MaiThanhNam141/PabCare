@@ -10,7 +10,7 @@ const timeToString = (time) => {
     return date.toISOString().split('T')[0];
 };
 
-const Todo = () => {
+const Diary = () => {
     const [userTodolist, setUserTodolist] = useState([]);
     const [items, setItems] = useState({});
 
@@ -104,4 +104,4 @@ const Todo = () => {
     );
 }
 
-export default Todo;
+export default Diary;

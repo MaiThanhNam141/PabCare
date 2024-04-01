@@ -1,28 +1,43 @@
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, FlatList, Image, KeyboardAvoidingView} from "react-native"
-import React, { useState, useEffect } from "react"
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, FlatList, Image, KeyboardAvoidingView, ToastAndroid, Keyboard} from "react-native"
+import React, { useState, useEffect, useContext, useRef } from "react"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { GoogleGenerativeAI  } from "@google/generative-ai"
 import {API_KEY} from '@env'
-import useAuthCheck from "../feature/firebase/useAuthCheck";
+import { UserContext } from "../feature/context/UserContext"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
-const ChatAI = ({navigation}) => {
+const ChatAI = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
     const [displayName, setDisplayName] = useState('');
     const [avatar, setAvatar] = useState('')
-    const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
+    //const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
 
     const [loadingResponse, setLoadingResponse] = useState(false);
+    const flatListRef = useRef(null);
+    const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const AIImage = 'https://play-lh.googleusercontent.com/DDIUuR0XwdSLnuuyOTn3STuoemW_M1qCSLHs8HE6DJq0NrwUNxYafZ2qG-78Uxj76Q=w240-h480-rw'
     
     useEffect(() => {
-      const { onAuthStateChanged } = useAuthCheck();
-      const unsubscribe = onAuthStateChanged(setDisplayName, setAvatar);
-      return () => unsubscribe();
-  }, []);
+      const fetchDataAndSetLoading = async () => {
+        try {
+          const userData = await AsyncStorage.getItem('user');
+          if (userData){
+            const user = JSON.parse(userData)
+            setDisplayName(user.displayName)
+            setAvatar(user.photoURL)
+          }
+        } catch (error) {
+          setUserLoggedIn(false)
+          ToastAndroid.show("Vui lòng đăng nhập trước khi sử dụng", ToastAndroid.SHORT)
+          console.log("ChatAI Error:", error)
+        }
+    };
+    fetchDataAndSetLoading();
+  }, [setUserLoggedIn]);
     
     const handleGenerateContent = async () => { 
         try {       
@@ -50,6 +65,7 @@ const ChatAI = ({navigation}) => {
     
   
     const sendMessage = async () => {
+      Keyboard.dismiss()
       try {
         setMessages(prevMessages => [
           ...prevMessages,
@@ -65,14 +81,23 @@ const ChatAI = ({navigation}) => {
       } catch (error) {
         console.error("Lỗi khi gửi tin nhắn:", error);
       }
+      
     };
     
-  
+    const scrollToBottom = () => {
+      if (flatListRef.current) {
+        flatListRef.current.scrollToEnd({ animated: true });
+      }
+    };
+
     const isCurrentUser = (sender) => sender === displayName;
     return(
       <KeyboardAvoidingView style={styles.container}>
         <FlatList
+          ref={flatListRef}
           data={messages}
+          showsVerticalScrollIndicator = {false}
+          onContentSizeChange={() => scrollToBottom()}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <View style={[styles.messageContainer, isCurrentUser(item.sender) && styles.currentUserMessage]}>
@@ -98,7 +123,6 @@ const ChatAI = ({navigation}) => {
             onChangeText={setNewMessage}
             placeholder="Type your message here"
           />
-          {/* <Button style={styles.btnSend} title="Send" onPress={sendMessage} /> */}
           <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
               <MaterialIcons name="send" color="#1341e8" size={30}/>
           </TouchableOpacity>
@@ -111,7 +135,6 @@ export default ChatAI
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    minWidth:150
   },
   messageContainer: {
     padding: 10,

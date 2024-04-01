@@ -1,49 +1,43 @@
-import React, {useEffect} from 'react';
-import { View, Text, StyleSheet, Dimensions, ImageBackground, ToastAndroid } from 'react-native';
+import React, {useContext, useState} from 'react';
+import { View, Text, StyleSheet, Dimensions, ImageBackground, ToastAndroid, ActivityIndicator } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
 import {GOOGLE_API_CLIENT} from '@env'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../feature/context/UserContext';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = () => {
   GoogleSignin.configure({
     webClientId: GOOGLE_API_CLIENT,
   });
   const {heightS, widthS} = Dimensions.get("window")
   const imageLink = require('..//..//assets//bg-image.jpg')
-  
 
-  useEffect(()=>{
-    const unsubscribe = auth().onAuthStateChanged(user=>{
-      if(user){
-        navigation.navigate('profilescreen')
-      }
-    })
-    return ()=> unsubscribe
-  },[])
+  const {setUserLoggedIn} = useContext(UserContext)
+
+  const [loading, setLoading] = useState(false)
 
   async function onGoogleButtonPress(){
     try {
-      //await GoogleSignin.signOut();
-      // await auth().signOut();
+      setLoading(true)
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      // Get the users ID token
       const { idToken } = await GoogleSignin.signIn();
-      // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      // Sign-in the user with the credential
       await auth().signInWithCredential(googleCredential);
       ToastAndroid.show("Đăng nhập thành công", ToastAndroid.SHORT)
       const user = auth().currentUser;
-      await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .set({
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        });
-      navigation.navigate('profilescreen')
+      const userDoc = {
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      }
+      await Promise.all([
+        AsyncStorage.setItem('user', JSON.stringify(user)),
+        firestore().collection('users').doc(user.uid).set(userDoc)
+      ]);
+      setUserLoggedIn(true)
+      setLoading(false)
     } catch (error) {
       if (error.code === statusCodes.IN_PROGRESS) {
         ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT)
@@ -57,6 +51,13 @@ const LoginScreen = ({navigation}) => {
     }
   }
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size={'large'} color={'#24A6D9'}></ActivityIndicator>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.backgroundContainer}>     

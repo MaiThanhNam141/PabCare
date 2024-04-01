@@ -1,8 +1,7 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import {SliderBox} from 'react-native-image-slider-box'
 
-export default class RenderSliderImage extends PureComponent {
-  render() {
+export default RenderSliderImage = props => {
     return (
         <SliderBox
         dotColor="black"
@@ -12,9 +11,8 @@ export default class RenderSliderImage extends PureComponent {
         autoplay={true}
         autoplayInterval={7000}
         circleLoop={true}
-        images={this.props.images}
+        images={props.images}
         borderRadius={20}
       />
     )
-  }
 }

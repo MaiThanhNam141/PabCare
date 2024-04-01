@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Congrat from './Congrat';
 import {
@@ -38,64 +38,55 @@ const timerParts = [
   { image: require('../../assets/egg.png'), label: 'Part 5' },
 ];
 
-export default class Focus extends Component {
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      remainingSeconds: 5,
-      isRunning: false,
-      selectHour: "0",
-      selectMinute: "30",
-      selectSecond: "0",
-      modalVisible: false
+const Focus = () => {
+  const [remainingSeconds, setRemainingSeconds] = useState(5);
+  const [isRunning, setIsRunning] = useState(false);
+  const [selectHour, setSelectHour] = useState("0");
+  const [selectMinute, setSelectMinute] = useState("30");
+  const [selectSecond, setSelectSecond] = useState("0");
+  const [modalVisible, setModalVisible] = useState(false);
+
+  let interval = null;
+
+  useEffect(() => {
+    if (remainingSeconds === 0) {
+      stop();
+      setModalVisible(true);
+    }
+  }, [remainingSeconds]);
+
+  useEffect(() => {
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
     };
-    this.interval = null;
-  }
+  }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.remainingSeconds === 0 && prevState.remainingSeconds !== 0) {
-      this.stop();
-      this.setState({ modalVisible: true });
-    }
-  }
+  const start = () => {
+    setRemainingSeconds(parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 30));
+    setIsRunning(true);
 
-  componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-  }
-
-  start = () => {
-    this.setState((state) => ({
-      remainingSeconds: parseInt(state.selectHour, 10) * 3600 + parseInt(state.selectMinute, 10) * 60 + parseInt(state.selectSecond, 30),
-      isRunning: true
-    }));
-
-    this.interval = setInterval(() => {
-      this.setState((state) => ({
-        remainingSeconds: state.remainingSeconds - 1
-      }));
+    interval = setInterval(() => {
+      setRemainingSeconds(prevSeconds => prevSeconds - 1);
     }, 1000);
   };
 
-  stop = () => {
-    if (this.interval)
-      clearInterval(this.interval);
-    this.interval = null;
-    this.setState({
-      remainingSeconds: 5,
-      isRunning: false
-    });
+  const stop = () => {
+    if (interval)
+      clearInterval(interval);
+    interval = null;
+    setRemainingSeconds(5);
+    setIsRunning(false);
   };
 
-  renderPickers = () => (
+  const renderPickers = () => (
     <View style={styles.pickerContainer}>
       <Picker
         style={styles.picker}
-        selectedValue={this.state.selectHour}
+        selectedValue={selectHour}
         onValueChange={(itemValue) => {
-          this.setState({ selectHour: itemValue });
+          setSelectHour(itemValue);
         }}
         mode="dropdown"
       >
@@ -106,9 +97,9 @@ export default class Focus extends Component {
       <Text style={styles.pickerItemSemiColon}>:</Text>
       <Picker
         style={styles.picker}
-        selectedValue={this.state.selectMinute}
+        selectedValue={selectMinute}
         onValueChange={(itemValue) => {
-          this.setState({ selectMinute: itemValue });
+          setSelectMinute(itemValue);
         }}
         mode="dropdown">
         {
@@ -118,19 +109,17 @@ export default class Focus extends Component {
         }
       </Picker>
     </View>
-  )
+  );
 
-  getCurrentTimerPart = (totalTime, currentTime) => {
+  const getCurrentTimerPart = (totalTime, currentTime) => {
     const partDuration = totalTime / timerParts.length;
     return Math.floor(currentTime / partDuration);
   };
 
-  renderTimer = () => {
-    const { hours, minutes, seconds } = getRemaining(
-      this.state.remainingSeconds
-    );
-    const totalTime = parseInt(this.state.selectHour, 10) * 3600 + parseInt(this.state.selectMinute, 10) * 60 + parseInt(this.state.selectSecond, 10);
-    const currentPart = Math.min(timerParts.length - 1, this.getCurrentTimerPart(totalTime, this.state.remainingSeconds))
+  const renderTimer = () => {
+    const { hours, minutes, seconds } = getRemaining(remainingSeconds);
+    const totalTime = parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10);
+    const currentPart = Math.min(timerParts.length - 1, getCurrentTimerPart(totalTime, remainingSeconds))
 
     return (
       <View style={styles.timerContainer}>
@@ -142,35 +131,33 @@ export default class Focus extends Component {
     );
   };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <StatusBar barStyle={"light-content"} />
-        {
-          this.state.isRunning ? (
-            this.renderTimer()
-          ) : (
-            this.renderPickers()
-          )
-        }
-        {
-          this.state.isRunning ? (
-            <TouchableOpacity onPress={this.stop} style={[styles.button, styles.buttonStop]}>
-              <Text style={[styles.buttonTextStop, styles.buttonText]}>Stop</Text>
-            </TouchableOpacity>
-          ) : (
-              <TouchableOpacity onPress={this.start} style={styles.button}>
-                <Text style={styles.buttonText}>Start</Text>
-              </TouchableOpacity>
-            )
-        }
-        <View>
-          <Congrat modalVisible={this.state.modalVisible} setModalVisible={(value) => this.setState({ modalVisible: value })} />
-        </View>
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle={"light-content"} />
+      {
+        isRunning ? (
+          renderTimer()
+        ) : (
+          renderPickers()
+        )
+      }
+      {
+        isRunning ? (
+          <TouchableOpacity onPress={stop} style={[styles.button, styles.buttonStop]}>
+            <Text style={[styles.buttonTextStop, styles.buttonText]}>Stop</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={start} style={styles.button}>
+            <Text style={styles.buttonText}>Start</Text>
+          </TouchableOpacity>
+        )
+      }
+      <View>
+        <Congrat modalVisible={modalVisible} setModalVisible={(value) => setModalVisible(value)} />
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -187,7 +174,7 @@ const styles = StyleSheet.create({
     borderRadius: screen.width / 2,
     alignItems: "center",
     justifyContent: "center",
-    margin:50,
+    margin: 50,
   },
   buttonStop: {
     borderColor: "#FF851B"
@@ -238,13 +225,13 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop:50
+    marginTop: 50
   },
   timerContainer: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop:50
+    marginTop: 50
   },
 
   timerImage: {
@@ -252,3 +239,5 @@ const styles = StyleSheet.create({
     height: 120,
   },
 });
+
+export default Focus;
