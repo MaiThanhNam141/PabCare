@@ -105,9 +105,4 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
 })
-// 1. Giới thiệu
-// 2. Lý thuyết về công nghệ sử dụng
-// 3. Phân tích thiết kế hệ thống
-// 4. {Tên đề tài} : Xây dựng ứng dụng di động React Native cho công ty Pabcare
-// 5. Kết luận
-// 6. Tài liệu tham khảo: Đừng có bỏ link web, ưu tiên sử dụng sách tên Tiếng Anh
+
