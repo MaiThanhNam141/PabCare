@@ -9,7 +9,6 @@ const HomeScreen = ({navigation}) => {
     const imageLink = require('..//..//assets//Icons//Logo.png')
     const imageBackground = require('..//..//assets//bg-image.jpg')
     const AIImage = 'https://play-lh.googleusercontent.com/DDIUuR0XwdSLnuuyOTn3STuoemW_M1qCSLHs8HE6DJq0NrwUNxYafZ2qG-78Uxj76Q=w240-h480-rw'
-    
     const [greetingHeight, setGreetingHeight] = useState(200);
     const [displayName, setDisplayName] = useState('');
     const [modalVisible, setModalVisible] = useState(false);

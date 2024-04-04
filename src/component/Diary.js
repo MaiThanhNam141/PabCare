@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
-import firestore from '@react-native-firebase/firestore'
-import auth from '@react-native-firebase/auth'
+import { Text, View, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { Agenda } from 'react-native-calendars';
 import { Card, Avatar } from 'react-native-paper';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import useFirestoreDiary from "../feature/firebase/useFirestoreDiary";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import DiaryModal from "./DiaryModal";
 
 const timeToString = (time) => {
     const date = new Date(time);
@@ -11,8 +13,34 @@ const timeToString = (time) => {
 };
 
 const Diary = () => {
-    const [userTodolist, setUserTodolist] = useState([]);
+    const [userDiary, setUserDiary] = useState([]);
     const [items, setItems] = useState({});
+    const [modalVisible, setModalVisible] = useState(false)
+
+    const {getDiary, addDiary, updateDiary} = useFirestoreDiary()
+
+    useEffect(() => {
+        const initializeFirebase = async () => {
+          try {
+            const userData = await AsyncStorage.getItem('user');
+            if (userData) {
+              const user = JSON.parse(userData)
+              setUser(user.displayName)
+              getDiaryFireStore();  
+            }
+          } catch (error) {
+            console.error("Error initializing Firestore in Diary:", error);
+          }
+        };
+        
+        const loadItem = () => {
+            const today = new Date();
+            loadItems({ timestamp: today.getTime() });
+        }
+
+        initializeFirebase();
+        loadItem()
+      }, []);
 
     const loadItems = async (day) => {
         const newItems = { ...items };
@@ -25,7 +53,7 @@ const Diary = () => {
                 }
             }
             
-            userTodolist.forEach(todoItem => {
+            userDiary.forEach(todoItem => {
                 const time = new Date(todoItem.timestamp);
                 const strTime = timeToString(time);
                 if (!newItems[strTime]) {
@@ -44,32 +72,19 @@ const Diary = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchUserTodolist = async () => {
-            try {
-                const currentUser = auth().currentUser;
-                if (currentUser) {
-                    const userSnapshot = await firestore()
-                        .collection('users')
-                        .doc(currentUser.uid)
-                        .get();
-                    if (userSnapshot.exists) {
-                        const userData = userSnapshot.data();
-                        setUserTodolist(userData.todolist || []);
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user todolist: ', error);
-            }
-        };
 
-        fetchUserTodolist();
-    }, []);
+    const getDiaryFireStore = async () => {
+        try {
+            const diary = await getDiary()
+            setUserDiary(diary)
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
-    useEffect(() => {
-        const today = new Date();
-        loadItems({ timestamp: today.getTime() });
-    }, []);
+    const handleAddModal = () => {
+
+    }
 
     const renderItem = (item) => {
         return (
@@ -94,14 +109,33 @@ const Diary = () => {
     return (
         <View style={{ flex: 1 }}>
             <Agenda
-                items={userTodolist.length > 0 ? items : { "Rảnh rỗi": [] }}
+                items={userDiary.length > 0 ? items : { "Rảnh rỗi": [] }}
                 loadItemsForMonth={loadItems}
                 selected={timeToString(new Date())}
                 renderItem={renderItem}
             />
-            
+            <View style={{ marginVertical: 48 }}>
+                <Modal animationType="slide" visible={modalVisible} onRequestClose={()=> setModalVisible(!modalVisible)}>
+                    <DiaryModal closeModal={()=>setModalVisible(!modalVisible)} addDiary={handleAddModal}/>
+                </Modal>
+                <TouchableOpacity style={styles.add} onPress={()=>setModalVisible(!modalVisible)}>
+                    <MaterialIcons name="add" size={16} color={'#24A6D9'} />
+                </TouchableOpacity>
+                <Text style={styles.add}>Add List</Text>
+            </View>
         </View>
     );
 }
 
 export default Diary;
+
+const styles = StyleSheet.create({
+    add:{
+        borderWidth: 2,
+        borderColor: '#A7CBD9',
+        borderRadius: 4,
+        padding: 16,
+        alignItems: "center",
+        justifyContent: "center"
+    }
+})

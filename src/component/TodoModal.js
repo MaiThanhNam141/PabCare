@@ -1,13 +1,25 @@
 import React, { useState} from 'react';
-import { Text, StyleSheet, View, SafeAreaView, TouchableOpacity, FlatList, KeyboardAvoidingView, TextInput, Keyboard, ToastAndroid } from 'react-native';
+import { 
+    Text, 
+    StyleSheet, 
+    View, 
+    SafeAreaView, 
+    TouchableOpacity, 
+    FlatList, 
+    KeyboardAvoidingView, 
+    TextInput, 
+    Keyboard, 
+    ToastAndroid, } from 'react-native';
+
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';;
+import TodoModalEdit from './TodoModalEdit';
 
 let todoId = 0;
 
 const TodoModal = (props) => {
     const [newTodo, setNewTodo] = useState("");
-    const [editable, setEditable] = useState(false)
-    const [editText, setEditText] = useState("")
+    const [index, setIndex] = useState(null)
+    const [modalVisible, setModalVisible] = useState(false);
 
     const list = props.list;
     const taskCount = list.todos ? list.todos.length : 0;
@@ -40,17 +52,19 @@ const TodoModal = (props) => {
     };
 
     const handleEditTodo = index => {
-        setEditable(true)
-        EditTodo(index)
+        setIndex(index)
+        setModalVisible(true)
     }
-
-    const EditTodo = index => {
-        list.todos[index] = editText
-        props.updateList(list)
-        setEditText("")
-        setEditable(false)
+    const handleEditSubmit = (text) => {
+        setModalVisible(false)
+        console.log("Received editText from TodoModalEdit:", text);
+        const updateList = {...list}
+        console.log(updateList)
+        updateList.todos[index].title = text
+        props.updateList(updateList);
+        setIndex("")
+        
     }
-
     const deleteTodo = index => {
         list.todos.splice(index, 1);
         props.updateList(list);
@@ -67,17 +81,14 @@ const TodoModal = (props) => {
                         style={{ width: 32 }}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onLongPress={()=>handleEditTodo(index)}>
-                    <TextInput
+                <TouchableOpacity onLongPress={()=>handleEditTodo(index)} style={{flex: 5}}>
+                    <Text
                         style={[
                             styles.todo,
                             { color: item.completed ? "#999" : "#000", textDecorationLine: item.completed ? 'line-through' : 'none' }
                         ]}
-                        editable={editable}
-                        onChangeText={text => setEditText(text)}
-                        value={item.title}
-                    >
-                    </TextInput>
+                    >{item.title}
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => deleteTodo(index)}>
                     <View style={styles.deleteButton}>
@@ -122,6 +133,11 @@ const TodoModal = (props) => {
                         <MaterialIcons name='add' size={16}/>
                     </TouchableOpacity>
                 </View>
+                <TodoModalEdit 
+                    modalVisible={modalVisible} 
+                    setModalVisible={setModalVisible}
+                    onSubmitQuest={()=>handleEditSubmit}
+                    />
             </SafeAreaView>
         </KeyboardAvoidingView>
     );
@@ -179,6 +195,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         paddingLeft: 32,
+        flex: 1
     },
     todo: {
         color: "#000",
@@ -193,7 +210,7 @@ const styles = StyleSheet.create({
         width: 27,
         height: 27,
         borderRadius: 100
-    }
+    },
 });
 
 export default TodoModal;

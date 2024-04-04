@@ -96,3 +96,5 @@ const MiniAppStackNavigator = () => {
 }
 
 export  {MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator}
+
+

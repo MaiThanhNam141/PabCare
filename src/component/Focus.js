@@ -43,7 +43,7 @@ const Focus = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [selectHour, setSelectHour] = useState("0");
   const [selectMinute, setSelectMinute] = useState("30");
-  const [selectSecond, setSelectSecond] = useState("0");
+  const [selectSecond] = useState("0");
   const [modalVisible, setModalVisible] = useState(false);
 
   let interval = null;
@@ -64,7 +64,7 @@ const Focus = () => {
   }, []);
 
   const start = () => {
-    setRemainingSeconds(parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 30));
+    setRemainingSeconds(parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10));
     setIsRunning(true);
 
     interval = setInterval(() => {
@@ -76,7 +76,7 @@ const Focus = () => {
     if (interval)
       clearInterval(interval);
     interval = null;
-    setRemainingSeconds(5);
+    setRemainingSeconds(0);
     setIsRunning(false);
   };
 
@@ -117,10 +117,11 @@ const Focus = () => {
   };
 
   const renderTimer = () => {
+  
     const { hours, minutes, seconds } = getRemaining(remainingSeconds);
     const totalTime = parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10);
-    const currentPart = Math.min(timerParts.length - 1, getCurrentTimerPart(totalTime, remainingSeconds))
-
+    const currentPart = Math.min(timerParts.length - 1, getCurrentTimerPart(totalTime, remainingSeconds));
+  
     return (
       <View style={styles.timerContainer}>
         {timerParts[currentPart] && (
@@ -130,6 +131,7 @@ const Focus = () => {
       </View>
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -225,13 +227,13 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 50
+    marginTop: screen.height/3.4
   },
   timerContainer: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50
+    marginTop: screen.height/5.9
   },
 
   timerImage: {

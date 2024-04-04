@@ -11,7 +11,7 @@ const ProfileScreen = ({navigation}) => {
   const [avatar, setAvatar] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
+  const {setUserLoggedIn} = useContext(UserContext)
 
   useEffect(() => {
     const fetchDataAndSetLoading = async () => {
@@ -33,7 +33,6 @@ const ProfileScreen = ({navigation}) => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchDataAndSetLoading();
     });
-
     return unsubscribe;
 }, [navigation]);
 
