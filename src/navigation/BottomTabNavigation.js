@@ -33,7 +33,7 @@ const BottomTabNavigation = () => {
       <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
         options={{
             tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="chat-bubble-outline" size={size} color={color} />
+              <MaterialIcons name="quiz" size={size} color={color} />
             ),
           }}/>
       <Tab.Screen name='MiniApp' component={MiniAppStackNavigator}
