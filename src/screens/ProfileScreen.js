@@ -14,9 +14,15 @@ const ProfileScreen = ({navigation}) => {
   const [displayName, setDisplayName] = useState('');
   const [avatar, setAvatar] = useState('')
   const [email, setEmail] = useState('')
+
   const [realName, setRealName] = useState('');
   const [phone, setPhone] = useState(0)
   const [address, setAddress] = useState('')
+
+  const [realNameSub, setRealNameSub] = useState('');
+  const [phoneSub, setPhoneSub] = useState(0)
+  const [addressSub, setAddressSub] = useState('')
+
   const [loading, setLoading] = useState(true)
 
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
@@ -38,15 +44,34 @@ const ProfileScreen = ({navigation}) => {
             console.error("Lỗi khi fetch dữ liệu và set loading:", error);
         }
     };
-
+    
     fetchDataAndSetLoading();
-
     const unsubscribe = navigation.addListener('focus', () => {
       fetchDataAndSetLoading();
     });
     return unsubscribe;
   }, [navigation]);
 
+  useEffect(()=>{
+    const getData = async() => {
+      try {
+        const user = auth().currentUser
+        if(user){
+          const userDocRef = firestore().collection('users').doc(user.uid);
+          const userDoc = await userDocRef.get();
+          if (userDoc) {
+            const userData = userDoc.data();
+            setRealName(userData.fullName);
+            setPhone(userData.phone);
+            setAddress(userData.address);
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getData()
+  }, [isUpdateModalVisible])
 
   const handleLogout = async () => {
     setLoading(true)
@@ -92,14 +117,18 @@ const ProfileScreen = ({navigation}) => {
     try {
       const user = auth().currentUser;
       const userDoc = {
-        phone: phone,
-        fullName: realName,
-        address: address,
+        phone: phoneSub,
+        fullName: realNameSub,
+        address: addressSub,
       };
+
       await firestore().collection('users').doc(user.uid).update(userDoc)
+      setAddressSub('')
+      setRealNameSub('')
+      setPhoneSub('')
       setIsUpdateModalVisible(false)
     } catch (error) {
-      console.log(error)
+      console.log("updateInfo Error: ",error)
     }
   }
   return (
@@ -130,12 +159,26 @@ const ProfileScreen = ({navigation}) => {
           <Image source={{uri: avatar}} style={[styles.image, {width: 100, height: 100}]} />
           <KeyboardAvoidingView style={{marginTop: 5}}>
             <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
-            <TextInput style={styles.textInput} placeholder='Họ và tên' onChangeText={(text)=>setRealName(text)}></TextInput>
-            <TextInput style={styles.textInput} placeholder='Số điện thoại' inputMode='numeric' onChangeText={(text)=>setPhone(text)}></TextInput>
-            <TextInput style={styles.textInput} placeholder='Địa chỉ' inputMode='text' multiline={true} onChangeText={(text)=>setAddress(text)}></TextInput>
+            <TextInput
+              style={styles.textInput}
+              placeholder='Họ và tên'
+              onChangeText={(text) => setRealNameSub(text)} 
+            >{realName?realName:''}</TextInput>
+            <TextInput
+              style={styles.textInput}
+              placeholder='Số điện thoại'
+              inputMode='numeric'
+              onChangeText={(text) => setPhoneSub(text)}
+            >{phone?phone:''}</TextInput>
+            <TextInput
+              style={styles.textInput}
+              placeholder='Địa chỉ'
+              onChangeText={(text) => setAddressSub(text)}
+            >{address?address:''}</TextInput>
+
           </KeyboardAvoidingView>
-          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#4df0f0'}]} onPress={()=>updateInfo()}>
-            <Text style={[styles.logoutText]}>Submit</Text>
+          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#4de3d1'}]} onPress={()=>updateInfo()}>
+            <Text style={styles.logoutText}>Cập nhật</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.closeButton}
@@ -187,7 +230,7 @@ const styles = StyleSheet.create({
   logoutText:{
     fontWeight: 'bold',
     fontSize: 20,
-    color: '#f0f2f2',
+    color: '#e8e3e3',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
