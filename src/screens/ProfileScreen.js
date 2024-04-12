@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -24,54 +24,44 @@ const ProfileScreen = ({navigation}) => {
   const [addressSub, setAddressSub] = useState('')
 
   const [loading, setLoading] = useState(true)
-
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
   const {setUserLoggedIn} = useContext(UserContext)
 
   useEffect(() => {
-    const fetchDataAndSetLoading = async () => {
-        try {
-            const userData = await AsyncStorage.getItem('user');
-            if (userData){
-              const user = JSON.parse(userData)
-              setDisplayName(user.displayName)
-              setAvatar(user.photoURL)
-              setEmail(user.email)
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error("Lỗi khi fetch dữ liệu và set loading:", error);
-        }
-    };
-    
-    fetchDataAndSetLoading();
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchDataAndSetLoading();
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  useEffect(()=>{
-    const getData = async() => {
+    const fetchData = async () => {
       try {
-        const user = auth().currentUser
-        if(user){
-          const userDocRef = firestore().collection('users').doc(user.uid);
-          const userDoc = await userDocRef.get();
-          if (userDoc) {
-            const userData = userDoc.data();
-            setRealName(userData.fullName);
-            setPhone(userData.phone);
-            setAddress(userData.address);
+        const user = auth().currentUser       
+        const firestoreDataPromise = await firestore().collection('users').doc(user.uid).get();
+        if (firestoreDataPromise.exists) {
+          const userDataFromFirestore = firestoreDataPromise.data();
+          setDisplayName(user.displayName || '');
+          setAvatar(user.photoURL || '');
+          setEmail(user.email || '');
+          setRealName(userDataFromFirestore.fullName || '');
+          setPhone(userDataFromFirestore.phone || '');
+          setAddress(userDataFromFirestore.address || '');
+          setLoading(false)
+          return;
+        } else {
+          const userData = await AsyncStorage.getItem('user');
+          const user = JSON.parse(userData) || {};
+          if(user){
+            setDisplayName(user.displayName || '');
+            setAvatar(user.photoURL || '');
+            setEmail(user.email || '');
           }
         }
+
+        setLoading(false);
       } catch (error) {
-        console.log(error)
+        console.error("Error fetching data and setting loading state:", error);
+        setLoading(false);
       }
-    }
-    getData()
-  }, [isUpdateModalVisible])
+    };
+
+    fetchData();
+  }, [navigation]);
 
   const handleLogout = async () => {
     setLoading(true)
@@ -106,31 +96,48 @@ const ProfileScreen = ({navigation}) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        {/* <ActivityIndicator size={'large'} color={'#00ff00'}></ActivityIndicator> */}
         <Image source={logo} style={styles.logo} resizeMode="contain" />
       </View>
     )
   }
 
 
-  const updateInfo = async() => {
+  const updateInfo = async () => {
     try {
       const user = auth().currentUser;
-      const userDoc = {
-        phone: phoneSub,
-        fullName: realNameSub,
-        address: addressSub,
-      };
+      const userDocRef = firestore().collection('users').doc(user.uid);
+      const userDoc = await userDocRef.get();
+  
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+  
+        const updatedUserData = {
+          ...userData,
+          phone: phoneSub !== '' ? phoneSub : userData.phone, 
+          fullName: realNameSub !== '' ? realNameSub : userData.fullName, 
+          address: addressSub !== '' ? addressSub : userData.address,
+        };
+  
+        await userDocRef.update(updatedUserData);
+        
+        setAddress(addressSub)
+        setRealName(realNameSub)
+        setPhone(phoneSub)
 
-      await firestore().collection('users').doc(user.uid).update(userDoc)
-      setAddressSub('')
-      setRealNameSub('')
-      setPhoneSub('')
-      setIsUpdateModalVisible(false)
+        setAddressSub('');
+        setRealNameSub('');
+        setPhoneSub('');
+  
+        setIsUpdateModalVisible(false);
+      }
     } catch (error) {
-      console.log("updateInfo Error: ",error)
+      console.log("updateInfo Error: ", error);
+      ToastAndroid.show("Hãy nhập đầy đủ các thông tin", ToastAndroid.SHORT)
     }
-  }
+  };
+  
+
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -156,28 +163,28 @@ const ProfileScreen = ({navigation}) => {
       >
         <View style={styles.subModalContainer}>
           <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
-          <Image source={{uri: avatar}} style={[styles.image, {width: 100, height: 100}]} />
+          <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.image, {width: 100, height: 100}]} />
           <KeyboardAvoidingView style={{marginTop: 5}}>
             <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {backgroundColor:"#fff"}]}
               placeholder='Họ và tên'
               onChangeText={(text) => setRealNameSub(text)} 
             >{realName?realName:''}</TextInput>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {backgroundColor:"#fff"}]}
               placeholder='Số điện thoại'
               inputMode='numeric'
               onChangeText={(text) => setPhoneSub(text)}
             >{phone?phone:''}</TextInput>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {backgroundColor:"#fff"}]}
               placeholder='Địa chỉ'
               onChangeText={(text) => setAddressSub(text)}
             >{address?address:''}</TextInput>
 
           </KeyboardAvoidingView>
-          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#4de3d1'}]} onPress={()=>updateInfo()}>
+          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b'}]} onPress={()=>updateInfo()}>
             <Text style={styles.logoutText}>Cập nhật</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
   logoutText:{
     fontWeight: 'bold',
     fontSize: 20,
-    color: '#e8e3e3',
+    color: '#ffffff',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

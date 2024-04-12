@@ -3,7 +3,6 @@ import React, {useEffect, useState} from "react"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChatAI from "../component/ChatAI";
-import NotificationsModal from "../component/NotificationModal";
 
 const HomeScreen = ({navigation}) => {
     const imageLink = require('..//..//assets//Icons//Logo.png')
@@ -50,18 +49,8 @@ const HomeScreen = ({navigation}) => {
          showsHorizontalScrollIndicator ={false}>
             <ImageBackground source={imageBackground} style={styles.imageBackground}/>
             <View style={styles.secondContainer}>
-                <Pressable onPress={()=>setModalVisible(true)}>
+                <Pressable onPress={()=>setModalVisible(true)} style={styles.notifiBtn}>
                     <MaterialIcons name="notifications" size={30} style={styles.notifications}/>
-                    {/* <Modal
-                      animationType="slide"
-                    //   transparent={true}
-                      visible={modalVisible}
-                      onRequestClose={() => setVisibleModal(false)}
-                    >
-                        <View style={styles.modalContainer}>
-                        <NotificationsModal closeModal={() => setVisibleModal(false)} />
-                        </View>
-                    </Modal> */}
                 </Pressable>
                 <View style={styles.titleContainer}>
                     <Image style={styles.logo} source={imageLink}></Image>
@@ -86,6 +75,16 @@ const HomeScreen = ({navigation}) => {
                     </View>
                 </View>
             </View>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setVisibleModal(false)}
+            >
+                <View style={styles.modalContainer}>
+                    
+                </View>
+            </Modal>
         </ScrollView>
     )
 }
@@ -110,6 +109,7 @@ const styles = StyleSheet.create({
         margin:15
     },
     titleContainer:{
+        marginTop: 20,
         marginBottom: 70,
         alignItems:"center",
         justifyContent: 'center',
@@ -182,5 +182,11 @@ const styles = StyleSheet.create({
         maxHeight:'100%',
         padding: 8,
         paddingVertical: 5
-    }
+    },
+    notifiBtn:{
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        padding: 10,
+}
 })

@@ -24,29 +24,47 @@ const LoginScreen = () => {
       const { idToken } = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
-      ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
+  
       const user = auth().currentUser;
-      const userDoc = {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-      };
-      await Promise.all([
-        AsyncStorage.setItem('user', JSON.stringify(user)),
-        firestore().collection('users').doc(user.uid).set(userDoc),
-      ]);
-      setUserLoggedIn(true);
-      setLoading(false);
+      if (user) { 
+        const userRef = firestore().collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+  
+        if (!userDoc.exists) {
+          const userDocData = {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          };
+  
+          await Promise.all([
+            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            AsyncStorage.setItem('user', JSON.stringify(user)),
+            userRef.set(userDocData),
+          ]);
+        } else {
+          await Promise.all([
+            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            AsyncStorage.setItem('user', JSON.stringify(user)),
+          ]);
+        }
+        setUserLoggedIn(true);
+        setLoading(false);
+        ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
+      } else {
+        setLoading(false);
+        ToastAndroid.show('Không thể lấy thông tin người dùng', ToastAndroid.SHORT);
+      }
     } catch (error) {
       if (error.code === statusCodes.IN_PROGRESS) {
         ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT);
-        console.log(statusCodes.IN_PROGRESS);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         ToastAndroid.show('Điện thoại không có Google PlayServices', ToastAndroid.SHORT);
-        console.log(statusCodes.PLAY_SERVICES_NOT_AVAILABLE);
       } else {
-        console.log(error.message);
+        console.log("Login error: ", error.message);
+        ToastAndroid.show('Đăng nhập không thành công', ToastAndroid.SHORT);
       }
+      setLoading(false);
     }
   }
 

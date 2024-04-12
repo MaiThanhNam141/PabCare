@@ -9,6 +9,7 @@ import ChatAI from "../component/ChatAI";
 import Focus from "../component/Focus";
 import Todo from "../component/Todo";
 import Diary from "../component/Diary";
+import Quizz from "../component/Quiz";
 
 import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
@@ -73,6 +74,7 @@ const QuizzStackNavigator = () => {
                 headerShown:false
             }}>
             <Stack.Screen name="quizzscreen" component={QuizzScreen} />
+            <Stack.Screen name="quiz" component={Quizz} />
         </Stack.Navigator>
     )
 }
