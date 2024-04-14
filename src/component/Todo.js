@@ -11,8 +11,8 @@ const Todo = () => {
   const [lists, setLists] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const { addList, updateList, getLists} = useFirestoreList()
+  const [reload, setReload] = useState(false)
+  const { addList, updateList, getLists, deleteList } = useFirestoreList()
 
   useEffect(() => {
     const initializeFirebase = async () => {
@@ -21,7 +21,7 @@ const Todo = () => {
         if (userData) {
           const user = JSON.parse(userData)
           setUser(user.displayName)
-          getListsFromFirestore();  
+          // getListsFromFirestore();  
         }
       } catch (error) {
         console.error("Error initializing Firestore in Todo:", error);
@@ -30,6 +30,10 @@ const Todo = () => {
 
     initializeFirebase();
   }, []);
+
+  useEffect(()=>{
+    getListsFromFirestore()
+  }, [reload])
 
   const getListsFromFirestore = async () => {
     try {
@@ -47,14 +51,14 @@ const Todo = () => {
 
   const renderList = ({ item }) => {
     return (
-      <TodoList list={item} updateList={updateListFireStore} />
+      <TodoList list={item} updateList={updateListFireStore} deleteList={handleDeleteList} />
     );
   };
 
   const addListFireStore = async (list) => {
     try {
       setLists([...lists, { ...list, id: lists.length + 1, todos: [] }]);
-      
+      setReload(!reload)
       await addList({
         name: list.name,
         color: list.color,
@@ -65,9 +69,19 @@ const Todo = () => {
       ToastAndroid.show("Thêm todo thất bại", ToastAndroid.SHORT)
     }
   };
+  const handleDeleteList = async (listId) => {
+    try {
+      setReload(!reload)
+      setLists(prevLists => prevLists.filter(item => item.id !== listId));
+      await deleteList(listId);
+    } catch (error) {
+      console.error("Error deleting list Todo.js:", error);
+    }
+  };
 
   const updateListFireStore = async (list) => {
     try {
+      // setReload(!reload)
       setLists(lists.map(item => (item.id === list.id ? list : item)));
       await updateList(list);
     } catch (error) {
@@ -105,7 +119,7 @@ const Todo = () => {
         </TouchableOpacity>
         <Text style={styles.add}>Add List</Text>
       </View>
-      <View style={{ height: 300, paddingLeft: 32 }}>
+      <View style={{ height: 300, paddingLeft: 16 }}>
         <FlatList
           data={lists}
           keyExtractor={item => item.id.toString()}

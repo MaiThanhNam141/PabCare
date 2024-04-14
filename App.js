@@ -29,7 +29,7 @@ export default App = () => {
       setTimeout(() => {
         fadeOutAndMoveUp(); 
         setTimeout(() => setLoading(false), 2500);
-      }, 550);
+      }, 450);
       const checkFirstTime = await AsyncStorage.getItem('isFirstTime')
       setFirstTime(!checkFirstTime)
     }

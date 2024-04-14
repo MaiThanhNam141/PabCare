@@ -11,25 +11,33 @@ const BottomTabNavigation = () => {
     <Tab.Navigator
       initialRouteName='HomeScreen'
       screenOptions={{
-      headerShown:false,
-      tabBarShowLabel: false,
-      tabBarActiveTintColor: "black",
-      tabBarInactiveTintColor: "gray",
-      tabBarHideOnKeyboard: true,
-      tabBarStyle:{
-        borderTopLeftRadius:10,
-        borderTopRightRadius:10,
-        overflow:"hidden",
-        backgroundColor:"#fff",
-        height:60,
-      },
-    }}>
+        headerShown:false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: "black",
+        tabBarInactiveTintColor: "gray",
+        tabBarHideOnKeyboard: true,
+        tabBarStyle:{
+          borderTopLeftRadius:10,
+          borderTopRightRadius:10,
+          overflow:"hidden",
+          backgroundColor:"#fff",
+          height:60,
+        },
+
+      }}>
       <Tab.Screen name='HomeScreen' component={MainStackNavigator}
-        options={{
+        options={({route})=>({
           tabBarIcon: ({ size, color}) => (
             <MaterialIcons name="home" size={size} color={color} />
           ),
-        }} />
+          tabBarStyle: ((route) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? ""
+            if (routeName === 'chatai'){
+              return { display: "none"}
+            }
+            return
+          })(route)
+        })} />
       <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
         options={{
             tabBarIcon: ({ size, color }) => (
@@ -44,7 +52,7 @@ const BottomTabNavigation = () => {
             tabBarStyle: ((route) => {
               const routeName = getFocusedRouteNameFromRoute(route) ?? ""
               if (routeName === 'focus' || routeName === 'todo' || routeName === 'diary') {
-                return { display: "none" }
+                return { display: "none"}
               }
               return
             })(route)

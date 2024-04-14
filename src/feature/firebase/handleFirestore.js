@@ -15,6 +15,14 @@ const getUserDocumentRef = () => {
     return null;
 }
 
+const getDocumentRef = async(collectionName) => {
+    try {
+        return await firestore().collection(collectionName).get()
+    } catch (error) {
+        console.error("handleFirestore:" , error)
+    }
+}
+
 // Lấy thông tin từ Firestore của người dùng hiện tại
 const getUserInfo = async () => {
     const userRef = getUserDocumentRef();
@@ -62,4 +70,4 @@ const setUserInfo = async (userData) => {
     return false; // Trả về false nếu không thể thiết lập
 }
 
-export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo };
+export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef };

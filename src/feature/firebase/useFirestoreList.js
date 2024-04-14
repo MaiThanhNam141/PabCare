@@ -25,7 +25,7 @@ const useFirestoreList = () => {
         console.error("Firestore reference is not initialized.");
       }
     } catch (error) {
-      throw new Error(error);
+     console.error("firebase nè:",error)
     }
   };
 
@@ -43,7 +43,22 @@ const useFirestoreList = () => {
     }
   };
 
-  return { addList, updateList, getLists };
+  const deleteList = async(listId) => {
+    try {
+      if (!ref) {
+        console.error("Firestore reference is not initialized.");
+        return;
+      }
+      
+      await ref.doc(listId).delete();
+      console.log(`Deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting list useFirestoreList:", error);
+      throw new Error(error);
+    }
+  }
+
+  return { addList, updateList, getLists, deleteList };
 };
 
 export default useFirestoreList;

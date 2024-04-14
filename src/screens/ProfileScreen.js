@@ -252,19 +252,7 @@ const styles = StyleSheet.create({
     right: 10,
     padding: 10,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxHeight: '80%',
-  },
+
   closeButton: {
     position: 'absolute',
     top: 20,

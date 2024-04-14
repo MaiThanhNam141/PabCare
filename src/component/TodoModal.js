@@ -11,15 +11,12 @@ import {
     Keyboard, 
     ToastAndroid, } from 'react-native';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';;
-import TodoModalEdit from './TodoModalEdit';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 let todoId = 0;
 
 const TodoModal = (props) => {
     const [newTodo, setNewTodo] = useState("");
-    const [index, setIndex] = useState(null)
-    const [modalVisible, setModalVisible] = useState(false);
 
     const list = props.list;
     const taskCount = list.todos ? list.todos.length : 0;
@@ -51,20 +48,7 @@ const TodoModal = (props) => {
         }
     };
 
-    const handleEditTodo = index => {
-        setIndex(index)
-        setModalVisible(true)
-    }
-    const handleEditSubmit = (text) => {
-        setModalVisible(false)
-        console.log("Received editText from TodoModalEdit:", text);
-        const updateList = {...list}
-        console.log(updateList)
-        updateList.todos[index].title = text
-        props.updateList(updateList);
-        setIndex("")
-        
-    }
+    
     const deleteTodo = index => {
         list.todos.splice(index, 1);
         props.updateList(list);
@@ -81,7 +65,7 @@ const TodoModal = (props) => {
                         style={{ width: 32 }}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onLongPress={()=>handleEditTodo(index)} style={{flex: 5}}>
+                <TouchableOpacity onPress={() => toggleTodoCompleted(index)} style={{flex: 5}}>
                     <Text
                         style={[
                             styles.todo,
@@ -90,7 +74,7 @@ const TodoModal = (props) => {
                     >{item.title}
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteTodo(index)}>
+                <TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
                     <View style={styles.deleteButton}>
                         <MaterialIcons name='delete' size={18} color="#e6e6e6" />
                     </View>
@@ -103,10 +87,10 @@ const TodoModal = (props) => {
         <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
             <SafeAreaView style={styles.container}>
                 <TouchableOpacity
-                    style={{ position: 'absolute', top: 64, right: 32, zIndex: 10 }}
+                    style={{ position: 'absolute', top: 20, right: 25, zIndex: 10 }}
                     onPress={props.closeModal}
                 >
-                    <MaterialIcons name='close' size={28} color="#000" />
+                    <MaterialIcons name='close' size={35} color="#000" />
                 </TouchableOpacity>
                 <View style={[styles.section, styles.header, { borderBottomColor: list.color }]} >
                     <View>
@@ -114,7 +98,7 @@ const TodoModal = (props) => {
                         <Text style={styles.taskCount}>{completedCount} of {taskCount} tasks</Text>
                     </View>
                 </View>
-                <View style={[styles.section, { flex: 3, marginVertical: 16 }]}>
+                <View style={[styles.section, { flex: 4, marginVertical: 16 }]}>
                     <FlatList
                         data={list.todos}
                         renderItem={({ item, index }) => renderTodo({item, index})}
@@ -133,11 +117,7 @@ const TodoModal = (props) => {
                         <MaterialIcons name='add' size={16}/>
                     </TouchableOpacity>
                 </View>
-                <TodoModalEdit 
-                    modalVisible={modalVisible} 
-                    setModalVisible={setModalVisible}
-                    onSubmitQuest={()=>handleEditSubmit}
-                    />
+                
             </SafeAreaView>
         </KeyboardAvoidingView>
     );
@@ -174,7 +154,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         flexDirection: 'row',
         alignItems: "center",
-        paddingVertical: 10
+        // paddingVertical: 10
     },
     input: {
         flex: 1,
@@ -200,7 +180,8 @@ const styles = StyleSheet.create({
     todo: {
         color: "#000",
         fontWeight: "700",
-        fontSize: 16
+        fontSize: 16,
+        marginLeft:10
     },
     deleteButton: {
         flex: 1,

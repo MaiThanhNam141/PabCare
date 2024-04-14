@@ -13,7 +13,8 @@ const ChatAI = () => {
     const [displayName, setDisplayName] = useState('');
     const [avatar, setAvatar] = useState('')
     //const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
-
+    const google = require('../../assets/google.png')
+    const gemini = require('../../assets/gemini.png')
     const [loadingResponse, setLoadingResponse] = useState(false);
     const flatListRef = useRef(null);
     const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
@@ -93,6 +94,9 @@ const ChatAI = () => {
     const isCurrentUser = (sender) => sender === displayName;
     return(
       <KeyboardAvoidingView style={styles.container}>
+        <View style={styles.title}>
+          <Image source={gemini} style={styles.titleAvatar}></Image>
+        </View>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -151,16 +155,18 @@ const styles = StyleSheet.create({
   senderInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10
   },
   avatar: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     borderRadius: 100,
     marginRight: 5,
   },
   senderName: {
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginLeft:5,
+    marginBottom: 0,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -184,5 +190,20 @@ const styles = StyleSheet.create({
   },
   btnSend:{
     borderRadius: 45,
+  },
+  title:{
+    textAlign:'center',
+    alignSelf:'center',
+    justifyContent:'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal:50,
+    marginBottom:20,
+    marginTop:25,
+  },
+  titleAvatar:{
+    margin: 5,
+    width: 100,
+    height:50,
+    resizeMode:'center',
   }
 });
