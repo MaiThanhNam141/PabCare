@@ -1,16 +1,14 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { defaultAvatar, logo, imageBG } from '../data/Link';
 
 const ProfileScreen = ({navigation}) => {
-  const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
-  const logo = require('../../assets/Icons/Logo.png');
-
   const [displayName, setDisplayName] = useState('');
   const [avatar, setAvatar] = useState('')
   const [email, setEmail] = useState('')
@@ -140,61 +138,65 @@ const ProfileScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.settingButton}
-        onPress={() => {setIsUpdateModalVisible(true)}}
-      >
-        <MaterialIcons name="settings" size={35} color="black" />
-      </TouchableOpacity>
-      <View style={styles.logoContainer}>
-        <Image source={logo} style={styles.logo} resizeMode="contain" />
-      </View>
-      <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
-      <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
-        <Text style={styles.logoutText}>Logout <MaterialIcons name="logout" size={16} style={styles.logoutIcon} /></Text>
-      </TouchableOpacity>
-      
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isUpdateModalVisible}
-        onRequestClose={() => setIsUpdateModalVisible(false)}
-      >
-        <View style={styles.subModalContainer}>
-          <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
-          <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.image, {width: 100, height: 100}]} />
-          <KeyboardAvoidingView style={{marginTop: 5}}>
-            <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Họ và tên'
-              onChangeText={(text) => setRealNameSub(text)} 
-            >{realName?realName:''}</TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Số điện thoại'
-              inputMode='numeric'
-              onChangeText={(text) => setPhoneSub(text)}
-            >{phone?phone:''}</TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Địa chỉ'
-              onChangeText={(text) => setAddressSub(text)}
-            >{address?address:''}</TextInput>
-
-          </KeyboardAvoidingView>
-          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b'}]} onPress={()=>updateInfo()}>
-            <Text style={styles.logoutText}>Cập nhật</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setIsUpdateModalVisible(false)}
-          >
-            <MaterialIcons name="close" size={25} color="black" />
-          </TouchableOpacity>
+      <ImageBackground source={imageBG} style={styles.imageBackground}>
+      <View style={styles.mainContainer}>
+        <TouchableOpacity
+          style={styles.settingButton}
+          onPress={() => {setIsUpdateModalVisible(true)}}
+        >
+          <MaterialIcons name="settings" size={35} color="black" />
+        </TouchableOpacity>
+        <View style={styles.logoContainer}>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
         </View>
-      </Modal>
+        <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
+        <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
+          <Text style={styles.logoutText}>Logout <MaterialIcons name="logout" size={16} style={styles.logoutIcon} /></Text>
+        </TouchableOpacity>
+        
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isUpdateModalVisible}
+          onRequestClose={() => setIsUpdateModalVisible(false)}
+        >
+          <View style={styles.subModalContainer}>
+            <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
+            <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.image, {width: 100, height: 100}]} />
+            <KeyboardAvoidingView style={{marginTop: 5}}>
+              <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Họ và tên'
+                onChangeText={(text) => setRealNameSub(text)} 
+              >{realName?realName:''}</TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Số điện thoại'
+                inputMode='numeric'
+                onChangeText={(text) => setPhoneSub(text)}
+              >{phone?phone:''}</TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Địa chỉ'
+                onChangeText={(text) => setAddressSub(text)}
+              >{address?address:''}</TextInput>
+
+            </KeyboardAvoidingView>
+            <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b'}]} onPress={()=>updateInfo()}>
+              <Text style={styles.logoutText}>Cập nhật</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsUpdateModalVisible(false)}
+            >
+              <MaterialIcons name="close" size={25} color="black" />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -202,8 +204,22 @@ const ProfileScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  imageBackground: {
+    flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  mainContainer:{
+    justifyContent: 'space-evenly',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: '#fafaf7',
+    borderRadius: 25,
+    width: '100%',
+    height: '85%',
+    alignSelf: 'flex-end',
+    marginTop: '20%'
   },
   title: {
     fontSize: 24,

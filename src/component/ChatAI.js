@@ -5,22 +5,17 @@ import { GoogleGenerativeAI  } from "@google/generative-ai"
 import {API_KEY} from '@env'
 import { UserContext } from "../feature/context/UserContext"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-
+import { gemini, AIImage } from "../data/Link"
 const ChatAI = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-
     const [displayName, setDisplayName] = useState('');
     const [avatar, setAvatar] = useState('')
-    //const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
-    const google = require('../../assets/google.png')
-    const gemini = require('../../assets/gemini.png')
     const [loadingResponse, setLoadingResponse] = useState(false);
     const flatListRef = useRef(null);
     const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
 
     const genAI = new GoogleGenerativeAI(API_KEY);
-    const AIImage = 'https://play-lh.googleusercontent.com/DDIUuR0XwdSLnuuyOTn3STuoemW_M1qCSLHs8HE6DJq0NrwUNxYafZ2qG-78Uxj76Q=w240-h480-rw'
     
     useEffect(() => {
       const fetchDataAndSetLoading = async () => {
@@ -125,7 +120,7 @@ const ChatAI = () => {
             style={styles.input}
             value={newMessage}
             onChangeText={setNewMessage}
-            placeholder="Type your message here"
+            placeholder="Type your message here..."
           />
           <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
               <MaterialIcons name="send" color="#1341e8" size={30}/>

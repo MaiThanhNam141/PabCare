@@ -51,7 +51,14 @@ const BottomTabNavigation = () => {
             ),
             tabBarStyle: ((route) => {
               const routeName = getFocusedRouteNameFromRoute(route) ?? ""
-              if (routeName === 'focus' || routeName === 'todo' || routeName === 'diary') {
+              if (routeName === 'focus' || 
+                  routeName === 'todo' || 
+                  routeName === 'diary' || 
+                  routeName === 'mood' ||
+                  routeName === 'healthy' ||
+                  routeName === 'music' ||
+                  routeName === 'goldensleep'
+                ) {
                 return { display: "none"}
               }
               return

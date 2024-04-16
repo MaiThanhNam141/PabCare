@@ -4,10 +4,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderSliderImage from "../component/RenderSliderImage";
 import { getDocumentRef } from "../feature/firebase/handleFirestore";
+import { AIImage, logo } from "../data/Link";
 
 const HomeScreen = ({ navigation }) => {
-    const imageLink = require('..//..//assets//Icons//Logo.png');
-    const AIImage = 'https://play-lh.googleusercontent.com/DDIUuR0XwdSLnuuyOTn3STuoemW_M1qCSLHs8HE6DJq0NrwUNxYafZ2qG-78Uxj76Q=w240-h480-rw';
     const [displayName, setDisplayName] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderImages, setSliderImages] = useState([]);
@@ -54,19 +53,9 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.notificationsButton}>
                     <MaterialIcons name="notifications" size={30} color="#000" />
                 </TouchableOpacity>
-                <Image style={styles.logo} source={imageLink} />
+                <Image style={styles.logo} source={logo} />
             </View>
             <View style={styles.mainContainer}>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
-                <Text>Đây là dòng vô nghĩa</Text>
                 <Text>Đây là dòng vô nghĩa</Text>
             </View>
             <View style={styles.renderImage}>

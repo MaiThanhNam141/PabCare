@@ -1,82 +1,128 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground } from 'react-native';
 import { updateUserInfo, getUserInfo } from '../feature/firebase/handleFirestore';
+import { imageBG } from '../data/Link';
 
-const QuizzScreen = ({navigation}) => {
+const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [userGender, setUserGender] = useState('');
 
-  useEffect(()=>{
-    const fetchData = async() => {
-      const user = await getUserInfo()
-      setUserGender(user.gender || '')
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = await getUserInfo();
+        setUserGender(user.gender || '');
+      } catch (error) {
+        ToastAndroid.show("Hãy thử đăng nhập lại!", ToastAndroid.SHORT)
+      }
+    };
+    fetchData();
+  }, []);
+
+  const goToScreen = (selectedQuiz) => {
+    navigation.navigate(selectedQuiz)
+  }
+
+  const renderData = [
+    { id: 1, title: 'MBTI Test', color: '#4287f5' },
+    { id: 2, title: 'EQ Test', color: '#bcc219' },
+    { id: 3, title: 'BDI Test', color: '#e06519' },
+  ];
+
+  const renderTest = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={[styles.quizItem, { borderColor: item.color }]}
+        onPress={() => handleQuizSelection(item)}
+      >
+        <Text style={[styles.quizTitle, {color:item.color}]}>{item.title}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const handleQuizSelection = (selectedQuiz) => {
+    console.log('Selected Quiz:', selectedQuiz);
+    switch (selectedQuiz.id) {
+      case 1:
+        handleSubmitMBTI()
+        break;
+      default:
+        goToScreen(selectedQuiz.title)
+        break;
     }
-    fetchData()
-  },[])
+  };
 
-
-  const handleSubmit = () => {
-    setShowGenderModal(true)
+  const handleSubmitMBTI = () => {
+    setShowGenderModal(true);
     if (userGender === '') {
-      ToastAndroid.show("Đã xảy ra lỗi", ToastAndroid.SHORT)
+      ToastAndroid.show('Vui lòng chọn giới tính', ToastAndroid.SHORT);
     } else {
-      if (updateUserInfo({gender: userGender})) {
-        navigation.navigate('quiz')
-      }
-      else{
-        console.log("Cập nhật dữ liệu thất bại")
-      }
+      updateUserInfo({ gender: userGender })
+        .then(() => {
+          navigation.navigate('quiz');
+        })
+        .catch((error) => {
+          console.log('Cập nhật dữ liệu thất bại:', error);
+        });
     }
-    
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>Bạn có muốn phân tích tính cách bằng MBTI test?</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.answerButton}
-          onPress={() => handleSubmit()}
-        >
-          <Text style={styles.answerText}>Có</Text>
-        </TouchableOpacity>
-      </View>
-      {userGender === '' && (
-        <Modal
-          visible={showGenderModal}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setShowGenderModal(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Chọn giới tính của bạn</Text>
-              <View style={{flexDirection:'row', marginBottom: 30}}>
-                <TouchableOpacity
-                  style={[styles.genderButton, userGender === 'male' && styles.selectedGender]}
-                  onPress={() => setUserGender('male')}
-                >
-                  <Text style={[styles.genderText, userGender === 'male' && styles.selectedText]}>Nam</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.genderButton, userGender === 'female' && styles.selectedGender]}
-                  onPress={() => setUserGender('female')}
-                >
-                  <Text style={[styles.genderText, , userGender === 'female' && styles.selectedText]}>Nữ</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{flexDirection:'row'}}>
-              <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                  <Text style={styles.submitText}>Xác nhận</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.submitButton, {backgroundColor:'#f20f2d'}]} onPress={()=>setShowGenderModal(false)}>
-                  <Text style={styles.submitText}>Hủy</Text>
-              </TouchableOpacity>
-              </View>
-            </View>
+      <ImageBackground source={imageBG} style={styles.imageBackground}>
+        <View style={styles.mainContainer}>
+          <View style={styles.title}>
+            <Text style={styles.titleText}>CÁC BÀI TEST</Text>
           </View>
-        </Modal>
-      )}
+          <FlatList
+            data={renderData}
+            renderItem={renderTest}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.flatListContainer}
+            numColumns={2}
+          />
+
+          {userGender === '' && (
+            <Modal
+              visible={showGenderModal}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={() => setShowGenderModal(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Chọn giới tính của bạn</Text>
+                  <View style={styles.genderButtonsContainer}>
+                    <TouchableOpacity
+                      style={[styles.genderButton, userGender === 'male' && styles.selectedGender]}
+                      onPress={() => setUserGender('male')}
+                    >
+                      <Text style={[styles.genderText, userGender === 'male' && styles.selectedText]}>Nam</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.genderButton, userGender === 'female' && styles.selectedGender]}
+                      onPress={() => setUserGender('female')}
+                    >
+                      <Text style={[styles.genderText, userGender === 'female' && styles.selectedText]}>Nữ</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.buttonRow}>
+                    <TouchableOpacity style={styles.submitButton} onPress={handleSubmitMBTI}>
+                      <Text style={styles.submitText}>Xác nhận</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.submitButton, { backgroundColor: '#f20f2d' }]}
+                      onPress={() => setShowGenderModal(false)}
+                    >
+                      <Text style={styles.submitText}>Hủy</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          )}
+        </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -84,49 +130,43 @@ const QuizzScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  imageBackground: {
+    flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  mainContainer: {
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 20,
+    backgroundColor: '#fafaf7',
+    borderRadius: 25,
+    width: '100%',
+    height: '85%',
+    alignSelf: 'flex-end',
+    marginTop: '20%'
   },
-  questionText: {
+  flatListContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  quizItem: {
+    width: 160, 
+    height: 160, 
+    margin: 10, 
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor:'#fff',
+    borderWidth: 1
+  },
+  quizTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  answerButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginHorizontal: 10,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: '#ccc',
-    width: 200,
-    alignItems:'center',
-    backgroundColor:'#2fedd4'
-  },
-  answerText: {
-    fontSize: 16,
-  },
-  selectedButton: {
-    backgroundColor: '#16afc7',
-    borderColor: '#16afc7',
-  },
-  submitButton: {
-    backgroundColor: '#16afc7',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    margin: 5
-  },
-  submitText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
@@ -139,26 +179,24 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    elevation: 0,
     width: 330,
-    height: 250
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  genderButtonsContainer: {
+    flexDirection: 'row',
+    marginBottom: 30,
+  },
   genderButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginVertical: 10,
+    marginHorizontal: 10,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: '#ccc',
-    minWidth: 100,
-    minHeight: 20,
-    alignItems:'center',
-    margin : 15
   },
   genderText: {
     fontSize: 16,
@@ -167,10 +205,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#16afc7',
     borderColor: '#16afc7',
   },
-  selectedText:{
+  selectedText: {
     color: 'white',
-    fontWeight:500
   },
+  buttonRow: {
+    flexDirection: 'row',
+  },
+  submitButton: {
+    backgroundColor: '#16afc7',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  submitText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  title:{
+    padding:5,
+    margin:10,
+    marginBottom:20,
+    alignItems:'center',
+    marginTop:30
+  },
+  titleText:{
+    fontWeight:'900',
+    fontSize:30,
+    color:'black'
+  }
 });
 
 export default QuizzScreen;

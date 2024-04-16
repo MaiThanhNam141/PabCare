@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 
-const BMITest = () => {
+const Healthy = () => {
     return (
         <View>
             <Text> textInComponent </Text>
@@ -9,4 +9,4 @@ const BMITest = () => {
     )
 }
 
-export default BMITest
+export default Healthy

@@ -6,15 +6,24 @@ import MiniApp from "../screens/MiniApp";
 import LoginScreen from "../screens/LoginScreen";
 
 import ChatAI from "../component/ChatAI";
+
 import Focus from "../component/Focus";
 import Todo from "../component/Todo";
 import Diary from "../component/Diary";
+import Mood from "../component/Mood";
+import Healthy from '../component/Healthy';
+import Music from "../component/Music";
+import GoldenSleep from "../component/GoldenSleep";
+
 import Quizz from "../component/Quiz";
+import EQQuiz from "../component/EQQuiz";
+import BDIQuiz from "../component/BDIQuiz";
 
 import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
 
 import { UserContext } from "../feature/context/UserContext";
+import EQQuiz from "../component/EQQuiz";
 
 const Stack = createStackNavigator()
 
@@ -75,6 +84,8 @@ const QuizzStackNavigator = () => {
             }}>
             <Stack.Screen name="quizzscreen" component={QuizzScreen} />
             <Stack.Screen name="quiz" component={Quizz} />
+            <Stack.Screen name="bdi" component={BDIQuiz} />
+            <Stack.Screen name="eq" component={EQQuiz} />
         </Stack.Navigator>
     )
 }
@@ -93,6 +104,10 @@ const MiniAppStackNavigator = () => {
             <Stack.Screen name="focus" component={Focus} />
             <Stack.Screen name="todo" component={Todo} />
             <Stack.Screen name="diary" component={Diary} />
+            <Stack.Screen name="mood" component={Mood} />
+            <Stack.Screen name="healthy" component={Healthy} />
+            <Stack.Screen name="music" component={Music} />
+            <Stack.Screen name="goldensleep" component={GoldenSleep} />
         </Stack.Navigator>
     )
 }

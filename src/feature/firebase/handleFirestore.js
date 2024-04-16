@@ -34,7 +34,7 @@ const getUserInfo = async () => {
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
-            throw error; // Ném lỗi để bên ngoài có thể xử lý
+            throw error; 
         }
     }
     return null;
