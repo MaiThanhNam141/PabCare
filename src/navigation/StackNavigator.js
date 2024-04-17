@@ -5,25 +5,24 @@ import QuizzScreen from "../screens/QuizzScreen";
 import MiniApp from "../screens/MiniApp";
 import LoginScreen from "../screens/LoginScreen";
 
-import ChatAI from "../component/ChatAI";
+import ChatAI from "../component/OtherScreen/ChatAI";
 
-import Focus from "../component/Focus";
-import Todo from "../component/Todo";
-import Diary from "../component/Diary";
-import Mood from "../component/Mood";
-import Healthy from '../component/Healthy';
-import Music from "../component/Music";
-import GoldenSleep from "../component/GoldenSleep";
+import Focus from "../component/MiniApp/Focus";
+import Todo from "../component/MiniApp/Todo";
+import Diary from "../component/MiniApp/Diary";
+import Mood from "../component/MiniApp/Mood";
+import Healthy from '../component/MiniApp/Healthy';
+import Music from "../component/MiniApp/Music";
+import GoldenSleep from "../component/MiniApp/GoldenSleep";
 
-import Quizz from "../component/Quiz";
-import EQQuiz from "../component/EQQuiz";
-import BDIQuiz from "../component/BDIQuiz";
+import Quizz from "../component/QuizzScreen/Quiz";
+import EQQuiz from "../component/QuizzScreen/EQQuiz";
+import BDIQuiz from "../component/QuizzScreen/BDIQuiz";
 
 import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
 
 import { UserContext } from "../feature/context/UserContext";
-import EQQuiz from "../component/EQQuiz";
 
 const Stack = createStackNavigator()
 

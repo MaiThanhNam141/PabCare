@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Image, Modal, TouchableOpacity, Text } from "react-native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RenderSliderImage from "../component/RenderSliderImage";
+import RenderSliderImage from "../component/OtherScreen/RenderSliderImage";
 import { getDocumentRef } from "../feature/firebase/handleFirestore";
 import { AIImage, logo } from "../data/Link";
 
