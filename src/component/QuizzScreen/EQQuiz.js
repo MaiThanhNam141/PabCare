@@ -1,12 +1,20 @@
-import React from 'react'
-import { Text, StyleSheet, View } from 'react-native'
+import React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 
 const EQQuiz = () => {
     return (
-        <View>
-            <Text> textInComponent </Text>
+        <View style={styles.container}>
+            <Text>EQQuiz</Text>
         </View>
-    )
-}
-export default EQQuiz
-const styles = StyleSheet.create({})
+    );
+};
+
+export default EQQuiz;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+});

@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const GenderSelect = ({ selected, gender = 'male', onPress }) => {
+const GenderSelect = ({ selected, gender = 'Nam', onPress }) => {
 
     const selectedStyle = {
-        color: 'white'
+        color: 'black'
     };
 
     return (
@@ -15,10 +15,10 @@ const GenderSelect = ({ selected, gender = 'male', onPress }) => {
             onPress={onPress}
         >
             {
-                gender === 'male' ?
-                    <MaterialIcons name="male" size={75} color={selected ? 'white' : '#8E8E98'} />
+                gender === 'Nam' ?
+                    <MaterialIcons name="male" size={75} color={selected ? 'black' : '#c2c0c0'} />
                     :
-                    <MaterialIcons name="female" size={75} color={selected ? 'white' : '#8E8E98'} />
+                    <MaterialIcons name="female" size={75} color={selected ? 'black' : '#c2c0c0'} />
             }
             <Text style={[styles.label, selected && selectedStyle]}>
                 {gender.toUpperCase()}
@@ -27,9 +27,10 @@ const GenderSelect = ({ selected, gender = 'male', onPress }) => {
     );
 };
 
+export default GenderSelect
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#1D1F32",
+        backgroundColor: "#faf8f7",
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
@@ -38,10 +39,9 @@ const styles = StyleSheet.create({
     },
 
     label: {
-        color: '#8E8E98',
+        color: '#c2c0c0',
         fontSize: 20,
         fontWeight: "600",
     }
 });
 
-export default GenderSelect;

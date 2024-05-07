@@ -11,7 +11,8 @@ import Focus from "../component/MiniApp/Focus";
 import Todo from "../component/MiniApp/Todo";
 import Diary from "../component/MiniApp/Diary";
 import Mood from "../component/MiniApp/Mood";
-import Healthy from '../component/MiniApp/Healthy';
+import BMITest from "../component/MiniApp/BMITest"
+import BmiResultScreen from "../component/MiniApp/BmiResultScreen"
 import Music from "../component/MiniApp/Music";
 import GoldenSleep from "../component/MiniApp/GoldenSleep";
 
@@ -104,7 +105,8 @@ const MiniAppStackNavigator = () => {
             <Stack.Screen name="todo" component={Todo} />
             <Stack.Screen name="diary" component={Diary} />
             <Stack.Screen name="mood" component={Mood} />
-            <Stack.Screen name="healthy" component={Healthy} />
+            <Stack.Screen name="bmi" component={BMITest} />
+            <Stack.Screen name="bmiresult" component={BmiResultScreen} />
             <Stack.Screen name="music" component={Music} />
             <Stack.Screen name="goldensleep" component={GoldenSleep} />
         </Stack.Navigator>

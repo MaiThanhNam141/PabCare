@@ -113,18 +113,20 @@ const Todo = () => {
           </Text>
         <View style={styles.divider} />
       </View>
-      <View style={{ marginVertical: 48 }}>
+      <View style={{ marginVertical: 38 }}>
         <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
           <MaterialIcons name="add" size={16} color={'#24A6D9'} />
         </TouchableOpacity>
         <Text style={styles.add}>Add List</Text>
       </View>
-      <View style={{ height: 300, paddingLeft: 16 }}>
+      <View style={{ height: 500, padding: 5 }}>
         <FlatList
           data={lists}
           keyExtractor={item => item.id.toString()}
-          horizontal={true}
+          horizontal={false}
+          numColumns={2}
           showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           renderItem={renderList}
           keyboardShouldPersistTaps="always"
         />

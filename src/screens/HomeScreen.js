@@ -46,7 +46,7 @@ const HomeScreen = ({ navigation }) => {
             <TouchableOpacity
             style={styles.circle}
             onPress={() => goChatAI()}>
-                <Text style={styles.chatbotText}>Xin chào, {displayName?displayName:'tài khoản khách'}</Text>
+                <Text style={styles.chatbotText}>Xin chào! {displayName?displayName:''}</Text>
                 <Image style={styles.chatbotLogo} source={{uri:AIImage}} />
             </TouchableOpacity>
             <View style={styles.header}>

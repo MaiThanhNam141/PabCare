@@ -39,11 +39,14 @@ const ChatAI = () => {
         try {       
           setLoadingResponse(true);
           const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-          const result = await model.generateContent("You're a Mental Health Counselor at Pabcare Counseling Center " 
-                                                        +"(Trung tâm hỗ trợ Pabcare) in Vietnamese."
-                                                        +" Use friendly, funny and simple Vietnamese language to respond." 
-                                                        +" Using 'tớ' to refer yourself and 'cậu' to refer me "
-                                                        +" This is a promt: " + messages);
+          const result = await model.generateContent(`
+              You are a Mental Health Counselor at Pabcare Counseling Center 
+              (Trung tâm hỗ trợ Pabcare) in Vietnamese. 
+              Use friendly, funny and simple Vietnamese language to respond. 
+              Using "tớ" to refer yourself and "cậu" to refer me. 
+              This is command from user: ${messages}
+          `);
+
           return result.response.text();
         }
         catch (e){
@@ -87,6 +90,7 @@ const ChatAI = () => {
     };
 
     const isCurrentUser = (sender) => sender === displayName;
+    
     return(
       <KeyboardAvoidingView style={styles.container}>
         <View style={styles.title}>
@@ -110,21 +114,23 @@ const ChatAI = () => {
             </View>
           )}
         />
-        {loadingResponse && ( 
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#0000ff" />
-          </View>
-        )}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             value={newMessage}
             onChangeText={setNewMessage}
-            placeholder="Type your message here..."
+            placeholder="Nhập tin nhắn ở đây..."
           />
-          <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
-              <MaterialIcons name="send" color="#1341e8" size={30}/>
-          </TouchableOpacity>
+          {loadingResponse ? (
+            <TouchableOpacity style={styles.btnSend} disabled={true}>
+              <ActivityIndicator size={34} color="#0EE4C4" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
+              <MaterialIcons name="send" color="#0EE4C4" size={35}/>
+            </TouchableOpacity>
+          )}
+
         </View>
       </KeyboardAvoidingView>
     )

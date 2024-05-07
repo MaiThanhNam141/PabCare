@@ -30,6 +30,15 @@ const AddListModal = (props) => {
         });
     };
 
+    const handleNameChange = (text) => {
+        if (text.length <= 30) {
+          setName(text);
+        }
+        else{
+            ToastAndroid.show("Tên danh sách tối đa 30 ký tự!!!", ToastAndroid.SHORT)
+        }
+      };
+
     return (
         <KeyboardAvoidingView style={styles.container} behavior='padding'>
             <TouchableOpacity style={{ position: "absolute", top: 64, right: 32 }} onPress={props.closeModal}>
@@ -40,11 +49,21 @@ const AddListModal = (props) => {
                 <TextInput
                     style={styles.input}
                     placeholder='List Name?'
-                    onChangeText={text => setName(text)}
+                    onChangeText={handleNameChange}
                     value={name}
                 />
-
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>
+                <View>
+                    <TouchableOpacity onPress={() => handleRoutine(index)}>
+                        <MaterialIcons
+                            name={item.completed ? 'check-box' : 'check-box-outline-blank'}
+                            size={24}
+                            color="#999"
+                            style={{ width: 32 }}
+                        />
+                    </TouchableOpacity>
+                    <Text>Lặp lại hàng ngày</Text>
+                </View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15 }}>
                     {renderColors()}
                 </View>
 

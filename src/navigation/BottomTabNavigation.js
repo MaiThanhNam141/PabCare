@@ -7,6 +7,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 const Tab = createBottomTabNavigator()
 
 const BottomTabNavigation = () => {
+  const hiddenRoutes = ['focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq'];
+
   return(
     <Tab.Navigator
       initialRouteName='HomeScreen'
@@ -21,7 +23,7 @@ const BottomTabNavigation = () => {
           borderTopRightRadius:10,
           overflow:"hidden",
           backgroundColor:"#fff",
-          height:60,
+          height:49,
         },
 
       }}>
@@ -30,39 +32,21 @@ const BottomTabNavigation = () => {
           tabBarIcon: ({ size, color}) => (
             <MaterialIcons name="home" size={size} color={color} />
           ),
-          tabBarStyle: ((route) => {
-            const routeName = getFocusedRouteNameFromRoute(route) ?? ""
-            if (routeName === 'chatai'){
-              return { display: "none"}
-            }
-            return
-          })(route)
+          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
         })} />
       <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
-        options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="quiz" size={size} color={color} />
-            ),
-          }}/>
+        options={({route})=>({
+          tabBarIcon: ({ size, color}) => (
+            <MaterialIcons name="quiz" size={size} color={color} />
+          ),
+          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
+        })} />
       <Tab.Screen name='MiniApp' component={MiniAppStackNavigator}
         options={({route}) => ({
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="list-alt" size={size} color={color} />
             ),
-            tabBarStyle: ((route) => {
-              const routeName = getFocusedRouteNameFromRoute(route) ?? ""
-              if (routeName === 'focus' || 
-                  routeName === 'todo' || 
-                  routeName === 'diary' || 
-                  routeName === 'mood' ||
-                  routeName === 'healthy' ||
-                  routeName === 'music' ||
-                  routeName === 'goldensleep'
-                ) {
-                return { display: "none"}
-              }
-              return
-            })(route)
+            tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
         })}
       />
       <Tab.Screen name='ProfileScreen' component={ProfileStackNavigator}

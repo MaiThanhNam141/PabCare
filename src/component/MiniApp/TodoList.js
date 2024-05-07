@@ -8,7 +8,7 @@ const TodoList = (props) => {
     const list = props.list;
     const todos = list.todos || [];
     const completedCount = todos.filter(todo => todo.completed).length;
-    const remainingCount = todos.length - completedCount;
+    const percentCount = todos.length === 0 ? 0 : (completedCount*100)/todos.length;
 
     const toggleListVisible = () => {
         setShowListVisible(!showListVisible);
@@ -27,17 +27,12 @@ const TodoList = (props) => {
             <Modal animationType='slide' visible={showListVisible} onRequestClose={() => toggleListVisible()}>
                 <TodoModal list={list} closeModal={() => toggleListVisible()} updateList={props.updateList}/>
             </Modal>
-            <TouchableOpacity style={[styles.listContainer, { backgroundColor: list.color }]} onPress={() => toggleListVisible()} onLongPress={()=>toggleDeleteAlert()}>
-                <Text style={styles.listTitle} numberOfLines={1}>{list.name}</Text>
-                <View>
-                    <View style={{ alignItems: "center" }}>
-                        <Text style={styles.count}>{remainingCount}</Text>
-                        <Text style={styles.subTitle}>Remaining</Text>
-                    </View>
-                    <View style={{ alignItems: "center" }}>
-                        <Text style={styles.count}>{completedCount}</Text>
-                        <Text style={styles.subTitle}>Completed</Text>
-                    </View>
+            <TouchableOpacity style={[styles.listContainer, { backgroundColor: list.color }]} 
+              onPress={() => toggleListVisible()} onLongPress={()=>toggleDeleteAlert()}>
+                <Text style={styles.listTitle} numberOfLines={2}>{list.name}</Text>
+                <View style={{ alignItems: "center" }}>
+                    <Text style={styles.count}>{percentCount}%</Text>
+                    <Text style={styles.subTitle}>Đã hoàn thành</Text>
                 </View>
             </TouchableOpacity>
             <Modal animationType='fade' transparent={true} visible={showDeleteAlert} onRequestClose={()=>setShowDeleteAlert(false)}>
@@ -61,21 +56,23 @@ const TodoList = (props) => {
 
 const styles = StyleSheet.create({
     listContainer: {
-        paddingVertical: 30,
-        paddingHorizontal: 16,
+        paddingVertical: 25,
+        paddingHorizontal: 15,
         borderRadius: 16,
-        marginHorizontal: 16,
+        margin: 10,
         alignItems: "center",
-        width: 200,
+        width: 150,
+        height:190,
+        borderWidth:StyleSheet.hairlineWidth,
     },
     listTitle: {
         fontWeight: "700",
-        fontSize: 24,
-        marginBottom: 15,
+        fontSize: 18,
+        marginBottom: 5,
         color: "white"
     },
     count: {
-        fontSize: 48,
+        fontSize: 36,
         fontWeight: "200",
         color: "white"
     },

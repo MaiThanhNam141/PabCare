@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
@@ -17,21 +17,21 @@ export default App = () => {
   const fadeAnim = new Animated.Value(1)
   const translateYAnim = new Animated.Value(0);
 
-  const logo = require('./assets/Icons/Logo.png');
-  const room = require('./assets/room.png')
+  const logo = useMemo(() => require('./assets/Icons/Logo.png'), []);
+  const room = useMemo(() => require('./assets/room.png'), []);
 
   GoogleSignin.configure({
     webClientId: GOOGLE_API_CLIENT,
   });
 
   useEffect(()=>{
-    start = async() => {
+    const start = async() => {
       setTimeout(() => {
         fadeOutAndMoveUp(); 
         setTimeout(() => setLoading(false), 2500);
       }, 450);
       const checkFirstTime = await AsyncStorage.getItem('isFirstTime')
-      setFirstTime(!checkFirstTime)
+      setFirstTime(Boolean(!checkFirstTime))
     }
     start()
   },[])
@@ -51,35 +51,50 @@ export default App = () => {
     ]).start();
   };
 
-  const loginButton = async() => {
+  async function loginButton() {
     try {
+      setLoading(true);
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const { idToken } = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
-      const userDoc = {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-      };
-      setFirstTime(false)
-      ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
-      await Promise.all([
-        AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
-        AsyncStorage.setItem('user', JSON.stringify(user)),
-        firestore().collection('users').doc(user.uid).set(userDoc),
-      ]);
-      setFirstTime(false)
+  
+      const user = auth().currentUser;
+      if (user) { 
+        const userRef = firestore().collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+  
+        if (!userDoc.exists) {
+          const userDocData = {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          };
+  
+          await Promise.all([
+            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            AsyncStorage.setItem('user', JSON.stringify(user)),
+            userRef.set(userDocData),
+          ]);
+        } else {
+          await Promise.all([
+            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            AsyncStorage.setItem('user', JSON.stringify(user)),
+          ]);
+        }
+        setFirstTime(false)
+        ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show('Không thể lấy thông tin người dùng', ToastAndroid.SHORT);
+      }
     } catch (error) {
-      setFirstTime(false)
       if (error.code === statusCodes.IN_PROGRESS) {
         ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT);
-        console.log(statusCodes.IN_PROGRESS);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         ToastAndroid.show('Điện thoại không có Google PlayServices', ToastAndroid.SHORT);
-        console.log(statusCodes.PLAY_SERVICES_NOT_AVAILABLE);
       } else {
-        console.log(error.message);
+        console.log("Login error: ", error.message);
+        ToastAndroid.show('Đăng nhập không thành công', ToastAndroid.SHORT);
       }
     }
   }

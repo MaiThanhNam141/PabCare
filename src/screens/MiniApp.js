@@ -19,7 +19,7 @@ const MiniApp = ({ navigation }) => {
             <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('focus')}>
               <Text style={styles.itemText}>Focus</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('healthy')}>
+            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('bmi')}>
               <Text style={styles.itemText}>Thể trạng</Text>
             </TouchableOpacity>
           </View>

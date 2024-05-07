@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const CounterSelect = ({ label = 'Weight', suffix, onValueChange, defaultValue = 0 }) => {
+const CounterSelect = ({ label = 'Cân nặng', suffix, onValueChange, defaultValue = 0 }) => {
     const [displayValue, setDisplayValue] = useState(defaultValue);
 
     const handleAdd = () => {
@@ -32,14 +32,14 @@ const CounterSelect = ({ label = 'Weight', suffix, onValueChange, defaultValue =
                     style={styles.btn}
                     onPress={handleSubtract}
                 >
-                    <MaterialIcons name="remove" size={40} color="white" />
+                    <MaterialIcons name="remove" size={40} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     activeOpacity={0.5}
                     style={styles.btn}
                     onPress={handleAdd}
                 >
-                    <MaterialIcons name="add" size={40} color="white" />
+                    <MaterialIcons name="add" size={40} color="black" />
                 </TouchableOpacity>
             </View>
         </View>
@@ -48,7 +48,7 @@ const CounterSelect = ({ label = 'Weight', suffix, onValueChange, defaultValue =
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#111426",
+        backgroundColor: "#faf8f7",
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
@@ -56,21 +56,23 @@ const styles = StyleSheet.create({
         flex: 1
     },
     label: {
-        color: '#8E8E98',
+        color: 'black',
         fontSize: 20,
         fontWeight: "600",
     },
     valueText: {
-        color: "white",
-        fontSize: 60,
+        color: "black",
+        fontSize: 50,
         fontWeight: "600",
-        marginBottom: '5%'
+        marginBottom: '5%',
+        paddingBottom: 40
     },
     btn: {
-        backgroundColor: '#1D2032',
-        borderRadius: 50,
+        backgroundColor: '#faf8f7',
+        borderRadius: 100,
         alignItems: 'center',
-        padding: 10
+        padding: 10,
+        borderLeftWidth:1,
     },
     btnGroup: {
         flexDirection: 'row',

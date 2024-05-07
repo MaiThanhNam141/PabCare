@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal } from 'react-native';
 import data from '../../data/QuizData';
+import QuizData2 from '../../data/QuizData2';
 import { getUserInfo } from '../../feature/firebase/handleFirestore';
 
 const Quizz = () => {
   const allQuestion = data;
+  const answer = QuizData2;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentOptionSelected, setCurrentOptionSelected] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
@@ -66,8 +68,8 @@ const Quizz = () => {
   };
 
   useEffect(()=>{
-    const gender = () => {
-      const user = getUserInfo()
+    const gender = async() => {
+      const user = await getUserInfo()
       setUserGender(user.gender)
     }
     gender()
@@ -152,27 +154,33 @@ const Quizz = () => {
     };
   const getMaxPoint = () => {
     let maxType = [];
-
     maxType.push(points.E <= points.I ? 'I' : 'E');
     maxType.push(points.S <= points.N ? 'N' : 'S');
-
     if (points.F === points.T) {
-      
       maxType.push(userGender ? 'T' : 'F');
-    } 
+    }
+    else {
+      maxType.push(points.F <= points.T ? 'F' : 'T');
+    }
 
     maxType.push(points.J <= points.P ? 'P' : 'J');
-    
     return { maxType };
   };
 
   const userPersonality = () => {
-    let comment = []
-    getMaxPoint().maxType.includes('E')?comment.push("Bạn là người loại E"):comment.push("Bạn là người loại I")
-    getMaxPoint().maxType.includes('N')?comment.push("Bạn là người loại N"):comment.push("Bạn là người loại S")
-    getMaxPoint().maxType.includes('T')?comment.push("Bạn là người loại T"):comment.push("Bạn là người loại F")
-    getMaxPoint().maxType.includes('P')?comment.push("Bạn là người loại P"):comment.push("Bạn là người loại J")
-    return comment.join("\n")
+    let max = getMaxPoint().maxType.join("")
+    let selectedPersonality = answer.find(index => index.type === max)
+    if(!selectedPersonality){
+      return 'Xảy ra lỗi'
+    }
+    return `
+      Bạn là: ${selectedPersonality.name}
+      Tính cách: ${selectedPersonality.kind}
+      Điểm mạnh: ${selectedPersonality.positive}
+      Điểm yếu: ${selectedPersonality.negative}
+      Cách cải thiện: ${selectedPersonality.solution}
+      Công việc phù hợp: ${selectedPersonality.jobSuitable}
+    `
   }
 
   return (
@@ -188,7 +196,7 @@ const Quizz = () => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Congratulations</Text>
               <View style={styles.scoreContainer}>
-                <Text style={styles.text}>Highest type: <Text style={{fontWeight:'bold'}}>{userPersonality()}</Text></Text>
+                <Text style={styles.text}>Kết quả: {showScoreModal?<Text style={{fontWeight:'bold'}}>{userPersonality()}</Text>:null}</Text>
               </View>
               <TouchableOpacity style={styles.retryButton} onPress={restart}>
                 <Text style={[styles.text, styles.retryButtonText]}>Retry</Text>

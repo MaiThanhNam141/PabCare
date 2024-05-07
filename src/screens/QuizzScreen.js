@@ -1,13 +1,11 @@
-import React, { useEffect, useState, useCallback, useMemo, memo, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert } from 'react-native';
 import { updateUserInfo, getUserInfo } from '../feature/firebase/handleFirestore';
 import { imageBG } from '../data/Link';
-import { UserContext } from '../feature/context/UserContext';
 
-const QuizzScreen = memo(({ navigation }) => {
+const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [userGender, setUserGender] = useState('');
-  const {userLoggedIn} = useContext(UserContext)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,21 +17,20 @@ const QuizzScreen = memo(({ navigation }) => {
       }
     };
     fetchData();
-  }, [userLoggedIn]);
+  }, []);
 
-  const goToScreen = useCallback((selectedQuiz) => {
-    navigation.navigate(selectedQuiz);
-  }, [navigation]);
+  const goToScreen = (selectedQuiz) => {
+    navigation.navigate(selectedQuiz)
+  }
 
-  const renderData = useMemo( () =>
-  [
+  const renderData = [
     { id: 1, title: 'MBTI Test', color: '#4287f5' },
     { id: 2, title: 'EQ Test', color: '#bcc219' },
     { id: 3, title: 'BDI Test', color: '#e06519' },
     { id: 4, title: 'DISC', color: '#000'},
-  ], []);
+  ];
 
-  const renderTest = useCallback(({ item }) => {
+  const renderTest = ({ item }) => {
     return (
       <TouchableOpacity
         style={[styles.quizItem, { borderColor: item.color }]}
@@ -42,21 +39,30 @@ const QuizzScreen = memo(({ navigation }) => {
         <Text style={[styles.quizTitle, {color:item.color}]}>{item.title}</Text>
       </TouchableOpacity>
     );
-  }, [handleQuizSelection]);
+  };
 
-  const handleQuizSelection = useCallback((selectedQuiz) => {
+  const handleQuizSelection = (selectedQuiz) => {
     console.log('Selected Quiz:', selectedQuiz);
     switch (selectedQuiz.id) {
       case 1:
         handleSubmitMBTI()
         break;
+      case 2:
+        Alert.alert("Tính năng đang phát triển")
+        break;
+      case 3:
+        Alert.alert("Tính năng đang phát triển")
+        break;
+      case 4:
+        Alert.alert("Tính năng đang phát triển")
+        break;
       default:
         goToScreen(selectedQuiz.title)
         break;
     }
-  }, [goToScreen]);
+  };
 
-  const handleSubmitMBTI = useCallback(() => {
+  const handleSubmitMBTI = () => {
     setShowGenderModal(true);
     if (userGender === '') {
       ToastAndroid.show('Vui lòng chọn giới tính', ToastAndroid.SHORT);
@@ -69,7 +75,7 @@ const QuizzScreen = memo(({ navigation }) => {
           console.log('Cập nhật dữ liệu thất bại:', error);
         });
     }
-  }, [navigation, userGender]);
+  };
 
   return (
     <View style={styles.container}>
@@ -129,7 +135,7 @@ const QuizzScreen = memo(({ navigation }) => {
       </ImageBackground>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

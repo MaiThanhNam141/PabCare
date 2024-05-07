@@ -51,7 +51,6 @@ const useFirestoreList = () => {
       }
       
       await ref.doc(listId).delete();
-      console.log(`Deleted successfully.`);
     } catch (error) {
       console.error("Error deleting list useFirestoreList:", error);
       throw new Error(error);
