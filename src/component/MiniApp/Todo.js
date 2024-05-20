@@ -5,6 +5,7 @@ import TodoList from './TodoList.js';
 import AddListModal from './AddListModal.js';
 import useFirestoreList from '../../feature/firebase/useFirestoreList.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebase } from '@react-native-firebase/firestore';
 
 const Todo = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
@@ -21,7 +22,6 @@ const Todo = () => {
         if (userData) {
           const user = JSON.parse(userData)
           setUser(user.displayName)
-          // getListsFromFirestore();  
         }
       } catch (error) {
         console.error("Error initializing Firestore in Todo:", error);
@@ -62,6 +62,8 @@ const Todo = () => {
       await addList({
         name: list.name,
         color: list.color,
+        routine: list.routine,
+        initdate: firebase.firestore.FieldValue.serverTimestamp(),
         todos: []
       });
     } catch (error) {

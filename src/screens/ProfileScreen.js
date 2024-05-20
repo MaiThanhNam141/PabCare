@@ -6,7 +6,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { defaultAvatar, logo, imageBG } from '../data/Link';
+import { defaultAvatar, logo, imageBG, profileScreenIcon } from '../data/Link';
 
 const ProfileScreen = ({navigation}) => {
   const [displayName, setDisplayName] = useState('');
@@ -61,18 +61,6 @@ const ProfileScreen = ({navigation}) => {
     fetchData();
   }, [navigation]);
 
-  const handleLogout = async () => {
-    setLoading(true)
-    const currentUser = auth().currentUser;
-    const providerData = currentUser.providerData;
-    providerData.forEach(profile => {
-      if (profile.providerId === 'google.com') {
-        googleSignOut();
-      } else if (profile.providerId === 'facebook.com') {
-        facebookSignOut();
-      }
-    });
-  };
 
   const googleSignOut = async () => {
     try {
@@ -84,10 +72,6 @@ const ProfileScreen = ({navigation}) => {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const facebookSignOut = async () => {
-    console.log('Logging out from Facebook');
   };
 
   
@@ -134,7 +118,13 @@ const ProfileScreen = ({navigation}) => {
     }
   };
   
+  const handleCooperation = () => {
+    console.log('Cooperation')
+  }
 
+  const handleDonation = () => {
+    console.log("Donation");
+  }
 
   return (
     <View style={styles.container}>
@@ -146,15 +136,19 @@ const ProfileScreen = ({navigation}) => {
         >
           <MaterialIcons name="settings" size={35} color="black" />
         </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
-        </View>
         <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
-        <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
-          <Text style={styles.logoutText}>Logout <MaterialIcons name="logout" size={16} style={styles.logoutIcon} /></Text>
-        </TouchableOpacity>
-        
+        <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.imageAvatar} />
+        <View>
+          <TouchableOpacity onPress={handleCooperation} style={[styles.logoutContainer, styles.cooperateContainer]}>
+            <Text style={styles.logoutText}>Hợp tác <Image source={profileScreenIcon.handshake} /></Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDonation} style={[styles.logoutContainer, styles.donationContainer]}>
+            <Text style={styles.logoutText}>Từ thiện <Image source={profileScreenIcon.heart} /></Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={googleSignOut} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Đăng xuất <MaterialIcons name="logout" size={20} style={styles.logoutIcon} /></Text>
+          </TouchableOpacity>
+        </View>
         <Modal
           animationType="slide"
           transparent={true}
@@ -163,7 +157,7 @@ const ProfileScreen = ({navigation}) => {
         >
           <View style={styles.subModalContainer}>
             <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
-            <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.image, {width: 100, height: 100}]} />
+            <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.imageAvatar, {width: 100, height: 100}]} />
             <KeyboardAvoidingView style={{marginTop: 5}}>
               <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
               <TextInput
@@ -224,20 +218,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 15,
   },
-  image: {
+  imageAvatar: {
     width: 200, 
     height: 200, 
-    marginBottom: 20,
+    marginBottom: 15,
     borderRadius:100,
   },
   logoutContainer: {
     backgroundColor: '#cf3119',
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     borderRadius: 20,
-    marginTop: 20,
+    marginTop: 10,
+    width:180,
+    height:50,
+    alignItems:'center'
   },
   logoContainer:{
     width: 150,
@@ -257,6 +254,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   logoutIcon: {
     marginLeft: 10,
@@ -291,7 +289,7 @@ const styles = StyleSheet.create({
   subModalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginBottom: 20,
   },
   textInput:{
     backgroundColor:'#f2f7f7',
@@ -301,6 +299,12 @@ const styles = StyleSheet.create({
     color:'black',
     minWidth: 300,
     margin:15
+  },
+  cooperateContainer:{
+    backgroundColor: '#56C596',
+  },
+  donationContainer:{
+    backgroundColor: '#329D9C',
   }
 });
 

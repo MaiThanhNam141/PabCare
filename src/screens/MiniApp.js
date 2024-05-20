@@ -1,11 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
-import { imageBG } from '../data/Link';
+import { View, StyleSheet, ImageBackground, TouchableOpacity, Alert, Image } from 'react-native';
+import { imageBG, miniAppIcon } from '../data/Link';
 
 const MiniApp = ({ navigation }) => {
 
   const goToScreen = (screenName) => {
-    navigation.navigate(screenName);
+    try {
+      if(screenName==='diary'){
+        Alert.alert('Lỗi',"Tính năng đang phát triển")
+        return;
+      }
+      navigation.navigate(screenName);
+    } catch (error) {
+      console.error(error)
+    }
   };
 
   return (
@@ -13,30 +21,30 @@ const MiniApp = ({ navigation }) => {
       <ImageBackground source={imageBG} style={styles.imageBackground}>
         <View style={styles.mainContainer}>
           <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('todo')}>
-            <Text style={styles.itemText}>Todo List</Text>
+            <Image source={miniAppIcon.todoList} style={[styles.itemImg, {height:129}]} />
           </TouchableOpacity>
           <View style={styles.rowContainer}>
-            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('focus')}>
-              <Text style={styles.itemText}>Focus</Text>
+            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('diary')}>
+              <Image source={miniAppIcon.diary} style={[styles.itemImg, { height: 117 }]} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('bmi')}>
-              <Text style={styles.itemText}>Thể trạng</Text>
+              <Image source={miniAppIcon.bmi} style={[styles.itemImg, { height: 117 }]} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('diary')}>
-            <Text style={styles.itemText}>Viết biết ơn</Text>
+          <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('focus')}>
+            <Image source={miniAppIcon.focus} style={[styles.itemImg, {height:129}]} />
           </TouchableOpacity>
           <View style={styles.rowContainer}>
             <View style={[styles.columnContainer, {width:'45%'}]}>
-              <TouchableOpacity style={[styles.itemContainer, {width:'100%', height:70, padding:5, margin: 5}]} onPress={() => goToScreen('mood')}>
-                <Text style={styles.itemText}>Tâm trạng</Text>
+              <TouchableOpacity style={[styles.itemContainer, { height:70, padding:0, margin: 5}]} onPress={() => goToScreen('mood')}>
+                <Image source={miniAppIcon.mood} style={styles.itemImg}/>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.itemContainer, {width:'100%', height:70, padding:5, margin: 5}]} onPress={() => goToScreen('music')}>
-                <Text style={styles.itemText}>Music</Text>
+              <TouchableOpacity style={[styles.itemContainer, {height:70, padding:0, margin: 5}]} onPress={() => goToScreen('goldensleep')}>
+                <Image source={miniAppIcon.goldensleep} style={styles.itemImg} />
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={[styles.itemContainer, {width:'50%', height:150}]} onPress={() => goToScreen('goldensleep')}>
-              <Text style={styles.itemText}>Giờ ngủ vàng</Text>
+            <TouchableOpacity style={[styles.itemContainer, {width:'50%', height:150}]} onPress={() => goToScreen('music')}>
+              <Image source={miniAppIcon.music} style={[styles.itemImg, {height:161}]} />
             </TouchableOpacity>
           </View>
         </View>
@@ -58,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 15,
-    backgroundColor: '#fafaf7',
+    backgroundColor: '#FBFBF9',
     borderRadius: 25,
     width: '100%',
     height: '85%',
@@ -71,8 +79,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    backgroundColor: '#ebedeb',
+    borderWidth:0,
+    backgroundColor: '#fafaf7',
     borderRadius: 15,
   },
   itemText: {
@@ -91,6 +99,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-start',
   },
+  itemImg:{
+    width: '100%',
+    height: 75,
+    resizeMode:'contain',
+    borderRadius: 0,
+  }
 });
 
 export default MiniApp;

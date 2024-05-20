@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Text, View, StyleSheet, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
+import { KeyboardAvoidingView, Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AddListModal = (props) => {
     const backgroundColor = ["#5CD859", "#24A6D9", "#8022D9", "#D159D8", "#D85963", "#D88559"];
     const [name, setName] = useState("");
     const [color, setColor] = useState(backgroundColor[0]);
+    const [routine, setRoutine] = useState(false);
 
     const createTodo = () => {
         if (!name.trim()) {
-            ToastAndroid.show('Vui lòng nhập tên danh sách!', ToastAndroid.SHORT);
+            Alert.alert('Vui lòng nhập tên danh sách!');
             return;
         }
-        const list = { name, color };
+        const list = { name, color, routine };
         setName("");
         props.addList(list);
         props.closeModal();
@@ -29,6 +30,10 @@ const AddListModal = (props) => {
             );
         });
     };
+
+    const handleRoutine = () => {
+        setRoutine(!routine)
+    }
 
     const handleNameChange = (text) => {
         if (text.length <= 30) {
@@ -52,16 +57,16 @@ const AddListModal = (props) => {
                     onChangeText={handleNameChange}
                     value={name}
                 />
-                <View>
-                    <TouchableOpacity onPress={() => handleRoutine(index)}>
+                <View style={{marginTop:15}}>
+                    <TouchableOpacity onPress={() => handleRoutine()} style={{flexDirection:'row', paddingRight:20}}>
                         <MaterialIcons
-                            name={item.completed ? 'check-box' : 'check-box-outline-blank'}
+                            name={routine?'check-box':'check-box-outline-blank'}
                             size={24}
                             color="#999"
                             style={{ width: 32 }}
                         />
+                        <Text>Lặp lại hàng ngày</Text>
                     </TouchableOpacity>
-                    <Text>Lặp lại hàng ngày</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15 }}>
                     {renderColors()}

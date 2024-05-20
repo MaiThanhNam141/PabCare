@@ -11,7 +11,7 @@ const Mood = () => {
     { id: 0, name: 'sentiment-very-dissatisfied', color: '#d60b0b' },
     { id: 1, name: 'sentiment-dissatisfied', color: '#de7123' },
     { id: 2, name: 'sentiment-neutral', color: '#0d0d0c' },
-    { id: 3, name: 'sentiment-savtisfied', color: '#11e5f0' },
+    { id: 3, name: 'sentiment-satisfied', color: '#11e5f0' },
     { id: 4, name: 'sentiment-very-satisfied', color: '#53f037' }
   ];
 

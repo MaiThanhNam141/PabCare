@@ -48,13 +48,13 @@ const QuizzScreen = ({ navigation }) => {
         handleSubmitMBTI()
         break;
       case 2:
-        Alert.alert("Tính năng đang phát triển")
+        Alert.alert('Lỗi',"Tính năng đang phát triển")
         break;
       case 3:
-        Alert.alert("Tính năng đang phát triển")
+        Alert.alert('Lỗi',"Tính năng đang phát triển")
         break;
       case 4:
-        Alert.alert("Tính năng đang phát triển")
+        Alert.alert('Lỗi',"Tính năng đang phát triển")
         break;
       default:
         goToScreen(selectedQuiz.title)

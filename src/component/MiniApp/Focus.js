@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
+import {focusBG} from '../../data/Link'
 import Congrat from './Congrat';
 import {
   Dimensions,
@@ -8,8 +9,8 @@ import {
   View,
   StatusBar,
   TouchableOpacity,
-  Platform,
-  Image
+  Image,
+  ImageBackground
 } from 'react-native';
 
 const screen = Dimensions.get("window");
@@ -88,6 +89,7 @@ const Focus = () => {
         onValueChange={(itemValue) => {
           setSelectHour(itemValue);
         }}
+        
         mode="dropdown"
       >
         {AVAILABLE_HOURS.map((value) => (
@@ -135,6 +137,7 @@ const Focus = () => {
 
   return (
     <View style={styles.container}>
+      <ImageBackground source={focusBG} style={styles.imageBG}>
       <StatusBar barStyle={"light-content"} />
       {
         isRunning ? (
@@ -149,14 +152,17 @@ const Focus = () => {
             <Text style={[styles.buttonTextStop, styles.buttonText]}>Stop</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={start} style={styles.button}>
-            <Text style={styles.buttonText}>Start</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={start} style={styles.button}>
+              <Text style={styles.buttonText}>Start</Text>
+            </TouchableOpacity>
+          </View>
         )
       }
       <View>
         <Congrat modalVisible={modalVisible} setModalVisible={(value) => setModalVisible(value)} />
       </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -164,9 +170,9 @@ const Focus = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#07121B",
+    // backgroundColor: "#CFF4D2",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "center"
   },
   button: {
     borderWidth: 10,
@@ -177,6 +183,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     margin: 50,
+    backgroundColor: '#CFF4D2'
   },
   buttonStop: {
     borderColor: "#FF851B"
@@ -196,38 +203,29 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: 150,
     marginLeft: 0,
-    ...Platform.select({
-      android: {
-        color: "#fff",
-        backgroundColor: "rgba(92, 92, 92, 0.206)",
-      }
-    }),
+    color: "#fff",
+    backgroundColor: "#5BA8A0",
   },
+
   pickerItem: {
     color: "#fff",
-    backgroundColor: "rgba(92, 92, 92, 0.206)",
+    backgroundColor: "#94B447",
     fontSize: 20,
-    ...Platform.select({
-      android: {
-        marginLeft: 10,
-        marginRight: 10,
-      }
-    })
+    marginLeft: 10,
+    marginRight: 10,
   },
+
   pickerItemSemiColon: {
     color: "#fff",
     fontSize: 20,
-    ...Platform.select({
-      android: {
-        marginLeft: 10,
-        marginRight: 10,
-      }
-    })
+    marginLeft: 10,
+    marginRight: 10,
   },
+
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: screen.height/3.4
+    marginTop: 50,
   },
   timerContainer: {
     flexDirection: 'column',
@@ -240,6 +238,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
+  imageBG:{
+    resizeMode: 'cover',
+    width: screen.width,
+    height: screen.height
+  }
 });
 
 export default Focus;

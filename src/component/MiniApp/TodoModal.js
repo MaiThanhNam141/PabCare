@@ -9,7 +9,8 @@ import {
     KeyboardAvoidingView, 
     TextInput, 
     Keyboard, 
-    ToastAndroid, } from 'react-native';
+    ToastAndroid,
+    Alert, } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -29,7 +30,7 @@ const TodoModal = (props) => {
 
     const addTodo = () => {
         if (!newTodo.trim()) {
-            ToastAndroid.show("Vui lòng nhập tên công việc", ToastAndroid.SHORT);
+            Alert.alert("Vui lòng nhập tên công việc");
             return;
         }
         if (!list.todos.some(todo => todo.title === newTodo)) {
@@ -40,11 +41,11 @@ const TodoModal = (props) => {
                 Keyboard.dismiss();
                 props.updateList(list);
             } catch (error) {
-                ToastAndroid.show("Đã có lỗi xảy ra", ToastAndroid.SHORT);
+                Alert.alert("Đã có lỗi xảy ra");
                 console.log("Todo Modal got errror:", error)
             }
         } else {
-            ToastAndroid.show("Công việc này đã tồn tại", ToastAndroid.SHORT);
+            Alert.alert("Công việc này đã tồn tại");
         }
     };
 
@@ -98,7 +99,7 @@ const TodoModal = (props) => {
                         <Text style={styles.taskCount}>{completedCount} of {taskCount} tasks</Text>
                     </View>
                 </View>
-                <View style={[styles.section, { flex: 4, marginVertical: 16 }]}>
+                <View style={[styles.section, { flex: 4, marginVertical: 10, marginRight:10 }]}>
                     <FlatList
                         data={list.todos}
                         renderItem={({ item, index }) => renderTodo({item, index})}
@@ -135,7 +136,8 @@ const styles = StyleSheet.create({
     },
     header: {
         justifyContent: "flex-end",
-        marginLeft: 64,
+        marginHorizontal: 15,
+        marginTop:70,
         borderBottomWidth: 3,
         paddingTop: 5
     },

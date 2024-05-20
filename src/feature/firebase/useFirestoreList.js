@@ -29,13 +29,55 @@ const useFirestoreList = () => {
     }
   };
 
+  const renewListRoutine = async (listID, userID) => {
+    try {
+        const renewListRef = firestore().collection('users').doc(userID).collection('lists').doc(listID);
+        const renewSnapshot = await renewListRef.get();
+
+        if (renewSnapshot.exists) {
+            const todos = renewSnapshot.data().todos;
+
+            // Thay đổi giá trị của completed thành false cho mỗi phần tử trong mảng todos
+            const updatedTodos = todos.map(todo => ({
+                ...todo,
+                completed: false
+            }));
+
+            // Cập nhật mảng todos mới vào tài liệu
+            await renewListRef.update({ todos: updatedTodos });
+        } else {
+            console.log("Document does not exist");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
   const getLists = async () => {
     try {
       const user = auth().currentUser;
+      const currentTimeStamp = firestore.FieldValue.serverTimestamp();
+
       const listRef = firestore().collection('users').doc(user.uid).collection('lists');
       const snapshot = await listRef.get()
+
       setRef(listRef);
       const lists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const renewRoutinePromises = snapshot.docs
+        .filter(doc => doc.data().routine)
+        .map(async doc => {
+          const listData = doc.data();
+          if (listData.initdate) {
+              const initdate = listData.initdate.toDate(); 
+              if (initdate < currentTimeStamp) {
+                await renewListRoutine(doc.id, user.uid);
+              }
+          }
+      });
+      await Promise.all(renewRoutinePromises);
+
       return lists;
     } catch (error) {
       console.error(error);
