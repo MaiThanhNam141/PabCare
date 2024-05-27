@@ -4,7 +4,7 @@ export const imageBG = require('../../assets/bg-image.jpg');
 export const AIImage = require('../../assets/Icons/google-gemini-ai-icon.png')
 export const gemini = require('../../assets/gemini.png')
 export const focusBG = require('../../assets/focus-bg.jpg')
-
+export const goldensleep = require('../../assets/Intro.gif')
 export const miniAppIcon = {
     mood: require('../../assets/Icons/Mood.png'),
     goldensleep: require('../../assets/Icons/GoldenSleep.png'),

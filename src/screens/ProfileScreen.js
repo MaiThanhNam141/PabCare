@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { defaultAvatar, logo, imageBG, profileScreenIcon } from '../data/Link';
+import { getUserInfo, getUserDocumentRef } from '../feature/firebase/handleFirestore';
 
 const ProfileScreen = ({navigation}) => {
   const [displayName, setDisplayName] = useState('');
@@ -21,6 +21,8 @@ const ProfileScreen = ({navigation}) => {
   const [phoneSub, setPhoneSub] = useState(0)
   const [addressSub, setAddressSub] = useState('')
 
+  const [userType, setUserType] = useState([])
+
   const [loading, setLoading] = useState(true)
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
@@ -30,15 +32,15 @@ const ProfileScreen = ({navigation}) => {
     const fetchData = async () => {
       try {
         const user = auth().currentUser       
-        const firestoreDataPromise = await firestore().collection('users').doc(user.uid).get();
-        if (firestoreDataPromise.exists) {
-          const userDataFromFirestore = firestoreDataPromise.data();
+        const firestoreDataPromise = await getUserInfo()
+        if (firestoreDataPromise) {
           setDisplayName(user.displayName || '');
           setAvatar(user.photoURL || '');
           setEmail(user.email || '');
-          setRealName(userDataFromFirestore.fullName || '');
-          setPhone(userDataFromFirestore.phone || '');
-          setAddress(userDataFromFirestore.address || '');
+          setRealName(firestoreDataPromise.fullName || '');
+          setPhone(firestoreDataPromise.phone || '');
+          setAddress(firestoreDataPromise.address || '');
+          setUserType(firestoreDataPromise.userType || [])
           setLoading(false)
           return;
         } else {
@@ -61,6 +63,26 @@ const ProfileScreen = ({navigation}) => {
     fetchData();
   }, [navigation]);
 
+  const userTypeToBadgeMap = {
+    ISTJ: require('../../assets/MBTI/ISTJ.jpg'),
+    ISFJ: require('../../assets/MBTI/ISFJ.jpg'),
+    INFJ: require('../../assets/MBTI/INFJ.jpg'),
+    INTJ: require('../../assets/MBTI/INTJ.jpg'),
+    ISTP: require('../../assets/MBTI/ISTP.jpg'),
+    ISFP: require('../../assets/MBTI/ISFP.jpg'),
+    INFP: require('../../assets/MBTI/INFP.jpg'),
+    INTP: require('../../assets/MBTI/INTP.jpg'),
+    ESTP: require('../../assets/MBTI/ESTP.jpg'),
+    ESFP: require('../../assets/MBTI/ESFP.jpg'),
+    ENFP: require('../../assets/MBTI/ENFP.jpg'),
+    ENTP: require('../../assets/MBTI/ENTP.jpg'),
+    ESTJ: require('../../assets/MBTI/ESTJ.jpg'),
+    ESFJ: require('../../assets/MBTI/ESFJ.jpg'),
+    ENFJ: require('../../assets/MBTI/ENFJ.jpg'),
+    ENTJ: require('../../assets/MBTI/ENTJ.jpg'),
+  }
+
+  const badgeSources = userType.map(type => userTypeToBadgeMap[type]).filter(Boolean);
 
   const googleSignOut = async () => {
     try {
@@ -86,8 +108,7 @@ const ProfileScreen = ({navigation}) => {
 
   const updateInfo = async () => {
     try {
-      const user = auth().currentUser;
-      const userDocRef = firestore().collection('users').doc(user.uid);
+      const userDocRef = getUserDocumentRef()
       const userDoc = await userDocRef.get();
   
       if (userDoc.exists) {
@@ -138,12 +159,26 @@ const ProfileScreen = ({navigation}) => {
         </TouchableOpacity>
         <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
         <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.imageAvatar} />
+        <Text style={styles.badgeTitle}>Huy hiệu</Text>
+        {badgeSources.length > 0 ? (
+          <FlatList
+            data={badgeSources}
+            renderItem={({ item }) => (
+              <Image source={item} style={styles.badge} />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal={true}
+            style={styles.badgeList}
+          />
+          ) : (
+            <Text style={{alignSelf:'flex-start'}}>Không sở hữu huy hiệu</Text>
+          )}
         <View>
           <TouchableOpacity onPress={handleCooperation} style={[styles.logoutContainer, styles.cooperateContainer]}>
-            <Text style={styles.logoutText}>Hợp tác <Image source={profileScreenIcon.handshake} /></Text>
+            <Text style={[styles.logoutText, {color:'#2EAC48'}]}>Hợp tác </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleDonation} style={[styles.logoutContainer, styles.donationContainer]}>
-            <Text style={styles.logoutText}>Từ thiện <Image source={profileScreenIcon.heart} /></Text>
+            <Text style={[styles.logoutText, {color:'#2AC5B7'}]}>Từ thiện <Image source={profileScreenIcon.heart} style={{width:30, height:30}}/></Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={googleSignOut} style={styles.logoutContainer}>
             <Text style={styles.logoutText}>Đăng xuất <MaterialIcons name="logout" size={20} style={styles.logoutIcon} /></Text>
@@ -197,7 +232,7 @@ const ProfileScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex:1
   },
   imageBackground: {
     flex: 1,
@@ -218,12 +253,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom:5,
   },
   imageAvatar: {
-    width: 200, 
-    height: 200, 
-    marginBottom: 15,
+    width: 150, 
+    height: 150, 
+    marginBottom: 10,
     borderRadius:100,
   },
   logoutContainer: {
@@ -231,10 +266,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 20,
     borderRadius: 20,
-    marginTop: 10,
-    width:180,
+    marginBottom: 10,
+    width:200,
     height:50,
-    alignItems:'center'
+    alignItems:'center',
+    borderWidth:1
   },
   logoContainer:{
     width: 150,
@@ -301,10 +337,27 @@ const styles = StyleSheet.create({
     margin:15
   },
   cooperateContainer:{
-    backgroundColor: '#56C596',
+    backgroundColor: '#ffffff',
   },
   donationContainer:{
-    backgroundColor: '#329D9C',
+    backgroundColor: '#ffffff',
+  },
+  badgeList:{
+    width:'90%',
+    margin:5,
+  },
+  badge:{
+    width:40,
+    height:40,
+    borderRadius:100,
+    marginRight:5
+  },
+  badgeTitle:{
+    fontWeight:'bold',
+    alignSelf:'flex-start',
+    marginVertical:10,
+    marginHorizontal:20,
+    fontSize:18
   }
 });
 

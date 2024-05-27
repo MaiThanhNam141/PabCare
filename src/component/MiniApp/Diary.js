@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import React from "react";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Agenda } from 'react-native-calendars';
 import { Card, Avatar } from 'react-native-paper';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import DiaryModal from "./DiaryModal";
+
 
 const timeToString = (time) => {
     const date = new Date(time);
@@ -73,15 +71,6 @@ const Diary = () => {
                 selected={timeToString(new Date())}
                 renderItem={renderItem}
             />
-            <View style={{ marginVertical: 48 }}>
-                <Modal animationType="slide" visible={modalVisible} onRequestClose={()=> setModalVisible(!modalVisible)}>
-                    <DiaryModal closeModal={()=>setModalVisible(!modalVisible)} addDiary={handleAddModal}/>
-                </Modal>
-                <TouchableOpacity style={styles.add} onPress={()=>setModalVisible(!modalVisible)}>
-                    <MaterialIcons name="add" size={16} color={'#24A6D9'} />
-                </TouchableOpacity>
-                <Text style={styles.add}>Add List</Text>
-            </View>
         </View>
     );
 }

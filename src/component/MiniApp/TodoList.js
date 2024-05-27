@@ -38,7 +38,7 @@ const TodoList = (props) => {
             <Modal animationType='fade' transparent={true} visible={showDeleteAlert} onRequestClose={()=>setShowDeleteAlert(false)}>
                 <View style={styles.alertContainer}>
                     <View style={styles.alertBox}>
-                        <Text style={styles.alertText}>Are you sure you want to delete this list?</Text>
+                        <Text style={styles.alertText}>Bạn có muốn xóa Todo này không?</Text>
                         <View style={styles.alertButtons}>
                             <TouchableOpacity onPress={()=>toggleDeleteAlert()} style={[styles.buttonContainer, {backgroundColor:'#fff'}]}>
                                 <Text style={[styles.confirmButtonText, {color:'black'}]}>Hủy</Text>

@@ -70,4 +70,4 @@ const setUserInfo = async (userData) => {
     return false; // Trả về false nếu không thể thiết lập
 }
 
-export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef };
+export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef };

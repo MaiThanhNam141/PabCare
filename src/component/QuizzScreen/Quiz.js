@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Image, ActivityIndicator, Alert } from 'react-native';
 import data from '../../data/QuizData';
 import QuizData2 from '../../data/QuizData2';
-import { getUserInfo } from '../../feature/firebase/handleFirestore';
-
-const Quizz = () => {
+import { getUserInfo, updateUserInfo, getUserDocumentRef } from '../../feature/firebase/handleFirestore';
+import { firebase } from '@react-native-firebase/firestore';
+const Quizz = ({navigation}) => {
   const allQuestion = data;
   const answer = QuizData2;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -44,6 +44,24 @@ const Quizz = () => {
       useNativeDriver: false
     }).start();
   };
+
+  const saveResult = async(type) => {
+    const userRef = getUserDocumentRef()
+    const userDoc = await userRef.get()
+    try {
+      if (!userDoc.exists || !userDoc.data().userType) {
+        await userRef.set({ userType: [type] }, { merge: true });
+      } else {
+        await userRef.update({
+          userType: firebase.firestore.FieldValue.arrayUnion(type)
+        });
+      }
+      navigation.goBack()
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Lỗi", "Hãy kiểm tra lại hệ thống mạng")
+    }
+  }
 
   const restart = () => {
     setShowScoreModal(false);
@@ -152,6 +170,42 @@ const Quizz = () => {
         );
     }
     };
+  
+  const renderPersonalityInfo = () => {
+    const personality = userPersonality();
+    if (personality === 'Xảy ra lỗi') {
+      return <Text>{personality}</Text>;
+    }
+    return (
+      <View>
+        <Text>
+          <Text style={styles.resultTextTitle}>Bạn là: </Text>
+          <Text style={styles.resultTextContent}>{personality.subName}</Text>
+        </Text>
+        <Text>
+          <Text style={styles.resultTextTitle}>Tính cách: </Text>
+          <Text style={styles.resultTextContent}>{personality.kind}</Text>
+        </Text>
+        <Text>
+          <Text style={styles.resultTextTitle}>Điểm mạnh: </Text>
+          <Text style={styles.resultTextContent}>{personality.positive}</Text>
+        </Text>
+        <Text>
+          <Text style={styles.resultTextTitle}>Điểm yếu: </Text>
+          <Text style={styles.resultTextContent}>{personality.negative}</Text>
+        </Text>
+        <Text>
+          <Text style={styles.resultTextTitle}>Cách cải thiện: </Text>
+          <Text style={styles.resultTextContent}>{personality.solution}</Text>
+        </Text>
+        <Text>
+          <Text style={styles.resultTextTitle}>Công việc phù hợp: </Text>
+          <Text style={styles.resultTextContent}>{personality.jobSuitable}</Text>
+        </Text>
+      </View>
+    );
+  }
+
   const getMaxPoint = () => {
     let maxType = [];
     maxType.push(points.E <= points.I ? 'I' : 'E');
@@ -173,14 +227,16 @@ const Quizz = () => {
     if(!selectedPersonality){
       return 'Xảy ra lỗi'
     }
-    return `
-      Bạn là: ${selectedPersonality.name}
-      Tính cách: ${selectedPersonality.kind}
-      Điểm mạnh: ${selectedPersonality.positive}
-      Điểm yếu: ${selectedPersonality.negative}
-      Cách cải thiện: ${selectedPersonality.solution}
-      Công việc phù hợp: ${selectedPersonality.jobSuitable}
-    `
+    return {
+      type: selectedPersonality.type,
+      subName: selectedPersonality.subName,
+      kind: selectedPersonality.kind,
+      positive: selectedPersonality.positive,
+      negative: selectedPersonality.negative,
+      solution: selectedPersonality.solution,
+      jobSuitable: selectedPersonality.jobSuitable,
+      bgImage: selectedPersonality.bgImage
+    };
   }
 
   return (
@@ -194,12 +250,16 @@ const Quizz = () => {
         <Modal animationType="slide" transparent={true} visible={showScoreModal}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Congratulations</Text>
+              <Text style={styles.modalTitle}>Kết quả</Text>
               <View style={styles.scoreContainer}>
-                <Text style={styles.text}>Kết quả: {showScoreModal?<Text style={{fontWeight:'bold'}}>{userPersonality()}</Text>:null}</Text>
+              {showScoreModal ? renderPersonalityInfo() : null}
+              {showScoreModal && userPersonality().bgImage ?  <Image source={userPersonality().bgImage} style={styles.resultImage}/> : null }
               </View>
               <TouchableOpacity style={styles.retryButton} onPress={restart}>
-                <Text style={[styles.text, styles.retryButtonText]}>Retry</Text>
+                <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.retryButton, {backgroundColor: '#F46A23'}]} onPress={()=>saveResult(userPersonality().type)}>
+                <Text style={[styles.text, styles.retryButtonText, {color: 'white'}]}>Lưu</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -213,7 +273,7 @@ const Quizz = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#defae3'
+    backgroundColor: '#edf0ef'
   },
   innerContainer: {
     flex: 1,
@@ -273,7 +333,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0472e'
   },
   nextButton: {
-    // marginTop: 30,
     backgroundColor: '#07e3cd',
     padding: 15,
     width: 360,
@@ -318,15 +377,35 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   retryButton: {
-    backgroundColor: '#1b7557',
-    padding: 20,
+    borderColor: '#1b7557',
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 20,
+    paddingVertical:10,
     width: '100%',
-    borderRadius: 20
+    borderRadius: 20,
+    marginVertical:5
   },
   retryButtonText: {
     textAlign: 'center',
-    color: 'white',
+    color: 'black',
     fontSize: 20
+  },
+  resultImage:{
+    resizeMode:'contain',
+    width:250,
+    height:250,
+    backgroundColor: 'black',
+    marginTop:10,
+    borderRadius: 10,
+    marginVertical: 10
+  },
+  resultTextTitle:{
+    fontWeight:'bold',
+    textAlign:'justify',
+  },
+  resultTextContent:{
+    fontWeight:'400',
+    textAlign:'justify',
   }
 });
 

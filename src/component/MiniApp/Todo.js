@@ -119,7 +119,7 @@ const Todo = () => {
         <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
           <MaterialIcons name="add" size={16} color={'#24A6D9'} />
         </TouchableOpacity>
-        <Text style={styles.add}>Add List</Text>
+        <Text style={styles.add}> Thêm </Text>
       </View>
       <View style={{ height: 500, padding: 5 }}>
         <FlatList

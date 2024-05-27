@@ -8,6 +8,8 @@ export default QuizData2 = [
         negative: 'Thường quá cứng nhắc, khó chấp nhận ý kiến mới',
         solution: 'Học cách mở lòng và linh hoạt hơn trong việc đối diện với sự thay đổi',
         jobSuitable: 'Kế toán, quản lý dự án, luật sư',
+        subName: 'Kẻ không ngủ',
+        bgImage: require('../../assets/MBTI/ISTJ.jpg')
     },
     {
         id: 1,
@@ -18,6 +20,8 @@ export default QuizData2 = [
         negative: 'Dễ căng thẳng khi phải đối mặt với áp lực',
         solution: 'Học cách quản lý stress và thể hiện nhu cầu của bản thân',
         jobSuitable: 'Y tá, giáo viên, nhân viên hành chính',
+        subName: 'Hộ vệ',
+        bgImage: require('../../assets/MBTI/ISFJ.jpg')
     },
     {
         id: 2,
@@ -28,6 +32,8 @@ export default QuizData2 = [
         negative: 'Dễ cảm thấy cô đơn và không được hiểu',
         solution: 'Tìm kiếm cơ hội gặp gỡ với những người có ý kiến giống nhau, thể hiện cảm xúc và ý kiến của bản thân một cách rõ ràng',
         jobSuitable: 'Tư vấn tâm lý, nhà thiết kế đồ họa, chuyên viên tư vấn',
+        subName: 'Người cầu khẩn ánh sáng',
+        bgImage: require('../../assets/MBTI/ISTJ.jpg')
     },
     {
         id: 3,
@@ -38,6 +44,9 @@ export default QuizData2 = [
         negative: 'Khó chấp nhận ý kiến khác, ít linh hoạt',
         solution: 'Học cách lắng nghe và đánh giá ý kiến của người khác một cách công bằng',
         jobSuitable: 'Quản lý chiến lược, nhà phân tích dữ liệu, kiến trúc sư',
+        subName: 'Hoàng đế tri thức',
+        bgImage: require('../../assets/MBTI/INTJ.jpg')
+
     },
     {
         id: 4,
@@ -48,6 +57,8 @@ export default QuizData2 = [
         negative: 'Dễ mất kiên nhẫn, thiếu sự cẩn thận',
         solution: 'Phát triển khả năng kiên nhẫn và tập trung vào kỹ năng quản lý thời gian',
         jobSuitable: 'Kỹ sư cơ khí, nhà nghiên cứu, kỹ thuật viên',
+        subName: 'Hắc ám chi quang',
+        bgImage: require('../../assets/MBTI/ISTP.jpg')
     },
     {
         id: 5,
@@ -58,6 +69,8 @@ export default QuizData2 = [
         negative: 'Dễ mất tự tin, ít quyết đoán',
         solution: 'Phát triển tự tin và khả năng đưa ra quyết định một cách dứt khoát',
         jobSuitable: 'Nghệ sĩ, nhà thiết kế thời trang, nhiếp ảnh gia',
+        subName: 'Ma thuật sư',
+        bgImage: require('../../assets/MBTI/ISFP.jpg')
     },
     {
         id: 6,
@@ -68,6 +81,8 @@ export default QuizData2 = [
         negative: 'Dễ cảm thấy bất an và mất hứng thú',
         solution: 'Tìm kiếm sự ổn định và xác định mục tiêu cụ thể để theo đuổi',
         jobSuitable: 'Nhà văn, nhà thơ, chuyên viên tư vấn nghệ thuật',
+        subName: 'Cánh tay trật tự ',
+        bgImage: require('../../assets/MBTI/INFP.jpg')
     },
     {
         id: 7,
@@ -78,6 +93,8 @@ export default QuizData2 = [
         negative: 'Dễ mất quan tâm và mất kiên nhẫn',
         solution: 'Phát triển khả năng tập trung và quản lý thời gian',
         jobSuitable: 'Nhà khoa học, lập trình viên, nhà nghiên cứu',
+        subName: 'Kẻ bị trói',
+        bgImage: require('../../assets/MBTI/INTP.jpg')
     },
     {
         id: 8,
@@ -88,6 +105,8 @@ export default QuizData2 = [
         negative: 'Thiếu suy nghĩ trước khi hành động, ít kiên nhẫn',
         solution: 'Học cách đánh giá rủi ro và tham khảo ý kiến của người khác trước khi ra quyết định',
         jobSuitable: 'Nhân viên kinh doanh, nhân viên bán hàng, tổ chức sự kiện',
+        subName:'Người chăn cừu',
+        bgImage:require('../../assets/MBTI/ESTP.jpg')
     },
     {
         id: 9,
@@ -98,6 +117,8 @@ export default QuizData2 = [
         negative: 'Dễ mất tập trung, ít kiên nhẫn',
         solution: 'Phát triển khả năng tập trung và quản lý thời gian',
         jobSuitable: 'Diễn viên, MC, nhà văn hóa',
+        subName: 'Bậc thầy lừa gạt',
+        bgImage: require('../../assets/MBTI/ESFP.jpg')
     },
     {
         id: 10,
@@ -108,6 +129,8 @@ export default QuizData2 = [
         negative: 'Dễ mất kiên nhẫn, ít quyết đoán',
         solution: 'Học cách đưa ra quyết định một cách dứt khoát và xác định mục tiêu cụ thể',
         jobSuitable: 'Nhà tổ chức sự kiện, nhà tư vấn, nhà biên kịch',
+        subName:'Kẻ chinh phục',
+        bgImage:require('../../assets/MBTI/ENFP.jpg')
     },
     {
         id: 11,
@@ -118,6 +141,8 @@ export default QuizData2 = [
         negative: 'Dễ mất quan tâm và mất kiên nhẫn',
         solution: 'Phát triển khả năng tập trung và đưa ra quyết định dựa trên thông tin cụ thể',
         jobSuitable: 'Luật sư, nhà kinh doanh, nhà phân tích',
+        subName: 'Tiên tri',
+        bgImage: require('../../assets/MBTI/ENTP.jpg')
     },
     {
         id: 12,
@@ -128,6 +153,8 @@ export default QuizData2 = [
         negative: 'Thường quá cứng nhắc và ít linh hoạt',
         solution: 'Học cách linh hoạt hơn trong quản lý thời gian và đánh giá ý kiến của người khác',
         jobSuitable: 'Quản lý sản xuất, quản lý dự án, quản lý nhân sự',
+        subName: 'Con mắt toàn tri',
+        bgImage: require('../../assets/MBTI/ESTJ.jpg')
     },
     {
         id: 13,
@@ -138,6 +165,8 @@ export default QuizData2 = [
         negative: 'Dễ mất khả năng tự quản lý và tự chăm sóc',
         solution: 'Tìm kiếm sự cân bằng giữa việc chăm sóc người khác và chăm sóc bản thân',
         jobSuitable: 'Quản lý dịch vụ khách hàng, nhà tư vấn hôn nhân, giáo viên',
+        subName: 'Người dệt mộng',
+        bgImage: require('../../assets/MBTI/ESFJ.jpg')
     },
     {
         id: 14,
@@ -148,6 +177,8 @@ export default QuizData2 = [
         negative: 'Dễ căng thẳng khi phải đối mặt với xung đột',
         solution: 'Học cách quản lý stress và thể hiện nhu cầu của bản thân',
         jobSuitable: 'Tư vấn tâm lý, giáo viên, nhà tổ chức sự kiện',
+        subName:'Người đưa đò',
+        bgImage:require('../../assets/MBTI/ENFJ.jpg')
     },
     {
         id: 15,
@@ -158,5 +189,7 @@ export default QuizData2 = [
         negative: 'Thường quá cứng nhắc và ít kiên nhẫn',
         solution: 'Học cách linh hoạt hơn trong quản lý thời gian và đánh giá ý kiến của người khác',
         jobSuitable: 'CEO, quản lý chiến lược, quản lý dự án',
+        subName: 'Hắc hoàng đế',
+        bgImage: require('../../assets/MBTI/ENTJ.jpg')
     },
 ]

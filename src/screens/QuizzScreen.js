@@ -84,6 +84,9 @@ const QuizzScreen = ({ navigation }) => {
           <View style={styles.title}>
             <Text style={styles.titleText}>CÁC BÀI TEST</Text>
           </View>
+          <TouchableOpacity style={styles.totalResult}>
+            <Text style={styles.totalResultText}>Tổng hợp các kết quả</Text>
+          </TouchableOpacity>
           <FlatList
             data={renderData}
             renderItem={renderTest}
@@ -244,6 +247,19 @@ const styles = StyleSheet.create({
     fontWeight:'900',
     fontSize:30,
     color:'black'
+  },
+  totalResult:{
+    borderColor:'green',
+    borderWidth:1,
+    width:340,
+    height:80,
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  totalResultText:{
+    fontSize:25,
+    textAlign:'center',
+    fontWeight:'600'
   }
 });
 
