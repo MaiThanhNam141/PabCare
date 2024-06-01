@@ -40,7 +40,7 @@ const AddListModal = (props) => {
           setName(text);
         }
         else{
-            ToastAndroid.show("Tên danh sách tối đa 30 ký tự!!!", ToastAndroid.SHORT)
+            Alert.alert("Quá dài!", "Tên danh sách tối đa 30 ký tự")
         }
       };
 
