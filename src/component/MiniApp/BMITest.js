@@ -30,7 +30,9 @@ const BMITest = ({ navigation }) => {
         if (weight && height) {
             let heightMeters = height / 100;
             const bmiResult = (weight / (heightMeters * heightMeters)).toFixed(2);
-            navigation.navigate("bmiresult", { bmi: Number.parseInt(bmiResult) });
+            const weightPredict = ((heightMeters - 1) * 90).toFixed(5);
+            console.log(weightPredict);
+            navigation.navigate("bmiresult", { bmi: Number.parseInt(bmiResult), weight:Number.parseInt(weightPredict) });
         }
     };
 

@@ -4,8 +4,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { GoogleGenerativeAI  } from "@google/generative-ai"
 import {API_KEY} from '@env'
 import { UserContext } from "../../feature/context/UserContext"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { gemini, AIImage } from "../../data/Link"
+import { getUserInfo } from "../../feature/firebase/handleFirestore"
+
 const ChatAI = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -20,11 +21,10 @@ const ChatAI = () => {
     useEffect(() => {
       const fetchDataAndSetLoading = async () => {
         try {
-          const userData = await AsyncStorage.getItem('user');
+          const userData = await getUserInfo()
           if (userData){
-            const user = JSON.parse(userData)
-            setDisplayName(user.displayName)
-            setAvatar(user.photoURL)
+            setDisplayName(userData.displayName)
+            setAvatar(userData.photoURL)
           }
         } catch (error) {
           setUserLoggedIn(false)
@@ -102,17 +102,19 @@ const ChatAI = () => {
           showsVerticalScrollIndicator = {false}
           onContentSizeChange={() => scrollToBottom()}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={[styles.messageContainer, isCurrentUser(item.sender) && styles.currentUserMessage]}>
-              {!isCurrentUser(item.sender) && (
-                <View style={styles.senderInfo}>
-                  <Image style={styles.avatar} source={{ uri: item.avatar }} />
-                  <Text style={styles.senderName}>{item.sender}</Text>
-                </View>
-              )}
-              <Text>{item.text}</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            const isUri = typeof item.avatar === 'string';
+            return(
+              <View style={[styles.messageContainer, isCurrentUser(item.sender) && styles.currentUserMessage]}>
+                {!isCurrentUser(item.sender) && (
+                  <View style={styles.senderInfo}>
+                    <Image style={styles.avatar} source={isUri ? { uri: item.avatar } : item.avatar} />
+                    <Text style={styles.senderName}>{item.sender}</Text>
+                  </View>
+                )}
+                <Text>{item.text}</Text>
+              </View>
+          )}}
         />
         <View style={styles.inputContainer}>
           <TextInput

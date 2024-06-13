@@ -6,7 +6,7 @@ const BmiResultScreen = ({ route, navigation }) => {
 
     let params = route.params || {};
     let bmi = params.bmi || 30;
-
+    let weight = params.weight;
     const getBmiDataKey = (bmi) => {
         switch (true) {
             case (bmi < 18.5):
@@ -53,6 +53,9 @@ const BmiResultScreen = ({ route, navigation }) => {
 
                     <Text style={styles.description}>
                         {resultHash[bmiData].text}
+                    </Text>
+                    <Text>
+                        Cân nặng bạn nên hướng tới:{weight} 
                     </Text>
                 </View>
 

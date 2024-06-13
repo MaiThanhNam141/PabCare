@@ -3,15 +3,18 @@ import React from "react";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native"
 import { MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator } from "./StackNavigator";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { UserContext } from "../feature/context/UserContext";
 
 const Tab = createBottomTabNavigator()
 
 const BottomTabNavigation = () => {
-  const hiddenRoutes = ['focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq'];
+  const hiddenRoutes = ['focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'loginscreen'];
+  const {userLoggedIn, setUserLoggedIn} = React.useContext(UserContext);
 
   return(
     <Tab.Navigator
-      initialRouteName='HomeScreen'
+      // initialRouteName='HomeScreen'
+      initialRouteName={userLoggedIn?'HomeScreen':'ProfileScreen'}
       screenOptions={{
         headerShown:false,
         tabBarShowLabel: false,
@@ -50,11 +53,12 @@ const BottomTabNavigation = () => {
         })}
       />
       <Tab.Screen name='ProfileScreen' component={ProfileStackNavigator}
-        options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="account-circle" size={size} color={color} />
-            ),
-          }}
+        options={({route}) => ({
+          tabBarIcon: ({ size, color }) => (
+            <MaterialIcons name="account-circle" size={size} color={color} />
+          ),
+          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
+        })}
       />
           
     </Tab.Navigator>

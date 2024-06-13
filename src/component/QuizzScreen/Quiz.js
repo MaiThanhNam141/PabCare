@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Image, ActivityIndicator, Alert } from 'react-native';
 import data from '../../data/QuizData';
 import QuizData2 from '../../data/QuizData2';
-import { getUserInfo, updateUserInfo, getUserDocumentRef } from '../../feature/firebase/handleFirestore';
+import { getUserInfo, getUserDocumentRef } from '../../feature/firebase/handleFirestore';
 import { firebase } from '@react-native-firebase/firestore';
 const Quizz = ({navigation}) => {
   const allQuestion = data;

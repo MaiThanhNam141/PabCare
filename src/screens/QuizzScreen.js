@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert, ScrollView } from 'react-native';
 import { updateUserInfo, getUserInfo } from '../feature/firebase/handleFirestore';
 import { imageBG } from '../data/Link';
 
 const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [userGender, setUserGender] = useState('');
+  const [userInfo, setUserInfo] = useState('');
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = await getUserInfo();
         setUserGender(user.gender || '');
+        setUserInfo(user || '')
       } catch (error) {
         ToastAndroid.show("Hãy thử đăng nhập lại!", ToastAndroid.SHORT)
       }
@@ -42,16 +45,15 @@ const QuizzScreen = ({ navigation }) => {
   };
 
   const handleQuizSelection = (selectedQuiz) => {
-    console.log('Selected Quiz:', selectedQuiz);
     switch (selectedQuiz.id) {
       case 1:
         handleSubmitMBTI()
         break;
       case 2:
-        Alert.alert('Lỗi',"Tính năng đang phát triển")
+        goToScreen('eq')
         break;
       case 3:
-        Alert.alert('Lỗi',"Tính năng đang phát triển")
+        goToScreen('bdi')
         break;
       case 4:
         Alert.alert('Lỗi',"Tính năng đang phát triển")
@@ -77,6 +79,15 @@ const QuizzScreen = ({ navigation }) => {
     }
   };
 
+  const renderUserType = () => {
+  return userInfo?.userType?.map((type, index) => (
+    <Text key={index} style={styles.userTypeText}>
+      <Text style={{fontWeight:'300'}}>Kiểu:</Text> {type}{' '}
+      <Text style={{fontWeight:'300'}}>ở lần thử:</Text> {index + 1}
+    </Text>
+  ));
+};
+
   return (
     <View style={styles.container}>
       <ImageBackground source={imageBG} style={styles.imageBackground}>
@@ -84,9 +95,9 @@ const QuizzScreen = ({ navigation }) => {
           <View style={styles.title}>
             <Text style={styles.titleText}>CÁC BÀI TEST</Text>
           </View>
-          <TouchableOpacity style={styles.totalResult}>
+          {/* <TouchableOpacity style={styles.totalResult} onPress={()=>setShowUserInfoModal(true)}>
             <Text style={styles.totalResultText}>Tổng hợp các kết quả</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <FlatList
             data={renderData}
             renderItem={renderTest}
@@ -134,6 +145,28 @@ const QuizzScreen = ({ navigation }) => {
               </View>
             </Modal>
           )}
+           <Modal
+            visible={showUserInfoModal} 
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setShowUserInfoModal(false)}
+          >
+            <View style={styles.userInfoModalContainer}>
+              <View style={styles.userInfoModalContent}>
+                <Text style={styles.userInfoModalTitle}>Thông tin người dùng</Text>
+                <View style={styles.userTypeContainer}>
+                  {renderUserType()}
+                </View>
+                <Text>{userInfo.BDIRateID}</Text>
+                <TouchableOpacity
+                  style={[styles.submitButton, { backgroundColor: '#f20f2d' }]}
+                  onPress={() => setShowUserInfoModal(false)}
+                >
+                  <Text style={styles.submitText}>Đóng</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ImageBackground>
     </View>
@@ -260,6 +293,31 @@ const styles = StyleSheet.create({
     fontSize:25,
     textAlign:'center',
     fontWeight:'600'
+  },
+  userInfoModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  userInfoModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  userInfoModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  userTypeContainer: {
+    marginVertical: 10,
+  },
+  userTypeText:{
+    fontWeight:'bold',
+    textAlign:'center',
   }
 });
 

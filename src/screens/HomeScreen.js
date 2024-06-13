@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, StyleSheet, Image, Modal, TouchableOpacity, Text, ImageBackground } from "react-native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RenderSliderImage from "../component/OtherScreen/RenderSliderImage";
 import { getDocumentRef, getUserInfo } from "../feature/firebase/handleFirestore";
-import { AIImage, logo, imageBG } from "../data/Link";
+import { AIImage, imageBG, defaultAvatar, HomeScreenIcon } from "../data/Link";
 import LinearGradient from "react-native-linear-gradient";
+import { UserContext } from "../feature/context/UserContext";
 
 const HomeScreen = ({ navigation }) => {
+    const [logoUser, setLogoUser] = useState('')
     const [displayName, setDisplayName] = useState('');
     const [coin, setCoin] = useState(0)
     const [type, setType] = useState("???")
@@ -14,7 +16,7 @@ const HomeScreen = ({ navigation }) => {
     const [eq, setEQ] = useState("???")
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderImages, setSliderImages] = useState([]);
-
+    const {userLoggedIn} = useContext(UserContext);
     useEffect(() => {
         const fetchDataAndSetLoading = async () => {
             try {
@@ -28,6 +30,7 @@ const HomeScreen = ({ navigation }) => {
                     setType(userData.userType[userData.userType.length -1] || '???')
                     setBMI(userData.bmi || '???')
                     setEQ(userData.eq || '???')
+                    setLogoUser(userData.photoURL || defaultAvatar)
                 }
                 if(snapshot) {
                     const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -42,7 +45,7 @@ const HomeScreen = ({ navigation }) => {
         };
 
         fetchDataAndSetLoading();
-    }, [navigation]);
+    }, [navigation, userLoggedIn]);
 
     const goChatAI = () => {
         navigation.navigate('chatai')
@@ -50,6 +53,7 @@ const HomeScreen = ({ navigation }) => {
     
     return (
         <ImageBackground source={imageBG} style={{flex:1, resizeMode:'contain'}}>
+            {/* <Text style={{color:'#fff', alignSelf:'center'}}>Welcome</Text> */}
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
                 <TouchableOpacity
                 style={styles.chatbotContainer}
@@ -61,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
                         <MaterialIcons name="notifications" size={30} color="#000" />
                     </TouchableOpacity>
                 <View style={styles.header}>
-                    <Image style={styles.logo} source={logo} />
+                    <Image style={styles.logo} source={{uri:logoUser || defaultAvatar}} />
                     <Text style={styles.userNameText}>{displayName}</Text>
                 </View>
                 <View style={styles.divider}/>
@@ -76,23 +80,23 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.quickstartMenu}>
                     <View style={styles.menuItem}>
-                        <Image source={logo} style={styles.menuItemImage} />
+                        <Image source={HomeScreenIcon.member} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Thẻ thành viên</Text>
                     </View>
                     <View style={styles.menuItem}>
-                        <Image source={logo} style={styles.menuItemImage} />
+                        <Image source={HomeScreenIcon.advise} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Tư vấn</Text>
                     </View>
                     <View style={styles.menuItem}>
-                        <Image source={logo} style={styles.menuItemImage} />
+                        <Image source={HomeScreenIcon.professors} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Các chuyên gia</Text>
                     </View>
                     <View style={styles.menuItem}>
-                        <Image source={logo} style={styles.menuItemImage} />
+                        <Image source={HomeScreenIcon.book} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Sách</Text>
                     </View>
                     <View style={styles.menuItem}>
-                        <Image source={logo} style={styles.menuItemImage} />
+                        <Image source={HomeScreenIcon.charity} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Từ thiện</Text>
                     </View>
                 </View>
@@ -158,8 +162,10 @@ const styles = StyleSheet.create({
         zIndex:1
     },
     chatbotLogo:{
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
+        borderRadius:100,
+        borderWidth:3
     },
     chatbotText:{
         backgroundColor:'rgba(248, 242, 242, 0.6)',
@@ -179,11 +185,13 @@ const styles = StyleSheet.create({
         top: 0
     },
     logo: {
-        width: 100,
-        height: 100,
+        width: 40,
+        height: 40,
         resizeMode: "contain",
         alignSelf:'center',
-        borderRadius:100
+        borderRadius:100,
+        marginLeft:15,
+        marginVertical:6
     },
     userNameText:{
         color:'#87bc9d',
@@ -192,10 +200,11 @@ const styles = StyleSheet.create({
     },
     divider:{
         backgroundColor:'#ffffff',
-        width:'90%',
+        width:'92%',
         height:5,
         marginBottom:30,
-        alignSelf:'center'
+        alignSelf:'center',
+        marginTop:5
     },
     mood:{
         backgroundColor:'#87bc9d',
@@ -204,7 +213,7 @@ const styles = StyleSheet.create({
         justifyContent:'space-around',
         marginHorizontal:15,
         borderRadius:100,
-        height:60
+        height:40
     },
     moodText:{
         color:'#153d2e',
@@ -213,7 +222,7 @@ const styles = StyleSheet.create({
     },
     coinContainer:{
         backgroundColor:'#3a915e',
-        paddingVertical:10,
+        paddingVertical:5,
         paddingRight:20,
         paddingLeft:45,
         borderRadius:50,
@@ -221,11 +230,11 @@ const styles = StyleSheet.create({
     cointext:{
         color:'#ffffff',
         fontWeight:'800',
-        fontSize:12
+        fontSize:10
     },
     quickstartMenu:{
         width:400,
-        marginVertical:10,
+        marginBottom:10,
         marginHorizontal:15,
         flexDirection:'row',
         flexWrap:'wrap',
@@ -242,15 +251,17 @@ const styles = StyleSheet.create({
     },
     menuItemImage:{
         borderRadius:10,
-        width: 60,
-        height:60,
+        width: 48,
+        height:48,
         resizeMode:'center',
-        borderWidth:1,
-        borderColor:'#000000'
+        borderWidth:4,
+        borderColor:'#153d2e',
+
     },
     menuItemText:{
         fontWeight:'500',
-        textAlign:'center'
+        textAlign:'center',
+        fontSize:10
     },
     status:{
         backgroundColor:'#87bc9d',
@@ -266,12 +277,14 @@ const styles = StyleSheet.create({
     statusItem:{
         backgroundColor:'#3a915e',
         borderRadius:60,
-        paddingRight:20,
-        paddingLeft:20,
+        paddingRight:10,
+        paddingLeft:10,
         paddingVertical:10,
         color:'#fff',
         fontWeight:'500',
-        fontSize:14
+        fontSize:12,
+        width:100,
+        textAlign:'center'
     },
     modalContainer: {
         flex: 1,
@@ -311,7 +324,7 @@ const styles = StyleSheet.create({
     },
 
     renderImage:{
-        marginVertical:20,
+        marginVertical:26,
         alignSelf:'flex-start',
         marginLeft:15,
     },
