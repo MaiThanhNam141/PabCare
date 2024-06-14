@@ -8,14 +8,19 @@ import { UserContext } from "../feature/context/UserContext";
 const Tab = createBottomTabNavigator()
 
 const BottomTabNavigation = () => {
+  const {userLoggedIn} = React.useContext(UserContext);
   const hiddenRoutes = ['focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'loginscreen'];
-  const {userLoggedIn, setUserLoggedIn} = React.useContext(UserContext);
-
+  const getTabBarStyle = (route) => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+    if (hiddenRoutes.includes(routeName)) {
+      return { display: "none" };
+    }
+    return {};
+  };
   return(
     <Tab.Navigator
-      // initialRouteName='HomeScreen'
       initialRouteName={userLoggedIn?'HomeScreen':'ProfileScreen'}
-      screenOptions={{
+      screenOptions={({route}) => ({
         headerShown:false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: "black",
@@ -27,38 +32,37 @@ const BottomTabNavigation = () => {
           overflow:"hidden",
           backgroundColor:"#fff",
           height:49,
+          ...getTabBarStyle(route)
         },
-
-      }}>
+      })}
+    >
       <Tab.Screen name='HomeScreen' component={MainStackNavigator}
-        options={({route})=>({
-          tabBarIcon: ({ size, color}) => (
+        options={{
+          tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="home" size={size} color={color} />
-          ),
-          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
-        })} />
+          )
+        }}  
+      />
       <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
-        options={({route})=>({
+        options={{
           tabBarIcon: ({ size, color}) => (
             <MaterialIcons name="quiz" size={size} color={color} />
-          ),
-          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
-        })} />
+          )
+        }} 
+      />
       <Tab.Screen name='MiniApp' component={MiniAppStackNavigator}
-        options={({route}) => ({
+        options={{ 
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="list-alt" size={size} color={color} />
-            ),
-            tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
-        })}
+            )
+        }}
       />
       <Tab.Screen name='ProfileScreen' component={ProfileStackNavigator}
-        options={({route}) => ({
+        options={{
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="account-circle" size={size} color={color} />
-          ),
-          tabBarStyle: hiddenRoutes.includes(getFocusedRouteNameFromRoute(route) ?? "") ? { display: "none" } : {}
-        })}
+          )
+        }}
       />
           
     </Tab.Navigator>

@@ -25,8 +25,8 @@ const HomeScreen = ({ navigation }) => {
                     getDocumentRef('SliderImages')
                   ]);
                 if (userData) {
-                    setCoin(userData.coin)
-                    setDisplayName(userData.displayName);
+                    setCoin(userData.coin || 0)
+                    setDisplayName(userData.displayName || 'Pabcare user');
                     setType(userData.userType[userData.userType.length -1] || '???')
                     setBMI(userData.bmi || '???')
                     setEQ(userData.eq || '???')

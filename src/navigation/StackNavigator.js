@@ -46,15 +46,9 @@ const MainStackNavigator = () =>{
 
 
 const ProfileStackNavigator = () =>{
-    const {userLoggedIn, setUserLoggedIn} = useContext(UserContext);
-
-    useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged(user => {
-            setUserLoggedIn(!!user);
-        });
-
-        return unsubscribe;
-    }, [setUserLoggedIn]);
+    const {userLoggedIn, loading} = useContext(UserContext);
+    if(loading)
+        return null
     return(
         <Stack.Navigator
             screenOptions={{

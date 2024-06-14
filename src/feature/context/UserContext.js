@@ -5,17 +5,18 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [userLoggedIn, setUserLoggedIn] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(user => {
           setUserLoggedIn(user)
-          console.log(user)
+          setLoading(false);
         });
         return unsubscribe;
     }, []);
 
     return (
-        <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn }}>
+        <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn, loading }}>
             {children}
         </UserContext.Provider>
     );
