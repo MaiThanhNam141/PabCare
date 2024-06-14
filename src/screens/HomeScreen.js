@@ -17,6 +17,7 @@ const HomeScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderImages, setSliderImages] = useState([]);
     const {userLoggedIn} = useContext(UserContext);
+
     useEffect(() => {
         const fetchDataAndSetLoading = async () => {
             try {
@@ -25,22 +26,25 @@ const HomeScreen = ({ navigation }) => {
                     getDocumentRef('SliderImages')
                   ]);
                 if (userData) {
-                    setCoin(userData.coin || 0)
+                    setCoin(userData?.coin || 0)
                     setDisplayName(userData.displayName || 'Pabcare user');
-                    setType(userData.userType[userData.userType.length -1] || '???')
-                    setBMI(userData.bmi || '???')
-                    setEQ(userData.eq || '???')
+                    setBMI(userData?.bmi || '???')
+                    setEQ(userData?.eq || '???')
                     setLogoUser(userData.photoURL || defaultAvatar)
+                    const userType = userData?.userType;
+                    if (userType) {
+                        setType(userType[userType.length - 1]);
+                    } else {
+                        setType('???');
+                    }
                 }
                 if(snapshot) {
                     const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     const imageUrls = images.map(image => image.link);
-
-
                     setSliderImages(imageUrls);
                 }
             } catch (error) {
-                console.error("Lỗi khi fetch dữ liệu và set loading:", error);
+                console.error("HomeScreen: Lỗi khi fetch dữ liệu và set loading:", error);
             }
         };
 
@@ -53,7 +57,6 @@ const HomeScreen = ({ navigation }) => {
     
     return (
         <ImageBackground source={imageBG} style={{flex:1, resizeMode:'contain'}}>
-            {/* <Text style={{color:'#fff', alignSelf:'center'}}>Welcome</Text> */}
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
                 <TouchableOpacity
                 style={styles.chatbotContainer}
@@ -73,6 +76,7 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={styles.moodText}>Tâm trạng của bạn hôm nay thế nào ?</Text>
                     <View style={styles.coinContainer}>
                         <Text style={styles.cointext}>{coin}</Text>
+                        <Image source={HomeScreenIcon.coin} style={styles.coinImage} />
                     </View>
                 </View>
                 <View style={styles.renderImage}>
@@ -147,7 +151,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         marginBottom: 0,
     },
-
     chatbotContainer: {
         backgroundColor: 'transparent',
         width: 200,
@@ -162,10 +165,12 @@ const styles = StyleSheet.create({
         zIndex:1
     },
     chatbotLogo:{
-        width: 36,
-        height: 36,
+        width: 62,
+        height: 62,
         borderRadius:100,
-        borderWidth:3
+        borderWidth:3,
+        borderWidth:5,
+        borderColor:'#87bc9d'
     },
     chatbotText:{
         backgroundColor:'rgba(248, 242, 242, 0.6)',
@@ -202,7 +207,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#ffffff',
         width:'92%',
         height:5,
-        marginBottom:30,
+        marginBottom:15,
         alignSelf:'center',
         marginTop:5
     },
@@ -223,9 +228,12 @@ const styles = StyleSheet.create({
     coinContainer:{
         backgroundColor:'#3a915e',
         paddingVertical:5,
-        paddingRight:20,
-        paddingLeft:45,
+        paddingRight:10,
+        paddingLeft:40,
         borderRadius:50,
+        justifyContent:'center',
+        alignItems:'center',
+        flexDirection:'row'
     },
     cointext:{
         color:'#ffffff',
@@ -233,9 +241,9 @@ const styles = StyleSheet.create({
         fontSize:10
     },
     quickstartMenu:{
-        width:400,
+        width:410,
         marginBottom:10,
-        marginHorizontal:15,
+        marginHorizontal:0,
         flexDirection:'row',
         flexWrap:'wrap',
         justifyContent:'flex-start',
@@ -247,12 +255,13 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         marginLeft:10,
         width:'21%',
-        marginTop:5
+        marginTop:5,
+        marginBottom:15
     },
     menuItemImage:{
         borderRadius:10,
-        width: 48,
-        height:48,
+        width: 50,
+        height:50,
         resizeMode:'center',
         borderWidth:4,
         borderColor:'#153d2e',
@@ -322,12 +331,19 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
     },
-
     renderImage:{
-        marginVertical:26,
+        marginBottom:26,
+        marginTop:13,
         alignSelf:'flex-start',
         marginLeft:15,
     },
-    
+    coinImage:{
+        resizeMode:'center',
+        borderRadius:100,
+        overflow:'hidden',
+        width:20,
+        height:20,
+        marginLeft:3
+    }
 })
 export default HomeScreen;

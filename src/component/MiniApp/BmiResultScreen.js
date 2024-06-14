@@ -54,7 +54,7 @@ const BmiResultScreen = ({ route, navigation }) => {
                     <Text style={styles.description}>
                         {resultHash[bmiData].text}
                     </Text>
-                    <Text>
+                    <Text style={[styles.description, {marginTop:0}]}>
                         Cân nặng bạn nên hướng tới:{weight} 
                     </Text>
                 </View>

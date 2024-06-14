@@ -5,7 +5,8 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { defaultAvatar, logo, imageBG, profileScreenIcon } from '../data/Link';
+import LinearGradient from "react-native-linear-gradient";
+import { defaultAvatar, logo, imageBG } from '../data/Link';
 import { getUserInfo, getUserDocumentRef } from '../feature/firebase/handleFirestore';
 
 const ProfileScreen = ({navigation}) => {
@@ -31,12 +32,11 @@ const ProfileScreen = ({navigation}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user = auth().currentUser       
         const firestoreDataPromise = await getUserInfo()
         if (firestoreDataPromise) {
-          setDisplayName(user.displayName || '');
-          setAvatar(user.photoURL || '');
-          setEmail(user.email || '');
+          setDisplayName(firestoreDataPromise.displayName || '');
+          setAvatar(firestoreDataPromise.photoURL || '');
+          setEmail(firestoreDataPromise.email || '');
           setRealName(firestoreDataPromise.fullName || '');
           setPhone(firestoreDataPromise.phone || '');
           setAddress(firestoreDataPromise.address || '');
@@ -99,7 +99,7 @@ const ProfileScreen = ({navigation}) => {
   
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={{flex:1}}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
       </View>
     )
@@ -148,40 +148,58 @@ const ProfileScreen = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={imageBG} style={styles.imageBackground}>
-      <View style={styles.mainContainer}>
-        <TouchableOpacity
-          style={styles.settingButton}
-          onPress={() => {setIsUpdateModalVisible(true)}}
-        >
-          <MaterialIcons name="settings" size={35} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
-        <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.imageAvatar} />
-        <Text style={styles.badgeTitle}>Huy hiệu</Text>
-        {badgeSources.length > 0 ? (
-          <FlatList
-            data={badgeSources}
-            renderItem={({ item }) => (
-              <Image source={item} style={styles.badge} />
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal={true}
-            style={styles.badgeList}
-          />
-          ) : (
-            <Text style={{alignSelf:'flex-start'}}>Không sở hữu huy hiệu</Text>
-          )}
+    <ImageBackground source={imageBG} style={styles.imageBackground}>
+      <LinearGradient colors={['#FFFFFF', '#3A915E']} style={styles.mainContainer}>
+        <View style={{flexDirection:'row', justifyContent:'flex-end', alignItems:'center', marginBottom:30}}>
+          <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.imageAvatar} />
+          <View style={{flexDirection:'column'}}>
+            <Text style={styles.title}>{displayName}</Text>
+            <Text style={[styles.title, { fontWeight: '400', fontSize: 12}]}>{email}</Text>
+            <Text style={styles.badgeTitle}>Huy hiệu</Text>
+            {badgeSources.length > 0 ? (
+              <FlatList
+                data={badgeSources}
+                renderItem={({ item }) => (
+                  <Image source={item} style={styles.badge} />
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal={true}
+                style={styles.badgeList}
+                showsHorizontalScrollIndicator={false}
+              />
+              ) : (
+                <Text style={{alignSelf:'flex-start'}}>Boo! Không sở hữu huy hiệu</Text>
+              )}
+          </View>
+        </View>
+        <View style={styles.divider}/>
         <View>
           <TouchableOpacity onPress={handleCooperation} style={[styles.logoutContainer, styles.cooperateContainer]}>
-            <Text style={[styles.logoutText, {color:'#2EAC48'}]}>Hợp tác </Text>
+            <Text style={[styles.logoutText, {color:'#2EAC48'}]}>Đăng ký gói Prenium </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleDonation} style={[styles.logoutContainer, styles.donationContainer]}>
-            <Text style={[styles.logoutText, {color:'#2AC5B7'}]}>Từ thiện <Image source={profileScreenIcon.heart} style={{width:30, height:30}}/></Text>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Cửa hàng </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.divider}/>
+        <View>
+          <TouchableOpacity onPress={handleCooperation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Hợp tác </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Từ thiện </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.divider}/>
+        <View>
+          <TouchableOpacity onPress={() => {setIsUpdateModalVisible(true)}} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Thông tin thêm</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Hỗ trợ </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={googleSignOut} style={styles.logoutContainer}>
-            <Text style={styles.logoutText}>Đăng xuất <MaterialIcons name="logout" size={20} style={styles.logoutIcon} /></Text>
+            <Text style={[styles.logoutText, { color:'red'}]}>Đăng xuất </Text>
           </TouchableOpacity>
         </View>
         <Modal
@@ -213,8 +231,8 @@ const ProfileScreen = ({navigation}) => {
               >{address?address:''}</TextInput>
 
             </KeyboardAvoidingView>
-            <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b'}]} onPress={()=>updateInfo()}>
-              <Text style={styles.logoutText}>Cập nhật</Text>
+            <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b', alignItems:'center', marginTop: 15}]} onPress={()=>updateInfo()}>
+              <Text style={[styles.logoutText]}>Cập nhật</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.closeButton}
@@ -224,59 +242,52 @@ const ProfileScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </Modal>
-      </View>
-      </ImageBackground>
-    </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex:1
-  },
   imageBackground: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
   },
   mainContainer:{
-    justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: '#fafaf7',
     borderRadius: 25,
     width: '100%',
-    height: '85%',
+    height: '88%',
     alignSelf: 'flex-end',
     marginTop: '20%'
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
     marginBottom:5,
   },
   imageAvatar: {
-    width: 150, 
-    height: 150, 
+    width: 100, 
+    height: 100, 
     marginBottom: 10,
+    marginRight:20,
     borderRadius:100,
+    top:-35,
   },
   logoutContainer: {
-    backgroundColor: '#cf3119',
+    backgroundColor: '#fff',
     paddingVertical: 5,
     paddingHorizontal: 20,
     borderRadius: 20,
     marginBottom: 10,
-    width:200,
-    height:50,
-    alignItems:'center',
-    borderWidth:1
-  },
-  logoContainer:{
-    width: 150,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width:320,
+    height:47,
+    alignItems:'flex-start',
+    justifyContent:'center',
+    borderWidth:1,
+    borderColor:'#a6a6a6'
   },
   logo: {
     width: '100%',
@@ -284,37 +295,18 @@ const styles = StyleSheet.create({
     opacity:1
   },
   logoutText:{
-    fontWeight: 'bold',
-    fontSize: 20,
-    color: '#ffffff',
+    fontWeight: '500',
+    fontSize: 15,
+    color: '#000',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     
   },
-  logoutIcon: {
-    marginLeft: 10,
-    color: 'white',
-  },
-  settingButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
-  },
-
   closeButton: {
     position: 'absolute',
     top: 20,
     right: 20,
-  },
-  settingsItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  settingsItemText: {
-    fontSize: 18,
   },
   subModalContainer: {
     flex: 1,
@@ -325,7 +317,7 @@ const styles = StyleSheet.create({
   subModalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 40,
   },
   textInput:{
     backgroundColor:'#f2f7f7',
@@ -336,29 +328,29 @@ const styles = StyleSheet.create({
     minWidth: 300,
     margin:15
   },
-  cooperateContainer:{
-    backgroundColor: '#ffffff',
-  },
-  donationContainer:{
-    backgroundColor: '#ffffff',
-  },
   badgeList:{
-    width:'90%',
-    margin:5,
+    width:'85%',
+    marginRight:5,
   },
   badge:{
-    width:40,
-    height:40,
+    width:35,
+    height:35,
     borderRadius:100,
     marginRight:5
   },
   badgeTitle:{
     fontWeight:'bold',
-    alignSelf:'flex-start',
-    marginVertical:10,
-    marginHorizontal:20,
+    marginVertical:0,
     fontSize:18
-  }
+  },
+  divider:{
+    backgroundColor:'#fff',
+    width:390,
+    height:2,
+    marginBottom:15,
+    alignSelf:'center',
+    marginTop:5,
+},
 });
 
 export default ProfileScreen;

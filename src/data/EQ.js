@@ -439,5 +439,4 @@ export default EQ = [
             { text: 'Tôi luôn giải quyết các mâu thuẫn một cách triệt để ngay khi nó vừa nhen nhóm xuất hiện.', type:'RelationshipManagement',point: 4 },
         ]
     },
-    
 ]

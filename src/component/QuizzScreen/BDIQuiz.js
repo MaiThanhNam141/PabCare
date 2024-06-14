@@ -194,13 +194,12 @@ const BDIQuiz = ({navigation}) => {
         {renderQuestion()}
         {renderOptions()}
         {renderNextButton()}
-        <Modal animationType="slide" transparent={true} visible={showScoreModal}>
+        <Modal animationType="slide" transparent={true} visible={showScoreModal} onRequestClose={()=>setShowScoreModal(false)}>
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Kết quả</Text>
                     <View style={styles.scoreContainer}>
-                    {showScoreModal ? renderPersonalityInfo() : null}
-                    
+                      {showScoreModal ? renderPersonalityInfo() : null}
                     </View>
                     <TouchableOpacity style={styles.retryButton} onPress={restart}>
                         <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>

@@ -47,14 +47,11 @@ const MainStackNavigator = () =>{
 
 const ProfileStackNavigator = () =>{
     const {userLoggedIn, loading} = useContext(UserContext);
-    if(loading)
-        return null
+    if(loading) return null
     return(
         <Stack.Navigator
             screenOptions={{
-                headerStyle: {
-                    backgroundColor: "#91c4f8"
-                },
+                headerStyle: {backgroundColor: "#91c4f8"},
                 headerShown: false
             }}>
             {userLoggedIn ? (

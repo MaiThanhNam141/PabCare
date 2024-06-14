@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert, ScrollView, Image } from 'react-native';
 import { updateUserInfo, getUserInfo } from '../feature/firebase/handleFirestore';
-import { imageBG } from '../data/Link';
+import { imageBG, QuizzScreenIcon } from '../data/Link';
 
 const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
@@ -27,19 +27,27 @@ const QuizzScreen = ({ navigation }) => {
   }
 
   const renderData = [
-    { id: 1, title: 'MBTI Test', color: '#4287f5' },
-    { id: 2, title: 'EQ Test', color: '#bcc219' },
-    { id: 3, title: 'BDI Test', color: '#e06519' },
-    { id: 4, title: 'DISC', color: '#000'},
+    { id: 1, title: 'MBTI Test', questions: 52, link:QuizzScreenIcon.mbti},
+    { id: 2, title: 'EQ Test', questions: 40, link:QuizzScreenIcon.eq},
+    { id: 3, title: 'BDI Test', questions: 21, link:QuizzScreenIcon.bdi},
+    { id: 4, title: 'DISC', questions: '???', link:QuizzScreenIcon.disc},
   ];
 
   const renderTest = ({ item }) => {
+    const alignmentStyle = item.id % 2 === 0 ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' };
     return (
       <TouchableOpacity
-        style={[styles.quizItem, { borderColor: item.color }]}
+        style={styles.quizItem}
         onPress={() => handleQuizSelection(item)}
-      >
-        <Text style={[styles.quizTitle, {color:item.color}]}>{item.title}</Text>
+      > 
+        <>
+          <Image source={item.link} style={styles.quizImage}></Image>
+          <View style={styles.quizImageOverlay} />
+        </>
+        <Text style={[alignmentStyle ,styles.quizTitle]}>{item.title}</Text>
+        <View style={[alignmentStyle, {backgroundColor:'#fff', borderRadius:5, marginHorizontal:15}]}>
+          <Text style={styles.quizNumber}>{item.questions}</Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -80,12 +88,12 @@ const QuizzScreen = ({ navigation }) => {
   };
 
   const renderUserType = () => {
-  return userInfo?.userType?.map((type, index) => (
-    <Text key={index} style={styles.userTypeText}>
-      <Text style={{fontWeight:'300'}}>Kiểu:</Text> {type}{' '}
-      <Text style={{fontWeight:'300'}}>ở lần thử:</Text> {index + 1}
-    </Text>
-  ));
+    return userInfo?.userType?.map((type, index) => (
+      <Text key={index} style={styles.userTypeText}>
+        <Text style={{fontWeight:'300'}}>Kiểu:</Text> {type}{' '}
+        <Text style={{fontWeight:'300'}}>ở lần thử:</Text> {index + 1}
+      </Text>
+    ));
 };
 
   return (
@@ -93,7 +101,7 @@ const QuizzScreen = ({ navigation }) => {
       <ImageBackground source={imageBG} style={styles.imageBackground}>
         <View style={styles.mainContainer}>
           <View style={styles.title}>
-            <Text style={styles.titleText}>CÁC BÀI TEST</Text>
+            <Text style={styles.titleText}>ALL TEST</Text>
           </View>
           {/* <TouchableOpacity style={styles.totalResult} onPress={()=>setShowUserInfoModal(true)}>
             <Text style={styles.totalResultText}>Tổng hợp các kết quả</Text>
@@ -103,7 +111,7 @@ const QuizzScreen = ({ navigation }) => {
             renderItem={renderTest}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.flatListContainer}
-            numColumns={2}
+            numColumns={1}
           />
 
           {userGender === '' && (
@@ -196,23 +204,30 @@ const styles = StyleSheet.create({
   flatListContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     width: '100%',
   },
   quizItem: {
-    width: 160, 
-    height: 160, 
-    margin: 10, 
+    width: 330, 
+    height: 110, 
+    marginHorizontal: 10, 
+    marginVertical:5,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:'#fff',
-    borderWidth: 1
   },
   quizTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: 'bold',
     color: 'white',
+    marginHorizontal:15
+  },
+  quizNumber:{
+    fontWeight:'700',
+    fontSize:15,
+    paddingVertical:3,
+    paddingHorizontal:35,
+    color:'black',
   },
   modalContainer: {
     flex: 1,
@@ -272,14 +287,14 @@ const styles = StyleSheet.create({
   title:{
     padding:5,
     margin:10,
-    marginBottom:20,
+    marginBottom:10,
     alignItems:'center',
     marginTop:30
   },
   titleText:{
     fontWeight:'900',
     fontSize:30,
-    color:'black'
+    color:'#87bc9d'
   },
   totalResult:{
     borderColor:'green',
@@ -318,7 +333,28 @@ const styles = StyleSheet.create({
   userTypeText:{
     fontWeight:'bold',
     textAlign:'center',
-  }
+  },
+  quizImage:{
+    width:330,
+    height:110,
+    borderRadius:15,
+    resizeMode:'cover',
+    overflow:'hidden',
+    position:'absolute',
+    top: 0,
+    left: 0,
+    borderWidth:1,
+    borderColor:'#87bc9d',
+  },
+  quizImageOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius:15,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+  },
 });
 
 export default QuizzScreen;

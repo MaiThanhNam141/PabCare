@@ -229,7 +229,7 @@ const Quizz = ({navigation}) => {
     }
     return {
       type: selectedPersonality.type,
-      subName: selectedPersonality.subName,
+      subName: selectedPersonality.name,
       kind: selectedPersonality.kind,
       positive: selectedPersonality.positive,
       negative: selectedPersonality.negative,

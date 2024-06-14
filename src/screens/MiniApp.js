@@ -17,8 +17,7 @@ const MiniApp = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={imageBG} style={styles.imageBackground}>
+    <ImageBackground source={imageBG} style={styles.imageBackground}>
         <View style={styles.mainContainer}>
           <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('todo')}>
             <Image source={miniAppIcon.todoList} style={[styles.itemImg, {height:129}]} />
@@ -48,8 +47,7 @@ const MiniApp = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </ImageBackground>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -82,6 +80,7 @@ const styles = StyleSheet.create({
     borderWidth:0,
     backgroundColor: '#fafaf7',
     borderRadius: 15,
+    marginTop:5
   },
   itemText: {
     fontSize: 16,

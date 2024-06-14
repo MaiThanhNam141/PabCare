@@ -4,15 +4,17 @@ import auth from '@react-native-firebase/auth';
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [userLoggedIn, setUserLoggedIn] = useState(null);
+    const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(user => {
-          setUserLoggedIn(user)
-          setLoading(false);
+            setUserLoggedIn(user);
+            setLoading(false);
+            console.log("onAuthStateChanged: ", !!user);
         });
-        return unsubscribe;
+
+        return () => unsubscribe();
     }, []);
 
     return (

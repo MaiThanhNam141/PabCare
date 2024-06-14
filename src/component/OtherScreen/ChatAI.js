@@ -75,7 +75,7 @@ const ChatAI = () => {
         
         setMessages(prevMessages => [
           ...prevMessages,
-          { id: Math.random().toString(), text: aiResponse, sender: 'Gemini', avatar: AIImage } 
+          { id: Math.random().toString(), text: aiResponse, sender: 'Pabmind', avatar: AIImage } 
         ]);
       } catch (error) {
         console.error("Lỗi khi gửi tin nhắn:", error);
@@ -161,8 +161,8 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   avatar: {
-    width: 25,
-    height: 25,
+    width: 30,
+    height: 30,
     borderRadius: 100,
     marginRight: 5,
   },
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
   },
   titleAvatar:{
     margin: 5,
-    width: 100,
-    height:50,
     resizeMode:'center',
+    width:220,
+    height:80,
   }
 });

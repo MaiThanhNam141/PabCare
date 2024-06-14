@@ -43,7 +43,7 @@ const EQQuiz = ({ navigation }) => {
   const saveResult = async (score) => {
     try {
       setLoading(true);
-      await updateUserInfo({ EQ: score });
+      await updateUserInfo({ eq: score });
     } catch (error) {
       console.log(error);
       Alert.alert("Lỗi", "Hãy kiểm tra lại hệ thống mạng");
@@ -151,15 +151,12 @@ const EQQuiz = ({ navigation }) => {
 
   const renderPersonalityInfo = () => {
     const personality = userPersonality();
-    if (personality === 'Lỗi') {
-      return <Text>{personality}</Text>;
-    }
     return (
       <View style={styles.returnContainer}>
         <View style={styles.eqContainer}>
           <Text style={styles.eqText}>EQ: {personality.EQ}</Text>
         </View>
-        <View style={styles.infoContainer}>
+        <View>
           <View style={styles.infoRow}>
             <Text style={styles.resultTextTitle}>Emotional Awareness:</Text>
             <Text style={styles.resultTextContent}>{personality.EA.comment}</Text>
@@ -177,6 +174,18 @@ const EQQuiz = ({ navigation }) => {
             <Text style={styles.resultTextContent}>{personality.RM.comment}</Text>
           </View>
         </View>
+        <TouchableOpacity style={styles.retryButton} onPress={restart}>
+          <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
+        </TouchableOpacity>
+        {!loading ?
+          <TouchableOpacity style={[styles.retryButton, { backgroundColor: '#F46A23' }]} onPress={() => saveResult(userPersonality().EQ)}>
+            <Text style={[styles.text, styles.retryButtonText, { color: 'white' }]}>Lưu</Text>
+          </TouchableOpacity>
+          :
+          <View>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        }
       </View>
     );
   };
@@ -198,9 +207,6 @@ const EQQuiz = ({ navigation }) => {
     let indexRM = calculateResult(points.RelationshipManagement);
 
     const total = points.EmotionalAwareness + points.EmotionalManagement + points.SocialEmotionalAwareness + points.RelationshipManagement;
-    if (!total) {
-      return 'Lỗi';
-    }
 
     return {
       EA: answer.EmotionalAwareness[indexEA],
@@ -219,25 +225,13 @@ const EQQuiz = ({ navigation }) => {
         {renderQuestion()}
         {renderOptions()}
         {renderNextButton()}
-        <Modal animationType="slide" transparent={true} visible={showScoreModal}>
+        <Modal animationType="slide" transparent={true} visible={showScoreModal} onRequestClose={()=>setShowScoreModal(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Kết quả</Text>
               <View style={styles.scoreContainer}>
                 {showScoreModal ? renderPersonalityInfo() : null}
               </View>
-              <TouchableOpacity style={styles.retryButton} onPress={restart}>
-                <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
-              </TouchableOpacity>
-              {!loading ?
-                <TouchableOpacity style={[styles.retryButton, { backgroundColor: '#F46A23' }]} onPress={() => saveResult(userPersonality().EQ)}>
-                  <Text style={[styles.text, styles.retryButtonText, { color: 'white' }]}>Lưu</Text>
-                </TouchableOpacity>
-                :
-                <View>
-                                    <ActivityIndicator size="large" color="#0000ff" />
-                </View>
-              }
             </View>
           </View>
         </Modal>
@@ -348,7 +342,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    width: '100%',
+    width: 300,
     borderRadius: 20,
     marginVertical: 5
   },
@@ -358,7 +352,6 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   returnContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -371,11 +364,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: 'center',
   },
-  infoContainer: {
-    width: '100%',
-  },
   infoRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     marginVertical: 5,
   },

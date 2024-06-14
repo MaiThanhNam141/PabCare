@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import SliderSelect from './SliderSelect';
 import CounterSelect from './CounterSelect';
 import GenderSelect from './GenderSelect'
+import { updateUserInfo } from '../../feature/firebase/handleFirestore';
 
 const BMITest = ({ navigation }) => {
 
@@ -27,12 +28,13 @@ const BMITest = ({ navigation }) => {
 
     const calculateBmi = () => {
         let { weight, height } = formState;
+        
         if (weight && height) {
             let heightMeters = height / 100;
-            const bmiResult = (weight / (heightMeters * heightMeters)).toFixed(2);
-            const weightPredict = ((heightMeters - 1) * 90).toFixed(5);
-            console.log(weightPredict);
+            const bmiResult = (weight / (heightMeters * heightMeters)).toFixed(0);
+            const weightPredict = ((heightMeters - 1) * 90).toFixed(0);
             navigation.navigate("bmiresult", { bmi: Number.parseInt(bmiResult), weight:Number.parseInt(weightPredict) });
+            updateUserInfo({bmi:Number.parseInt(bmiResult)})
         }
     };
 
