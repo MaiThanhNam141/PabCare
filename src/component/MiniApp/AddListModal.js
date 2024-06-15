@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Text, View, StyleSheet, TouchableOpacity, TextInp
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AddListModal = (props) => {
-    const backgroundColor = ["#5CD859", "#24A6D9", "#8022D9", "#D159D8", "#D85963", "#D88559"];
+    const backgroundColor = ["#48d344", "#24A6D9", "#8022D9", "#D159D8", "#D85963", "#D88559"];
     const [name, setName] = useState("");
     const [color, setColor] = useState(backgroundColor[0]);
     const [routine, setRoutine] = useState(false);

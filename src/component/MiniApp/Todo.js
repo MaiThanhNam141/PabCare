@@ -6,6 +6,7 @@ import AddListModal from './AddListModal.js';
 import useFirestoreList from '../../feature/firebase/useFirestoreList.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firebase } from '@react-native-firebase/firestore';
+import LinearGradient from "react-native-linear-gradient";
 
 const Todo = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
@@ -50,6 +51,13 @@ const Todo = () => {
   };
 
   const renderList = ({ item }) => {
+    if (item.addNew) {
+      return (
+        <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
+          <MaterialIcons name="add" size={32} color={'#2b7449'} />
+        </TouchableOpacity>
+      );
+    }
     return (
       <TodoList list={item} updateList={updateListFireStore} deleteList={handleDeleteList} />
     );
@@ -71,6 +79,7 @@ const Todo = () => {
       ToastAndroid.show("Thêm todo thất bại", ToastAndroid.SHORT)
     }
   };
+
   const handleDeleteList = async (listId) => {
     try {
       setReload(!reload)
@@ -83,7 +92,6 @@ const Todo = () => {
 
   const updateListFireStore = async (list) => {
     try {
-      // setReload(!reload)
       setLists(lists.map(item => (item.id === list.id ? list : item)));
       await updateList(list);
     } catch (error) {
@@ -101,29 +109,19 @@ const Todo = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
       <Modal animationType='slide' visible={addTodoVisible} onRequestClose={toggleAddTodoModal}>
         <AddListModal closeModal={toggleAddTodoModal} addList={addListFireStore} />
       </Modal>
-      <View>
-        <Text>User: {user ? user : 'Guest'}</Text>
-      </View>
       <View style={{ flexDirection: 'row'}}>
-        <View style={styles.divider} />
-          <Text style={styles.title}>
-            Todo<Text style={{ fontWeight: "300", color: '#24A6D9' }}> Lists</Text>
-          </Text>
-        <View style={styles.divider} />
+        <View style={[styles.divider, {marginLeft:15}]} />
+          <Text style={styles.title}>User: {user}</Text>
+        <View style={[styles.divider, {marginRight:15}]} />
       </View>
-      <View style={{ marginVertical: 38 }}>
-        <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
-          <MaterialIcons name="add" size={16} color={'#24A6D9'} />
-        </TouchableOpacity>
-        <Text style={styles.add}> Thêm </Text>
-      </View>
+      <Text style={styles.subTitle}>Danh sách</Text>
       <View style={{ height: 500, padding: 5 }}>
         <FlatList
-          data={lists}
+          data={[...lists, { id: 'add', addNew: true }]}
           keyExtractor={item => item.id.toString()}
           horizontal={false}
           numColumns={2}
@@ -133,7 +131,7 @@ const Todo = () => {
           keyboardShouldPersistTaps="always"
         />
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -144,32 +142,44 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
   },
   divider: {
-    backgroundColor: '#A7CBD9',
-    height: 1,
+    backgroundColor: '#87bc9d',
+    height: 3,
     flex: 1,
-    alignSelf: "center"
+    alignSelf: "center",
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: '#203436',
-    paddingHorizontal: 45
+    fontSize: 12,
+    fontWeight: "700",
+    color: '#fafaf7',
+    paddingHorizontal: 50,
+    paddingVertical:10,
+    borderRadius:35,
+    backgroundColor:'#87bc9d',
+  },
+  subTitle:{
+    fontWeight:'bold',
+    color:'black',
+    fontSize:22,
+    alignSelf:'flex-start',
+    marginLeft:10,
+    marginBottom:-80,
+    marginTop:-40
   },
   addList: {
-    borderWidth: 2,
-    borderColor: '#A7CBD9',
-    borderRadius: 4,
-    padding: 16,
+    paddingVertical: 25,
+    paddingHorizontal: 15,
+    borderRadius: 16,
+    margin: 10,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent:'center',
+    width: 170,
+    height: 120,
+    borderWidth: 3,
+    backgroundColor: '#fafaf7',
+    borderColor:'#d9d9d9'
   },
-  add: {
-    color: '#24A6D9',
-    fontWeight: "600",
-    fontSize: 14,
-    marginTop: 8
-  }
+
 });

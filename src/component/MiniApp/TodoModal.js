@@ -9,7 +9,6 @@ import {
     KeyboardAvoidingView, 
     TextInput, 
     Keyboard, 
-    ToastAndroid,
     Alert, } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -61,8 +60,8 @@ const TodoModal = (props) => {
                 <TouchableOpacity onPress={() => toggleTodoCompleted(index)}>
                     <MaterialIcons
                         name={item.completed ? 'check-box' : 'check-box-outline-blank'}
-                        size={24}
-                        color="#999"
+                        size={28}
+                        color="#87bc9d"
                         style={{ width: 32 }}
                     />
                 </TouchableOpacity>
@@ -75,11 +74,14 @@ const TodoModal = (props) => {
                     >{item.title}
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
-                    <View style={styles.deleteButton}>
-                        <MaterialIcons name='delete' size={18} color="#e6e6e6" />
-                    </View>
-                </TouchableOpacity>
+                {item.completed?
+                    (<TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
+                        <View style={styles.deleteButton}>
+                            <MaterialIcons name='delete' size={28} color="#87bc9d" />
+                        </View>
+                    </TouchableOpacity>)
+                    :(null)
+                }
             </View>
         );
     };
@@ -87,17 +89,10 @@ const TodoModal = (props) => {
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
             <SafeAreaView style={styles.container}>
-                <TouchableOpacity
-                    style={{ position: 'absolute', top: 20, right: 25, zIndex: 10 }}
-                    onPress={props.closeModal}
-                >
-                    <MaterialIcons name='close' size={35} color="#000" />
-                </TouchableOpacity>
-                <View style={[styles.section, styles.header, { borderBottomColor: list.color }]} >
-                    <View>
-                        <Text style={styles.title}>{list.name}</Text>
-                        <Text style={styles.taskCount}>{completedCount} of {taskCount} tasks</Text>
-                    </View>
+                <View style={styles.headerTitle}>
+                    <View style={styles.divider} />
+                    <Text style={styles.title}>{list.name}</Text>
+                    <View style={styles.divider} />
                 </View>
                 <View style={[styles.section, { flex: 4, marginVertical: 10, marginRight:10 }]}>
                     <FlatList
@@ -110,12 +105,14 @@ const TodoModal = (props) => {
                 </View>
                 <View style={[styles.section, styles.footer]}>
                     <TextInput
-                        style={[styles.input, { borderColor: list.color }]}
+                        style={[styles.input, { borderColor: list.color, backgroundColor: list.color }]}
                         onChangeText={text => setNewTodo(text)}
                         value={newTodo}
+                        placeholder='Điều gì đó bạn muốn thực hiện...'
+                        placeholderTextColor={'#ffffff'}
                     />
-                    <TouchableOpacity style={[styles.addTodo, { backgroundColor: list.color }]} onPress={addTodo}>
-                        <MaterialIcons name='add' size={16}/>
+                    <TouchableOpacity style={styles.addTodo} onPress={addTodo}>
+                        <MaterialIcons name='reply' size={35} color={list.color}/>
                     </TouchableOpacity>
                 </View>
                 
@@ -128,24 +125,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center"
     },
     section: {
         flex: 1,
-        alignSelf: "stretch"
+        alignSelf: "stretch",
     },
     header: {
         justifyContent: "flex-end",
         marginHorizontal: 15,
-        marginTop:70,
         borderBottomWidth: 3,
         paddingTop: 5
     },
     title: {
-        fontSize: 30,
-        fontWeight: "800",
-        color: "#000"
-    },
+        fontSize: 12,
+        fontWeight: "700",
+        color: '#fafaf7',
+        paddingHorizontal: 50,
+        paddingVertical:10,
+        borderWidth:1,
+        borderRadius:35,
+        backgroundColor:'#87bc9d',
+      },
     taskCount: {
         marginTop: 4,
         marginBottom: 16,
@@ -156,44 +156,58 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         flexDirection: 'row',
         alignItems: "center",
-        // paddingVertical: 10
+        justifyContent:'center'
     },
     input: {
         flex: 1,
         height: 48,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 6,
-        marginRight: 8,
-        paddingHorizontal: 8
+        borderWidth: 1,
+        borderRadius: 60,
+        paddingHorizontal: 8,
+        color:'white',
+        paddingLeft:25,
+        marginLeft:-10
     },
+
     addTodo: {
         borderRadius: 4,
         padding: 16,
-        alignItems: "center",
-        justifyContent: "center"
+        marginRight:-15
     },
     todoContainer: {
-        paddingVertical: 16,
+        paddingBottom: 16,
         flexDirection: "row",
         alignItems: "center",
-        paddingLeft: 32,
-        flex: 1
+        flex: 1,
     },
     todo: {
         color: "#000",
         fontWeight: "700",
-        fontSize: 16,
+        fontSize: 18,
         marginLeft:10
     },
     deleteButton: {
         flex: 1,
-        backgroundColor: '#ad050e',
         justifyContent:'center',
         alignItems: 'center',
         width: 27,
         height: 27,
         borderRadius: 100
     },
+    divider: {
+        backgroundColor: '#87bc9d',
+        height: 3,
+        flex: 1,
+        alignSelf: "center",
+    },
+    headerTitle:{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 15,
+        paddingTop: 5,
+        marginTop:25
+    }
 });
 
 export default TodoModal;

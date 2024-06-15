@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { View, ActivityIndicator } from "react-native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native"
 import { MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator } from "./StackNavigator";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -19,14 +18,7 @@ const BottomTabNavigation = () => {
     }
     return {};
   };
-  if (loading) {
-    // return (
-    //   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //     <ActivityIndicator size="large" color="#0000ff" />
-    //   </View>
-    // );
-  }
-  console.log("Bottom tab: ",!!userLoggedIn);
+
   return(
     <Tab.Navigator
       initialRouteName={userLoggedIn?'HomeScreen':'ProfileScreen'}
