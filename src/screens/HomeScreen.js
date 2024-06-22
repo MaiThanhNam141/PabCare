@@ -6,6 +6,7 @@ import { getDocumentRef, getUserInfo } from "../feature/firebase/handleFirestore
 import { AIImage, imageBG, defaultAvatar, HomeScreenIcon } from "../data/Link";
 import LinearGradient from "react-native-linear-gradient";
 import { UserContext } from "../feature/context/UserContext";
+import Membership from "../component/OtherScreen/Membership";
 
 const HomeScreen = ({ navigation }) => {
     const [logoUser, setLogoUser] = useState('')
@@ -51,8 +52,8 @@ const HomeScreen = ({ navigation }) => {
         fetchDataAndSetLoading();
     }, [navigation, userLoggedIn]);
 
-    const goChatAI = () => {
-        navigation.navigate('chatai')
+    const goToScreen = (route) => {
+        navigation.navigate(route)
     }
     
     return (
@@ -60,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
                 <TouchableOpacity
                 style={styles.chatbotContainer}
-                onPress={() => goChatAI()}>
+                onPress={() => goToScreen("chatai")}>
                     <Text style={styles.chatbotText}>Hôm nay tôi có thể giúp gì cho bạn nè</Text>
                     <Image style={styles.chatbotLogo} source={AIImage} />
                 </TouchableOpacity>
@@ -83,26 +84,26 @@ const HomeScreen = ({ navigation }) => {
                     <RenderSliderImage images={sliderImages} />
                 </View>
                 <View style={styles.quickstartMenu}>
-                    <View style={styles.menuItem}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => goToScreen('member')}>
                         <Image source={HomeScreenIcon.member} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Thẻ thành viên</Text>
-                    </View>
-                    <View style={styles.menuItem}>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem}>
                         <Image source={HomeScreenIcon.advise} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Tư vấn</Text>
-                    </View>
-                    <View style={styles.menuItem}>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem}>
                         <Image source={HomeScreenIcon.professors} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Các chuyên gia</Text>
-                    </View>
-                    <View style={styles.menuItem}>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem}>
                         <Image source={HomeScreenIcon.book} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Sách</Text>
-                    </View>
-                    <View style={styles.menuItem}>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem}>
                         <Image source={HomeScreenIcon.charity} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Từ thiện</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.status}>
                     <Text style={styles.statusItem}>Nhóm: {type}</Text>

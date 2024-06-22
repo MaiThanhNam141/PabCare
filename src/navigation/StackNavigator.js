@@ -24,6 +24,7 @@ import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
 
 import { UserContext } from "../feature/context/UserContext";
+import Membership from "../component/OtherScreen/Membership";
 
 const Stack = createStackNavigator()
 
@@ -39,7 +40,7 @@ const MainStackNavigator = () =>{
             }}>
             <Stack.Screen name="homescreen" component={HomeScreen}/>
             <Stack.Screen name="chatai" component={ChatAI} />
-                
+            <Stack.Screen name="member" component={Membership} />
         </Stack.Navigator>
     )
 }

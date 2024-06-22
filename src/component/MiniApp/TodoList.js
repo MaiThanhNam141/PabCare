@@ -8,7 +8,8 @@ const TodoList = (props) => {
     const list = props.list;
     const todos = list.todos || [];
     const completedCount = todos.filter(todo => todo.completed).length;
-    const percentCount = todos.length === 0 ? 0 : (completedCount*100)/todos.length;
+    const percentCount = (todos.length === 0 ? 0 : (completedCount*100)/todos.length).toFixed(0);
+    const taskCount = list.todos ? list.todos.length : 0;
 
     const toggleListVisible = () => {
         setShowListVisible(!showListVisible);
@@ -30,6 +31,7 @@ const TodoList = (props) => {
             </Modal>
             <TouchableOpacity style={[styles.listContainer, { borderColor: list.color }]} 
               onPress={() => toggleListVisible()} onLongPress={() => toggleDeleteAlert()}>
+                <Text style={styles.taskCount}>{taskCount}</Text>
                 <Text style={styles.listTitle} numberOfLines={2}>{list.name}</Text>
                 <View style={{ alignItems: "center" }}>
                     <Text style={styles.count}>{percentCount}%</Text>
@@ -70,7 +72,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 16,
         marginBottom: 5,
-        color: "black"
+        color: "black",
+        marginTop:5
     },
     count: {
         fontSize: 12,
@@ -115,6 +118,17 @@ const styles = StyleSheet.create({
         textAlign:'center',
         justifyContent: 'center',
         backgroundColor: 'red'
+    },
+    taskCount:{
+        fontSize:10,
+        color:'#2b7449',
+        backgroundColor:'#d9d9d9',
+        borderRadius:100,
+        paddingVertical:3,
+        paddingHorizontal:10,
+        position:'absolute',
+        top:5,
+        right:5,
     }
 });
 
