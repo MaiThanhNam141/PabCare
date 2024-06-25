@@ -16,7 +16,7 @@ const handleScheduleNotification = ( title, message ) => {
 };
 
 const handleCancel = () => {
-    PushNotification.cacelAllLocalNotifications();
+    PushNotification.cancelAllLocalNotifications();
 };
 
 export { showNotifications, handleScheduleNotification, handleCancel}
