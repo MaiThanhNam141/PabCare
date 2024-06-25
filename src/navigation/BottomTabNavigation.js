@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { View, ActivityIndicator } from "react-native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native"
 import { MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator } from "./StackNavigator";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -9,8 +8,8 @@ import { UserContext } from "../feature/context/UserContext";
 const Tab = createBottomTabNavigator()
 
 const BottomTabNavigation = () => {
-  const {userLoggedIn, loading} = React.useContext(UserContext);
-  const hiddenRoutes = ['loginscreen', 'focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq'];
+  const { userLoggedIn, loading } = React.useContext(UserContext);
+  const hiddenRoutes = ['loginscreen', 'focus', 'todo', 'diary', 'mood', 'bmi', 'music', 'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'member'];
   
   const getTabBarStyle = (route) => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? "";
@@ -19,14 +18,9 @@ const BottomTabNavigation = () => {
     }
     return {};
   };
-  if (loading) {
-    // return (
-    //   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //     <ActivityIndicator size="large" color="#0000ff" />
-    //   </View>
-    // );
-  }
-  console.log("Bottom tab: ",!!userLoggedIn);
+
+  if (loading){}
+
   return(
     <Tab.Navigator
       initialRouteName={userLoggedIn?'HomeScreen':'ProfileScreen'}

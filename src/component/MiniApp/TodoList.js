@@ -8,7 +8,8 @@ const TodoList = (props) => {
     const list = props.list;
     const todos = list.todos || [];
     const completedCount = todos.filter(todo => todo.completed).length;
-    const percentCount = todos.length === 0 ? 0 : (completedCount*100)/todos.length;
+    const percentCount = (todos.length === 0 ? 0 : (completedCount*100)/todos.length).toFixed(0);
+    const taskCount = list.todos ? list.todos.length : 0;
 
     const toggleListVisible = () => {
         setShowListVisible(!showListVisible);
@@ -19,31 +20,32 @@ const TodoList = (props) => {
     };
 
     const deleteList = () => {
-        toggleDeleteAlert()
+        toggleDeleteAlert();
         props.deleteList(list.id); 
     }
+
     return (
         <View>
             <Modal animationType='slide' visible={showListVisible} onRequestClose={() => toggleListVisible()}>
                 <TodoModal list={list} closeModal={() => toggleListVisible()} updateList={props.updateList}/>
             </Modal>
-            <TouchableOpacity style={[styles.listContainer, { backgroundColor: list.color }]} 
-              onPress={() => toggleListVisible()} onLongPress={()=>toggleDeleteAlert()}>
+            <TouchableOpacity style={[styles.listContainer, { borderColor: list.color }]} 
+              onPress={() => toggleListVisible()} onLongPress={() => toggleDeleteAlert()}>
+                <Text style={styles.taskCount}>{taskCount}</Text>
                 <Text style={styles.listTitle} numberOfLines={2}>{list.name}</Text>
                 <View style={{ alignItems: "center" }}>
                     <Text style={styles.count}>{percentCount}%</Text>
-                    <Text style={styles.subTitle}>Đã hoàn thành</Text>
                 </View>
             </TouchableOpacity>
-            <Modal animationType='fade' transparent={true} visible={showDeleteAlert} onRequestClose={()=>setShowDeleteAlert(false)}>
+            <Modal animationType='fade' transparent={true} visible={showDeleteAlert} onRequestClose={() => setShowDeleteAlert(false)}>
                 <View style={styles.alertContainer}>
                     <View style={styles.alertBox}>
-                        <Text style={styles.alertText}>Bạn có muốn xóa Todo này không?</Text>
+                        <Text style={styles.alertText}>Xóa <Text style={{fontWeight:'bold'}}>{list.name}</Text> ?</Text>
                         <View style={styles.alertButtons}>
-                            <TouchableOpacity onPress={()=>toggleDeleteAlert()} style={[styles.buttonContainer, {backgroundColor:'#fff'}]}>
-                                <Text style={[styles.confirmButtonText, {color:'black'}]}>Hủy</Text>
+                            <TouchableOpacity onPress={() => toggleDeleteAlert()} style={[styles.buttonContainer, { backgroundColor: '#fff' }]}>
+                                <Text style={[styles.confirmButtonText, { color: 'black' }]}>Hủy</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>deleteList()} style={styles.buttonContainer}>
+                            <TouchableOpacity onPress={() => deleteList()} style={styles.buttonContainer}>
                                 <Text style={styles.confirmButtonText}>Đồng ý</Text>
                             </TouchableOpacity>
                         </View>
@@ -61,25 +63,22 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         margin: 10,
         alignItems: "center",
-        width: 150,
-        height:190,
-        borderWidth:StyleSheet.hairlineWidth,
+        width: 170,
+        height: 120,
+        borderWidth: 3,
+        backgroundColor: '#fafaf7'
     },
     listTitle: {
-        fontWeight: "700",
-        fontSize: 18,
+        fontWeight: "bold",
+        fontSize: 16,
         marginBottom: 5,
-        color: "white"
+        color: "black",
+        marginTop:5
     },
     count: {
-        fontSize: 36,
-        fontWeight: "200",
-        color: "white"
-    },
-    subTitle: {
-        fontWeight: "700",
         fontSize: 12,
-        color: "white"
+        fontWeight: "700",
+        color: "black"
     },
     alertContainer: {
         flex: 1,
@@ -90,9 +89,11 @@ const styles = StyleSheet.create({
     alertBox: {
         backgroundColor: 'white',
         padding: 15,
-        paddingVertical:40,
+        paddingVertical: 40,
         borderRadius: 30,
         alignItems: 'center',
+        width: '100%',
+        maxWidth: 340,
     },
     alertText: {
         fontSize: 18,
@@ -105,19 +106,29 @@ const styles = StyleSheet.create({
     confirmButtonText: {
         fontSize: 16,
         color: 'white',
-        marginRight: 20,
-        fontWeight:'500'
+        paddingHorizontal: 20,
+        fontWeight: '500'
     },
-    buttonContainer:{
+    buttonContainer: {
         borderWidth: StyleSheet.hairlineWidth,
-        borderRadius:15,
+        borderRadius: 15,
         marginHorizontal: 20,
-        alignSelf:'center',
-        padding:15,
-        paddingHorizontal:30,
-        paddingLeft:45,
-        justifyContent:'center',
-        backgroundColor:'red'
+        padding: 15,
+        alignItems:'center',
+        textAlign:'center',
+        justifyContent: 'center',
+        backgroundColor: 'red'
+    },
+    taskCount:{
+        fontSize:10,
+        color:'#2b7449',
+        backgroundColor:'#d9d9d9',
+        borderRadius:100,
+        paddingVertical:3,
+        paddingHorizontal:10,
+        position:'absolute',
+        top:5,
+        right:5,
     }
 });
 

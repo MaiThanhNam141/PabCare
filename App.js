@@ -97,6 +97,9 @@ export default App = () => {
         ToastAndroid.show('Đăng nhập không thành công', ToastAndroid.SHORT);
       }
     }
+    finally {
+      setLoading(false)
+    }
   }
 
   return (

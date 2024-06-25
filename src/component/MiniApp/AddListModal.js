@@ -3,17 +3,16 @@ import { KeyboardAvoidingView, Text, View, StyleSheet, TouchableOpacity, TextInp
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AddListModal = (props) => {
-    const backgroundColor = ["#5CD859", "#24A6D9", "#8022D9", "#D159D8", "#D85963", "#D88559"];
+    const backgroundColor = ["#48d344", "#24A6D9", "#8022D9", "#D159D8", "#D85963", "#D88559"];
     const [name, setName] = useState("");
     const [color, setColor] = useState(backgroundColor[0]);
-    const [routine, setRoutine] = useState(false);
 
     const createTodo = () => {
         if (!name.trim()) {
             Alert.alert('Vui lòng nhập tên danh sách!');
             return;
         }
-        const list = { name, color, routine };
+        const list = { name, color };
         setName("");
         props.addList(list);
         props.closeModal();
@@ -31,10 +30,6 @@ const AddListModal = (props) => {
         });
     };
 
-    const handleRoutine = () => {
-        setRoutine(!routine)
-    }
-
     const handleNameChange = (text) => {
         if (text.length <= 30) {
           setName(text);
@@ -50,24 +45,14 @@ const AddListModal = (props) => {
                 <MaterialIcons name='close' size={34} color="black" />
             </TouchableOpacity>
             <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
-                <Text style={styles.title}>Create Todo List</Text>
+                <Text style={styles.title}>Tạo danh sách!</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder='List Name?'
+                    placeholder='Tên danh sách?'
                     onChangeText={handleNameChange}
                     value={name}
                 />
-                <View style={{marginTop:15}}>
-                    <TouchableOpacity onPress={() => handleRoutine()} style={{flexDirection:'row', paddingRight:20}}>
-                        <MaterialIcons
-                            name={routine?'check-box':'check-box-outline-blank'}
-                            size={24}
-                            color="#999"
-                            style={{ width: 32 }}
-                        />
-                        <Text>Lặp lại hàng ngày</Text>
-                    </TouchableOpacity>
-                </View>
+
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15 }}>
                     {renderColors()}
                 </View>
@@ -76,7 +61,7 @@ const AddListModal = (props) => {
                     style={[styles.create, { backgroundColor: color }]}
                     onPress={createTodo}
                 >
-                    <Text style={{ color: "white", fontWeight: "600" }} >Create!</Text>
+                    <Text style={{ color: "white", fontWeight: "600" }} >Tạo</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

@@ -25,62 +25,86 @@ const useFirestoreList = () => {
         console.error("Firestore reference is not initialized.");
       }
     } catch (error) {
-     console.error("firebase nè:",error)
+     console.error("updateList nè:",error)
     }
   };
 
-  const renewListRoutine = async (listID, userID) => {
+  const updateRoutine = async (routine) => {
     try {
-        const renewListRef = firestore().collection('users').doc(userID).collection('lists').doc(listID);
-        const renewSnapshot = await renewListRef.get();
-
-        if (renewSnapshot.exists) {
-            const todos = renewSnapshot.data().todos;
-
-            // Thay đổi giá trị của completed thành false cho mỗi phần tử trong mảng todos
-            const updatedTodos = todos.map(todo => ({
-                ...todo,
-                completed: false
-            }));
-
-            // Cập nhật mảng todos mới vào tài liệu
-            await renewListRef.update({ todos: updatedTodos });
-        } else {
-            console.log("Document does not exist");
-        }
+      if (ref) {
+        await ref.doc("Routine").update(routine);
+      } else {
+        console.error("Firestore reference is not initialized.");
+      }
     } catch (error) {
-        console.error(error);
+     console.error("updateRoutine nè:",error)
     }
-};
+  };
 
+  const renewListRoutine = async (routineListTomorrowID, currentTimeStamp, routineListTodayID) => {
+    try {
+      if(routineListTodayID) {
+        await ref.doc(routineListTodayID).delete();
+      }
+      const renewListRef = await ref.doc(routineListTomorrowID);
+      const renewSnapshot = await renewListRef.get();
+
+      if (renewSnapshot.exists) {
+        const updatedTodos = renewSnapshot.data().todos.map(todo => ({
+          ...todo,
+          completed: false
+        }));
+
+        await renewListRef.update({ todos: updatedTodos, date: "Today", lastDate:  currentTimeStamp});
+      } else {
+        console.log("Document does not exist");
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getLists = async () => {
     try {
       const user = auth().currentUser;
-      const currentTimeStamp = firestore.FieldValue.serverTimestamp();
-
+      const currentTimeStamp = new Date();
+      currentTimeStamp.setHours(0, 0, 0, 0);
       const listRef = firestore().collection('users').doc(user.uid).collection('lists');
       const snapshot = await listRef.get()
-
       setRef(listRef);
-      const lists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      if(snapshot){
+        const lists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const routineListIndexTomorrow = lists.findIndex(list => list?.date === 'Tomorrow');
+        const routineListIndexToday = lists.findIndex(list => list?.date === 'Today');
 
-      const renewRoutinePromises = snapshot.docs
-        .filter(doc => doc.data().routine)
-        .map(async doc => {
-          const listData = doc.data();
-          if (listData.initdate) {
-              const initdate = listData.initdate.toDate(); 
-              if (initdate < currentTimeStamp) {
-                await renewListRoutine(doc.id, user.uid);
-              }
+        if (routineListIndexTomorrow !== -1 && routineListIndexToday === -1) {
+          const routineList = lists[routineListIndexTomorrow];
+          const initdate = routineList.initdate.toDate();
+          initdate.setHours(0, 0, 0, 0);
+
+          if (initdate < currentTimeStamp) {
+            await renewListRoutine(routineList.id, currentTimeStamp, 0);
           }
-      });
-      await Promise.all(renewRoutinePromises);
+          lists.splice(routineListIndexTomorrow, 1);
+        }
+        
+        if (routineListIndexTomorrow !== -1 && routineListIndexToday !== -1) {
+          const routineList = lists[routineListIndexTomorrow];
+          const initdate = routineList.initdate.toDate();
+          initdate.setHours(0, 0, 0, 0);
 
-      return lists;
+          if (initdate < currentTimeStamp && !routineList.todos?.length) {
+            await renewListRoutine(routineList.id, currentTimeStamp, routineListIndexToday);
+          }
+          lists.splice(routineListIndexTomorrow, 1);
+          lists.splice(routineListIndexToday, 1);
+        }
+        return lists;
+      }
+      else console.log("Lỗi");
     } catch (error) {
-      console.error(error);
+      console.error("Error getLists: ", error);
       return [];
     }
   };
@@ -91,7 +115,6 @@ const useFirestoreList = () => {
         console.error("Firestore reference is not initialized.");
         return;
       }
-      
       await ref.doc(listId).delete();
     } catch (error) {
       console.error("Error deleting list useFirestoreList:", error);
@@ -99,7 +122,31 @@ const useFirestoreList = () => {
     }
   }
 
-  return { addList, updateList, getLists, deleteList };
-};
+  const getRoutine = async() => {
+    try {
+      let initdate = new Date();
+      const user = auth().currentUser;
+      const listRef = firestore().collection('users').doc(user.uid).collection('lists');
+      const snapshot = await listRef.get()
 
+      const routineListToday = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .find(list => list.date === 'Today');
+
+      const routineListTomorrow = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .find(list => list.date === 'Tomorrow');
+
+      routineListTomorrow || await listRef.doc(`Routine ${initdate}`).set({ "color":"#87bc9d", "routine": true,"initdate" :initdate,"lastDate" : initdate, "todos" : [], "date" : "Tomorrow"})
+
+      return routineListToday;
+
+    } catch (error) {
+      console.error("Error getting routine:", error);
+      throw new Error(error);
+    }
+  }
+
+  return { addList, updateList, getLists, deleteList, getRoutine, updateRoutine };
+};
 export default useFirestoreList;

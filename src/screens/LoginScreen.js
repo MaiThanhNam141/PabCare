@@ -37,13 +37,13 @@ const LoginScreen = () => {
           };
   
           await Promise.all([
-            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
             AsyncStorage.setItem('user', JSON.stringify(user)),
             userRef.set(userDocData),
           ]);
         } else {
           await Promise.all([
-            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
             AsyncStorage.setItem('user', JSON.stringify(user)),
           ]);
         }

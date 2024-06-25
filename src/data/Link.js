@@ -1,5 +1,3 @@
-import EQ from './EQ';
-
 export const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
 export const logo = require('../../assets/Icons/Logo.png');
 export const imageBG = require('../../assets/bg-image.jpg');
@@ -7,6 +5,9 @@ export const AIImage = require('../../assets/Icons/AIIcon.jpg')
 export const gemini = require('../../assets/gemini.png')
 export const focusBG = require('../../assets/focus-bg.jpg')
 export const bg2 = require('../../assets/bg-image2.jpg')
+export const Today = require('../../assets/Icons/Today.jpg')
+export const Tomorrow = require('../../assets/Icons/Tomorrow.jpg')
+
 export const HomeScreenIcon = {
     member: require('../../assets/Icons/member.jpg'),
     advise: require('../../assets/Icons/advise.jpg'),
@@ -30,8 +31,4 @@ export const QuizzScreenIcon = {
     eq: require('../../assets/Icons/EQ.jpg'),
     bdi: require('../../assets/Icons/BDI.jpg'),
     disc: require('../../assets/Icons/DISC.jpg'),
-}
-export const profileScreenIcon = {
-    heart: require('../../assets/Icons/heart.png'),
-    handshake: require('../../assets/Icons/handshake.png')
 }

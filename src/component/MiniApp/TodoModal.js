@@ -1,31 +1,20 @@
-import React, { useState} from 'react';
-import { 
-    Text, 
-    StyleSheet, 
-    View, 
-    SafeAreaView, 
-    TouchableOpacity, 
-    FlatList, 
-    KeyboardAvoidingView, 
-    TextInput, 
-    Keyboard, 
-    ToastAndroid,
-    Alert, } from 'react-native';
-
+import React, { useState } from 'react';
+import { Text, StyleSheet, View, SafeAreaView, TouchableOpacity, FlatList, KeyboardAvoidingView, TextInput, Keyboard, Alert, Image, } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { AIImage } from '../../data/Link';
 
 let todoId = 0;
 
 const TodoModal = (props) => {
     const [newTodo, setNewTodo] = useState("");
-
-    const list = props.list;
-    const taskCount = list.todos ? list.todos.length : 0;
-    const completedCount = list.todos ? list.todos.filter(todo => todo.completed).length : 0;
+    const { list, date, user } = props;
+    const vietsubName = date === 'Tomorrow' ? 'Ngày mai' : 'Hôm nay';
 
     const toggleTodoCompleted = index => {
-        list.todos[index].completed = !list.todos[index].completed;
-        props.updateList(list);
+        const newTodos = [...list.todos];
+        newTodos[index].completed = !newTodos[index].completed;
+        const newList = { ...list, todos: newTodos };
+        props.updateList(newList);
     };
 
     const addTodo = () => {
@@ -49,10 +38,11 @@ const TodoModal = (props) => {
         }
     };
 
-    
     const deleteTodo = index => {
-        list.todos.splice(index, 1);
-        props.updateList(list);
+        const newTodos = [...list.todos]; 
+        newTodos.splice(index, 1); 
+        const newList = { ...list, todos: newTodos };
+        props.updateList(newList); 
     };
 
     const renderTodo = ({item, index}) => {
@@ -61,8 +51,8 @@ const TodoModal = (props) => {
                 <TouchableOpacity onPress={() => toggleTodoCompleted(index)}>
                     <MaterialIcons
                         name={item.completed ? 'check-box' : 'check-box-outline-blank'}
-                        size={24}
-                        color="#999"
+                        size={28}
+                        color={list.color ? list.color : '#87bc9d'}
                         style={{ width: 32 }}
                     />
                 </TouchableOpacity>
@@ -75,11 +65,14 @@ const TodoModal = (props) => {
                     >{item.title}
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
-                    <View style={styles.deleteButton}>
-                        <MaterialIcons name='delete' size={18} color="#e6e6e6" />
-                    </View>
-                </TouchableOpacity>
+                {item.completed?
+                    (<TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
+                        <View style={styles.deleteButton}>
+                            <MaterialIcons name='delete' size={28} color={list.color ? list.color : '#87bc9d'} />
+                        </View>
+                    </TouchableOpacity>)
+                    :(null)
+                }
             </View>
         );
     };
@@ -87,35 +80,101 @@ const TodoModal = (props) => {
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
             <SafeAreaView style={styles.container}>
-                <TouchableOpacity
-                    style={{ position: 'absolute', top: 20, right: 25, zIndex: 10 }}
-                    onPress={props.closeModal}
-                >
-                    <MaterialIcons name='close' size={35} color="#000" />
-                </TouchableOpacity>
-                <View style={[styles.section, styles.header, { borderBottomColor: list.color }]} >
-                    <View>
-                        <Text style={styles.title}>{list.name}</Text>
-                        <Text style={styles.taskCount}>{completedCount} of {taskCount} tasks</Text>
-                    </View>
+                <View style={styles.headerTitle}>
+                    <View style={[styles.divider, { backgroundColor: list.color}]} />
+                    <Text style={[styles.title, { backgroundColor: list.color}]}>{date ? vietsubName : list.name}</Text>
+                    <View style={[styles.divider, { backgroundColor: list.color}]} />
                 </View>
-                <View style={[styles.section, { flex: 4, marginVertical: 10, marginRight:10 }]}>
-                    <FlatList
-                        data={list.todos}
-                        renderItem={({ item, index }) => renderTodo({item, index})}
-                        keyExtractor={(item, index) => index.toString()}
-                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-                        showsVerticalScrollIndicator={false}
-                    />
+
+                <View style={[styles.section, { flex: 4, marginVertical: 10, marginRight: 10 }]}>
+                    {user ? (
+                        date === 'Today' ? (
+                            list.date === 'Today' ? (
+                                !list.todos?.length ? (
+                                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text>Xin chào, {user}</Text>
+                                            <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                        </View>
+                                        <Text>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
+                                    </View>
+                                ) : (
+                                    <FlatList
+                                        data={list.todos}
+                                        renderItem={({ item, index }) => renderTodo({ item, index })}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
+                                        showsVerticalScrollIndicator={false}
+                                    />
+                                )
+                            ) : (
+                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text>Xin chào, {user}</Text>
+                                        <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                    </View>
+                                    <Text>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
+                                </View>
+                            )
+                        ) : date === 'Tomorrow' ? (
+                            list.date === 'Tomorrow' ? (
+                                !list.todos.length ? (
+                                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text>Xin chào, {user}</Text>
+                                            <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                        </View>
+                                        <Text>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
+                                    </View>
+                                ) : (
+                                    <FlatList
+                                        data={list.todos}
+                                        renderItem={({ item, index }) => renderTodo({ item, index })}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
+                                        showsVerticalScrollIndicator={false}
+                                    />
+                                )
+                            ) : (
+                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text>Xin chào, {user}</Text>
+                                        <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                    </View>
+                                    <Text>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
+                                </View>
+                            )
+                        ) : (
+                            <FlatList
+                                data={list.todos}
+                                renderItem={({ item, index }) => renderTodo({ item, index })}
+                                keyExtractor={(item, index) => index.toString()}
+                                contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
+                                showsVerticalScrollIndicator={false}
+                            />
+                        )
+                    ) : (
+                        <FlatList
+                            data={list.todos}
+                            renderItem={({ item, index }) => renderTodo({ item, index })}
+                            keyExtractor={(item, index) => index.toString()}
+                            contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    )}
                 </View>
+
+
                 <View style={[styles.section, styles.footer]}>
                     <TextInput
-                        style={[styles.input, { borderColor: list.color }]}
+                        style={[styles.input, { backgroundColor: list.color}]}
                         onChangeText={text => setNewTodo(text)}
                         value={newTodo}
+                        placeholder='Điều gì đó bạn muốn thực hiện...'
+                        placeholderTextColor={'#ffffff'}
                     />
-                    <TouchableOpacity style={[styles.addTodo, { backgroundColor: list.color }]} onPress={addTodo}>
-                        <MaterialIcons name='add' size={16}/>
+                    <TouchableOpacity style={styles.addTodo} onPress={addTodo}>
+                        <MaterialIcons name='reply' size={35} color={list.color ? list.color : '#87bc9d'}/>
                     </TouchableOpacity>
                 </View>
                 
@@ -128,24 +187,26 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center"
     },
     section: {
         flex: 1,
-        alignSelf: "stretch"
+        alignSelf: "stretch",
     },
     header: {
         justifyContent: "flex-end",
         marginHorizontal: 15,
-        marginTop:70,
         borderBottomWidth: 3,
         paddingTop: 5
     },
     title: {
-        fontSize: 30,
-        fontWeight: "800",
-        color: "#000"
-    },
+        fontSize: 12,
+        fontWeight: "700",
+        color: '#fafaf7',
+        paddingHorizontal: 50,
+        paddingVertical:10,
+        borderRadius:35,
+        backgroundColor:'#87bc9d',
+      },
     taskCount: {
         marginTop: 4,
         marginBottom: 16,
@@ -156,44 +217,57 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         flexDirection: 'row',
         alignItems: "center",
-        // paddingVertical: 10
+        justifyContent:'center'
     },
     input: {
         flex: 1,
         height: 48,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 6,
-        marginRight: 8,
-        paddingHorizontal: 8
+        borderRadius: 60,
+        paddingHorizontal: 8,
+        color:'white',
+        paddingLeft:25,
+        marginLeft:-10
     },
+
     addTodo: {
         borderRadius: 4,
         padding: 16,
-        alignItems: "center",
-        justifyContent: "center"
+        marginRight:-15
     },
     todoContainer: {
-        paddingVertical: 16,
+        paddingBottom: 16,
         flexDirection: "row",
         alignItems: "center",
-        paddingLeft: 32,
-        flex: 1
+        flex: 1,
     },
     todo: {
         color: "#000",
         fontWeight: "700",
-        fontSize: 16,
+        fontSize: 18,
         marginLeft:10
     },
     deleteButton: {
         flex: 1,
-        backgroundColor: '#ad050e',
         justifyContent:'center',
         alignItems: 'center',
         width: 27,
         height: 27,
         borderRadius: 100
     },
+    divider: {
+        backgroundColor: '#87bc9d',
+        height: 3,
+        flex: 1,
+        alignSelf: "center",
+    },
+    headerTitle:{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 15,
+        paddingTop: 5,
+        marginTop:25
+    }
 });
 
 export default TodoModal;
