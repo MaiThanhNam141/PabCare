@@ -95,7 +95,6 @@ const ProfileScreen = ({navigation}) => {
       console.error(error);
     }
   };
-
   
   if (loading) {
     return (
@@ -139,8 +138,8 @@ const ProfileScreen = ({navigation}) => {
     }
   };
   
-  const handleCooperation = () => {
-    console.log('Cooperation')
+  const handleCooperation = (route) => {
+    navigation.navigate(route)
   }
 
   const handleDonation = () => {
@@ -174,7 +173,7 @@ const ProfileScreen = ({navigation}) => {
         </View>
         <View style={styles.divider}/>
         <View>
-          <TouchableOpacity onPress={handleCooperation} style={[styles.logoutContainer, styles.cooperateContainer]}>
+          <TouchableOpacity onPress={() => handleCooperation("member")} style={[styles.logoutContainer, styles.cooperateContainer]}>
             <Text style={[styles.logoutText, {color:'#2EAC48'}]}>Đăng ký gói Prenium </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>

@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, StyleSheet, Image, Modal, TouchableOpacity, Text, ImageBackground } from "react-native";
+import { View, StyleSheet, Image, Modal, TouchableOpacity, Text, ImageBackground, Alert } from "react-native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RenderSliderImage from "../component/OtherScreen/RenderSliderImage";
 import { getDocumentRef, getUserInfo } from "../feature/firebase/handleFirestore";
 import { AIImage, imageBG, defaultAvatar, HomeScreenIcon } from "../data/Link";
 import LinearGradient from "react-native-linear-gradient";
 import { UserContext } from "../feature/context/UserContext";
-import Membership from "../component/OtherScreen/Membership";
 
 const HomeScreen = ({ navigation }) => {
     const [logoUser, setLogoUser] = useState('')
@@ -56,6 +55,10 @@ const HomeScreen = ({ navigation }) => {
         navigation.navigate(route)
     }
     
+    const onDevelopment = () => {
+        Alert.alert("Thông báo", "Coming soon");
+    }
+
     return (
         <ImageBackground source={imageBG} style={{flex:1, resizeMode:'contain'}}>
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
@@ -88,19 +91,19 @@ const HomeScreen = ({ navigation }) => {
                         <Image source={HomeScreenIcon.member} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Thẻ thành viên</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => onDevelopment()}>
                         <Image source={HomeScreenIcon.advise} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Tư vấn</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => onDevelopment()}>
                         <Image source={HomeScreenIcon.professors} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Các chuyên gia</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => onDevelopment()}>
                         <Image source={HomeScreenIcon.book} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Sách</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => onDevelopment()}>
                         <Image source={HomeScreenIcon.charity} style={styles.menuItemImage} />
                         <Text style={styles.menuItemText}>Từ thiện</Text>
                     </TouchableOpacity>

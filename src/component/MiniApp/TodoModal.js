@@ -93,10 +93,10 @@ const TodoModal = (props) => {
                                 !list.todos?.length ? (
                                     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                         <View style={{ flexDirection: 'row' }}>
-                                            <Text>Xin chào, {user}</Text>
-                                            <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                            <Text style={styles.helloUser}>Xin chào, {user}</Text>
+                                            <Image source={AIImage} style={{ width: 55, height: 55 }} />
                                         </View>
-                                        <Text>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
+                                        <Text style={styles.reminder}>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
                                     </View>
                                 ) : (
                                     <FlatList
@@ -110,10 +110,10 @@ const TodoModal = (props) => {
                             ) : (
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <Text>Xin chào, {user}</Text>
-                                        <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                        <Text styles={styles.helloUser}>Xin chào, {user}</Text>
+                                        <Image source={AIImage} style={{ width: 55, height: 55 }} />
                                     </View>
-                                    <Text>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
+                                    <Text style={styles.reminder}>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
                                 </View>
                             )
                         ) : date === 'Tomorrow' ? (
@@ -121,10 +121,10 @@ const TodoModal = (props) => {
                                 !list.todos.length ? (
                                     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                         <View style={{ flexDirection: 'row' }}>
-                                            <Text>Xin chào, {user}</Text>
-                                            <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                            <Text styles={styles.helloUser}>Xin chào, {user}</Text>
+                                            <Image source={AIImage} style={{ width: 55, height: 55 }} />
                                         </View>
-                                        <Text>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
+                                        <Text style={styles.reminder}>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
                                     </View>
                                 ) : (
                                     <FlatList
@@ -138,10 +138,10 @@ const TodoModal = (props) => {
                             ) : (
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <Text>Xin chào, {user}</Text>
-                                        <Image source={AIImage} style={{ width: 30, height: 30 }} />
+                                        <Text styles={styles.helloUser}>Xin chào, {user}</Text>
+                                        <Image source={AIImage} style={{ width: 55, height: 55 }} />
                                     </View>
-                                    <Text>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
+                                    <Text style={styles.reminder}>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
                                 </View>
                             )
                         ) : (
@@ -267,6 +267,17 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         paddingTop: 5,
         marginTop:25
+    },
+    helloUser:{
+        color:'#2b7449',
+        fontSize:27,
+        fontWeight:'bold',
+        marginRight:5
+    },
+    reminder:{
+        color:'#737373',
+        fontSize:10,
+        fontWeight:'400',
     }
 });
 

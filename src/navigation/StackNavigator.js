@@ -60,6 +60,8 @@ const ProfileStackNavigator = () =>{
             ) : (
                 <Stack.Screen name="loginscreen" component={LoginScreen} />
             )}
+
+            <Stack.Screen name="member" component={Membership} />
         </Stack.Navigator>
     )
 }

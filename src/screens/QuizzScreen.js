@@ -208,13 +208,15 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   quizItem: {
-    width: 330, 
-    height: 110, 
+    width: 333, 
+    height: 113, 
     marginHorizontal: 10, 
     marginVertical:5,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth:1,
+    borderColor:'#87bc9d'
   },
   quizTitle: {
     fontSize: 28,
@@ -287,13 +289,13 @@ const styles = StyleSheet.create({
   title:{
     padding:5,
     margin:10,
-    marginBottom:10,
+    // marginBottom:10,
     alignItems:'center',
     marginTop:30
   },
   titleText:{
     fontWeight:'900',
-    fontSize:30,
+    fontSize:23,
     color:'#87bc9d'
   },
   totalResult:{
@@ -343,8 +345,6 @@ const styles = StyleSheet.create({
     position:'absolute',
     top: 0,
     left: 0,
-    borderWidth:1,
-    borderColor:'#87bc9d',
   },
   quizImageOverlay: {
     position: 'absolute',
