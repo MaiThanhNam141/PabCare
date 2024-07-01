@@ -1,8 +1,8 @@
 import React from "react";
-import { Dimensions, Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { congrat } from "../../data/Link";
 
 const Congrat = ({ modalVisible, setModalVisible }) => {
-  const screen = Dimensions.get("window");
 
   return (
     <View style={styles.container}>
@@ -14,9 +14,9 @@ const Congrat = ({ modalVisible, setModalVisible }) => {
           setModalVisible(false);
         }}
       >
-        <Image source={require('../../../assets/congrat.jpg')} style={styles.imageCongrat} />
+        <Image source={congrat} style={styles.imageCongrat} />
         <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.button}>
-          <Text style={styles.buttonText}>Close</Text>
+          <Text style={styles.buttonText}>Đóng</Text>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -26,20 +26,20 @@ const Congrat = ({ modalVisible, setModalVisible }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#07121B",
+    backgroundColor: "#87bc9d",
     alignItems: "center",
     justifyContent: "center",
+    width:200,
+    height:200,
+    overflow:'hidden'
   },
   imageCongrat: {
-    width: 300,
-    height: 300,
+    width: 150,
+    height: 150,
   },
   button: {
-    borderWidth: 10,
-    borderColor: "#89AAFF",
-    // width: screen.width / 2.2, 
-    // height: screen.width / 4, 
-    // borderRadius: screen.width / 2, 
+    borderWidth: 3,
+    borderColor: "#87bc9d",
     width: 600,
     height: 800,
     borderRadius: 15,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, ImageBackground, Image, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { goldensleep, bg2 } from '../../data/Link';
+import { goldensleep, goldenSleepBackGround } from '../../data/Link';
 import PushNotification from 'react-native-push-notification'
 
 const GoldenSleep = () => {
@@ -75,7 +75,7 @@ const GoldenSleep = () => {
     };
 
     return (
-        <ImageBackground source={bg2} style={styles.container}>
+        <ImageBackground source={goldenSleepBackGround} style={styles.container}>
             <View style={styles.gifContainer}>
                 <Image source={goldensleep} style={styles.gifImage} resizeMode='contain' />
             </View>
