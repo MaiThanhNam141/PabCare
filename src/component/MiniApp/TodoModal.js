@@ -110,7 +110,7 @@ const TodoModal = (props) => {
                             ) : (
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <Text styles={styles.helloUser}>Xin chào, {user}</Text>
+                                        <Text style={styles.helloUser}>Xin chào, {user}</Text>
                                         <Image source={AIImage} style={{ width: 55, height: 55 }} />
                                     </View>
                                     <Text style={styles.reminder}>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
