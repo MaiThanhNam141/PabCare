@@ -37,7 +37,7 @@ const Focus = () => {
   const [selectHour, setSelectHour] = useState("0");
   const [selectMinute, setSelectMinute] = useState("30");
   const [selectSecond] = useState("0");
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [logoUser, setLogoUser] = useState('')
   const [displayName, setDisplayName] = useState('');
   const [coin, setCoin] = useState(0)
@@ -57,15 +57,19 @@ const Focus = () => {
           setDisplayName(userData.displayName || '');
           setCoin(userData?.coin  || 0);
           setFocusStreak(userData?.streak || 0);
-          setLastDateFocus(userData?.lastDateFocus || 0)
+          setLastDateFocus(userData?.lastDateFocus.toDate()|| 0)
           setLoading(false);
         }
         
       }
       fetchData()
+
     } catch (error) {
       Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
       console.error("Focus ", error)
+    }
+    finally {
+      setLoading(false)
     }
   }, [])
 
@@ -94,12 +98,23 @@ const Focus = () => {
 
       const newCoin = coin + tempCoin;
       const newFocusStreak = focusStreak + 1;
+      const millisecondsInOneDay = 86400000; 
+      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
 
-      if( lastDate !== currentTimeStamp)
+      switch (isOneDayAgo) {
+        case 0: updateUserInfo({ coin: newCoin });
+          break;
+        case 1: updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
+          break;
+        default: updateUserInfo({ coin: newCoin, streak: 0, lastDateFocus: currentTimeStamp });
+          break;
+      }
+
+      if( isOneDayAgo )
         updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
       else updateUserInfo({ coin: newCoin, lastDateFocus: currentTimeStamp });
 
-      setModalVisible(true);
+      // setModalVisible(true);
     } catch (error) {
       console.error("completeFocusSession: ", error);
     }

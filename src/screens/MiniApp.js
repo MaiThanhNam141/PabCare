@@ -3,58 +3,50 @@ import { View, StyleSheet, ImageBackground, TouchableOpacity, Alert, Image } fro
 import { imageBG, miniAppIcon } from '../data/Link';
 
 const MiniApp = ({ navigation }) => {
-
   const goToScreen = (screenName) => {
-    try {
-      if(screenName==='diary'){
-        Alert.alert('Lỗi',"Tính năng đang phát triển")
-        return;
-      }
-      navigation.navigate(screenName);
-    } catch (error) {
-      console.error(error)
+    if (screenName === 'diary') {
+      Alert.alert('Lỗi', "Tính năng đang phát triển");
+      return;
     }
+    navigation.navigate(screenName);
   };
 
   return (
     <ImageBackground source={imageBG} style={styles.imageBackground}>
-        <View style={styles.mainContainer}>
-          <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('todo')}>
-            <Image source={miniAppIcon.todoList} style={[styles.itemImg, {height:129}]} />
+      <View style={styles.mainContainer}>
+        <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('todo')}>
+          <Image source={miniAppIcon.todoList} style={[styles.itemImg, styles.itemImgLarge]} />
+        </TouchableOpacity>
+        <View style={styles.rowContainer}>
+          <TouchableOpacity style={[styles.itemContainer, styles.itemHalfWidth]} onPress={() => goToScreen('diary')}>
+            <Image source={miniAppIcon.diary} style={[styles.itemImg, styles.itemImgMedium]} />
           </TouchableOpacity>
-          <View style={styles.rowContainer}>
-            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('diary')}>
-              <Image source={miniAppIcon.diary} style={[styles.itemImg, { height: 117 }]} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.itemContainer, {width:'49%'}]} onPress={() => goToScreen('bmi')}>
-              <Image source={miniAppIcon.bmi} style={[styles.itemImg, { height: 117 }]} />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('focus')}>
-            <Image source={miniAppIcon.focus} style={[styles.itemImg, {height:129}]} />
+          <TouchableOpacity style={[styles.itemContainer, styles.itemHalfWidth]} onPress={() => goToScreen('bmi')}>
+            <Image source={miniAppIcon.bmi} style={[styles.itemImg, styles.itemImgMedium]} />
           </TouchableOpacity>
-          <View style={styles.rowContainer}>
-            <View style={[styles.columnContainer, {width:'45%'}]}>
-              <TouchableOpacity style={[styles.itemContainer, { height:70, padding:0, margin: 5}]} onPress={() => goToScreen('mood')}>
-                <Image source={miniAppIcon.mood} style={styles.itemImg}/>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.itemContainer, {height:70, padding:0, margin: 5}]} onPress={() => goToScreen('goldensleep')}>
-                <Image source={miniAppIcon.goldensleep} style={styles.itemImg} />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={[styles.itemContainer, {width:'50%', height:150}]} onPress={() => goToScreen('music')}>
-              <Image source={miniAppIcon.music} style={[styles.itemImg, {height:161}]} />
-            </TouchableOpacity>
-          </View>
         </View>
+        <TouchableOpacity style={styles.itemContainer} onPress={() => goToScreen('focus')}>
+          <Image source={miniAppIcon.focus} style={[styles.itemImg, styles.itemImgLarge]} />
+        </TouchableOpacity>
+        <View style={styles.rowContainer}>
+          <View style={[styles.columnContainer, styles.columnWidth]}>
+            <TouchableOpacity style={[styles.itemContainer, styles.itemSmall]} onPress={() => goToScreen('mood')}>
+              <Image source={miniAppIcon.mood} style={styles.itemImg} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.itemContainer, styles.itemSmall]} onPress={() => goToScreen('goldensleep')}>
+              <Image source={miniAppIcon.goldensleep} style={styles.itemImg} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={[styles.itemContainer, styles.itemLarge]} onPress={() => goToScreen('music')}>
+            <Image source={miniAppIcon.music} style={[styles.itemImg, styles.itemImgExtraLarge]} />
+          </TouchableOpacity>
+        </View>
+      </View>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   imageBackground: {
     flex: 1,
     resizeMode: 'cover',
@@ -77,33 +69,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    borderWidth:0,
     backgroundColor: '#fafaf7',
     borderRadius: 15,
-    marginTop:5
-  },
-  itemText: {
-    fontSize: 16,
-    fontWeight:'500'
+    marginTop: 5,
   },
   rowContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '100%',
-    marginVertical: 25,
-    alignItems: 'center'
+    marginVertical: 15,
+    alignItems: 'center',
   },
   columnContainer: {
     flexDirection: 'column',
     justifyContent: 'space-around',
     alignItems: 'flex-start',
   },
-  itemImg:{
+  itemImg: {
     width: '100%',
     height: 75,
-    resizeMode:'contain',
-    borderRadius: 0,
-  }
+    resizeMode: 'contain',
+  },
+  itemImgLarge: {
+    height: 129,
+  },
+  itemImgMedium: {
+    height: 117,
+  },
+  itemImgExtraLarge: {
+    height: 161,
+  },
+  itemHalfWidth: {
+    width: '49%',
+  },
+  itemSmall: {
+    height: 70,
+    padding: 0,
+    margin: 5,
+  },
+  itemLarge: {
+    width: '50%',
+    height: 150,
+  },
+  columnWidth: {
+    width: '45%',
+  },
 });
 
 export default MiniApp;

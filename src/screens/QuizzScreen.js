@@ -27,10 +27,10 @@ const QuizzScreen = ({ navigation }) => {
   }
 
   const renderData = [
-    { id: 1, title: 'MBTI Test', questions: 52, link:QuizzScreenIcon.mbti},
-    { id: 2, title: 'EQ Test', questions: 40, link:QuizzScreenIcon.eq},
-    { id: 3, title: 'BDI Test', questions: 21, link:QuizzScreenIcon.bdi},
-    { id: 4, title: 'DISC', questions: '???', link:QuizzScreenIcon.disc},
+    { id: 1, title: 'MBTI TEST', questions: 52, link:QuizzScreenIcon.mbti},
+    { id: 2, title: 'EQ TEST', questions: 40, link:QuizzScreenIcon.eq},
+    { id: 3, title: 'BDI TEST', questions: 21, link:QuizzScreenIcon.bdi},
+    { id: 4, title: 'DISC TEST', questions: '???', link:QuizzScreenIcon.disc},
   ];
 
   const renderTest = ({ item }) => {
