@@ -24,7 +24,7 @@ const App = () => {
     useEffect(() => {
       Sound.setCategory("Playback");
   
-      const audio = new Sound(require('./assets/Music/bgMusic.mp3'), (error) => {
+      const audio = new Sound(require('./assets/Music/Track1.mp3'), (error) => {
         if (error) {
           console.log("Error playing audio", error);
           return;

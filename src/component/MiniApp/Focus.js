@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Congrat from './Congrat';
 import { focusBG, HomeScreenIcon, defaultAvatar, focusInbucator, streakOn, streakOff } from '../../data/Link';
-import { Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
+import { Vibration, Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
 import { getUserInfo, updateUserInfo } from '../../feature/firebase/handleFirestore';
 
 const screen = Dimensions.get("window");
@@ -63,7 +63,11 @@ const Focus = () => {
         
       }
       fetchData()
-
+      const millisecondsInOneDay = 86400000; 
+      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
+      if(isOneDayAgo>2){
+        setFocusStreak(0)
+      }
     } catch (error) {
       Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
       console.error("Focus ", error)
@@ -93,20 +97,19 @@ const Focus = () => {
   const completeFocusSession = () => {
     try {
       stop();
-      setCoin(prev => prev + tempCoin)
-      setFocusStreak(prev => prev + 1)
+      Vibration.vibrate(1000);
+      setCoin(prev => prev + tempCoin);
+      setFocusStreak(prev => prev + 1);
 
       const newCoin = coin + tempCoin;
       const newFocusStreak = focusStreak + 1;
-      const millisecondsInOneDay = 86400000; 
-      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
 
       switch (isOneDayAgo) {
         case 0: updateUserInfo({ coin: newCoin });
           break;
         case 1: updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
           break;
-        default: updateUserInfo({ coin: newCoin, streak: 0, lastDateFocus: currentTimeStamp });
+        default: updateUserInfo({ coin: newCoin, streak: 1, lastDateFocus: currentTimeStamp });
           break;
       }
 

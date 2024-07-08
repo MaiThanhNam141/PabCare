@@ -7,10 +7,11 @@ import App from './App';
 import {name as appName} from './app.json';
 import PushNotification from "react-native-push-notification";
 import { Platform } from 'react-native';
+import { CHANNEL_ID } from './src/data/Link';
 
 PushNotification.createChannel(
   {
-    channelId: "channel-id", // (required)
+    channelId: CHANNEL_ID, // (required)
     channelName: "My channel", // (required)
     channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
     soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
