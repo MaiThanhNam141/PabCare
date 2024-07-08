@@ -6,14 +6,13 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-goo
 import { GOOGLE_API_CLIENT } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
+import { imageBG, logo } from '../data/Link';
 
 const LoginScreen = () => {
   GoogleSignin.configure({
     webClientId: GOOGLE_API_CLIENT,
   });
 
-  const imageLink = require('../../assets/bg-image.jpg');
-  const logo = require('../../assets/Icons/Logo.png');
   const { setUserLoggedIn } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
 
@@ -38,13 +37,13 @@ const LoginScreen = () => {
           };
   
           await Promise.all([
-            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
             AsyncStorage.setItem('user', JSON.stringify(user)),
             userRef.set(userDocData),
           ]);
         } else {
           await Promise.all([
-            AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
+            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
             AsyncStorage.setItem('user', JSON.stringify(user)),
           ]);
         }
@@ -78,13 +77,15 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.backgroundContainer}>
-      <ImageBackground source={imageLink} style={styles.imageBackground}>
+      <ImageBackground source={imageBG} style={styles.imageBackground}>
         <View style={styles.container}>
           <View style={styles.logoContainer}>
             <Image source={logo} style={styles.logo} resizeMode="contain" />
           </View>
-          <Text style={styles.titleText}>Đăng nhập</Text>
-          <GoogleSigninButton size={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={onGoogleButtonPress} />
+          <View style={{alignItems:'center'}}>
+            <Text style={styles.titleText}>Đăng nhập</Text>
+            <GoogleSigninButton size={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={onGoogleButtonPress} />
+          </View>
         </View>
       </ImageBackground>
     </View>
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   container: {
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: '#fafaf7',
@@ -113,8 +114,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoContainer: {
-    width: 250,
-    height: 250,
+    width: 300,
+    height: 300,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 28,
-    marginVertical: 14,
+    marginVertical: 10,
     fontWeight: 'bold',
   },
 });

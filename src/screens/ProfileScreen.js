@@ -1,16 +1,15 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import LinearGradient from "react-native-linear-gradient";
+import { defaultAvatar, logo, imageBG } from '../data/Link';
+import { getUserInfo, getUserDocumentRef } from '../feature/firebase/handleFirestore';
 
 const ProfileScreen = ({navigation}) => {
-  const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg'
-  const logo = require('../../assets/Icons/Logo.png');
-
   const [displayName, setDisplayName] = useState('');
   const [avatar, setAvatar] = useState('')
   const [email, setEmail] = useState('')
@@ -23,6 +22,8 @@ const ProfileScreen = ({navigation}) => {
   const [phoneSub, setPhoneSub] = useState(0)
   const [addressSub, setAddressSub] = useState('')
 
+  const [userType, setUserType] = useState([])
+
   const [loading, setLoading] = useState(true)
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
@@ -31,16 +32,15 @@ const ProfileScreen = ({navigation}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user = auth().currentUser       
-        const firestoreDataPromise = await firestore().collection('users').doc(user.uid).get();
-        if (firestoreDataPromise.exists) {
-          const userDataFromFirestore = firestoreDataPromise.data();
-          setDisplayName(user.displayName || '');
-          setAvatar(user.photoURL || '');
-          setEmail(user.email || '');
-          setRealName(userDataFromFirestore.fullName || '');
-          setPhone(userDataFromFirestore.phone || '');
-          setAddress(userDataFromFirestore.address || '');
+        const firestoreDataPromise = await getUserInfo()
+        if (firestoreDataPromise) {
+          setDisplayName(firestoreDataPromise.displayName || '');
+          setAvatar(firestoreDataPromise.photoURL || '');
+          setEmail(firestoreDataPromise.email || '');
+          setRealName(firestoreDataPromise.fullName || '');
+          setPhone(firestoreDataPromise.phone || '');
+          setAddress(firestoreDataPromise.address || '');
+          setUserType(firestoreDataPromise.userType || [])
           setLoading(false)
           return;
         } else {
@@ -63,18 +63,26 @@ const ProfileScreen = ({navigation}) => {
     fetchData();
   }, [navigation]);
 
-  const handleLogout = async () => {
-    setLoading(true)
-    const currentUser = auth().currentUser;
-    const providerData = currentUser.providerData;
-    providerData.forEach(profile => {
-      if (profile.providerId === 'google.com') {
-        googleSignOut();
-      } else if (profile.providerId === 'facebook.com') {
-        facebookSignOut();
-      }
-    });
-  };
+  const userTypeToBadgeMap = {
+    ISTJ: require('../../assets/MBTI/ISTJ.jpg'),
+    ISFJ: require('../../assets/MBTI/ISFJ.jpg'),
+    INFJ: require('../../assets/MBTI/INFJ.jpg'),
+    INTJ: require('../../assets/MBTI/INTJ.jpg'),
+    ISTP: require('../../assets/MBTI/ISTP.jpg'),
+    ISFP: require('../../assets/MBTI/ISFP.jpg'),
+    INFP: require('../../assets/MBTI/INFP.jpg'),
+    INTP: require('../../assets/MBTI/INTP.jpg'),
+    ESTP: require('../../assets/MBTI/ESTP.jpg'),
+    ESFP: require('../../assets/MBTI/ESFP.jpg'),
+    ENFP: require('../../assets/MBTI/ENFP.jpg'),
+    ENTP: require('../../assets/MBTI/ENTP.jpg'),
+    ESTJ: require('../../assets/MBTI/ESTJ.jpg'),
+    ESFJ: require('../../assets/MBTI/ESFJ.jpg'),
+    ENFJ: require('../../assets/MBTI/ENFJ.jpg'),
+    ENTJ: require('../../assets/MBTI/ENTJ.jpg'),
+  }
+
+  const badgeSources = userType.map(type => userTypeToBadgeMap[type]).filter(Boolean);
 
   const googleSignOut = async () => {
     try {
@@ -87,15 +95,10 @@ const ProfileScreen = ({navigation}) => {
       console.error(error);
     }
   };
-
-  const facebookSignOut = async () => {
-    console.log('Logging out from Facebook');
-  };
-
   
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={{flex:1}}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
       </View>
     )
@@ -104,8 +107,7 @@ const ProfileScreen = ({navigation}) => {
 
   const updateInfo = async () => {
     try {
-      const user = auth().currentUser;
-      const userDocRef = firestore().collection('users').doc(user.uid);
+      const userDocRef = getUserDocumentRef()
       const userDoc = await userDocRef.get();
   
       if (userDoc.exists) {
@@ -136,98 +138,155 @@ const ProfileScreen = ({navigation}) => {
     }
   };
   
+  const handleCooperation = (route) => {
+    navigation.navigate(route)
+  }
 
+  const handleDonation = () => {
+    console.log("Donation");
+  }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.settingButton}
-        onPress={() => {setIsUpdateModalVisible(true)}}
-      >
-        <MaterialIcons name="settings" size={35} color="black" />
-      </TouchableOpacity>
-      <View style={styles.logoContainer}>
-        <Image source={logo} style={styles.logo} resizeMode="contain" />
-      </View>
-      <Text style={styles.title}>Hello, {displayName ? displayName : "Guest"}</Text>
-      <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.image} />
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
-        <Text style={styles.logoutText}>Logout <MaterialIcons name="logout" size={16} style={styles.logoutIcon} /></Text>
-      </TouchableOpacity>
-      
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isUpdateModalVisible}
-        onRequestClose={() => setIsUpdateModalVisible(false)}
-      >
-        <View style={styles.subModalContainer}>
-          <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
-          <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.image, {width: 100, height: 100}]} />
-          <KeyboardAvoidingView style={{marginTop: 5}}>
-            <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Họ và tên'
-              onChangeText={(text) => setRealNameSub(text)} 
-            >{realName?realName:''}</TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Số điện thoại'
-              inputMode='numeric'
-              onChangeText={(text) => setPhoneSub(text)}
-            >{phone?phone:''}</TextInput>
-            <TextInput
-              style={[styles.textInput, {backgroundColor:"#fff"}]}
-              placeholder='Địa chỉ'
-              onChangeText={(text) => setAddressSub(text)}
-            >{address?address:''}</TextInput>
-
-          </KeyboardAvoidingView>
-          <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b'}]} onPress={()=>updateInfo()}>
-            <Text style={styles.logoutText}>Cập nhật</Text>
+    <ImageBackground source={imageBG} style={styles.imageBackground}>
+      <LinearGradient colors={['#FFFFFF', '#3A915E']} style={styles.mainContainer}>
+        <View style={{flexDirection:'row', justifyContent:'flex-end', alignItems:'center', marginBottom:30}}>
+          <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={styles.imageAvatar} />
+          <View style={{flexDirection:'column'}}>
+            <Text style={styles.title}>{displayName}</Text>
+            <Text style={[styles.title, { fontWeight: '400', fontSize: 12}]}>{email}</Text>
+            <Text style={styles.badgeTitle}>Huy hiệu</Text>
+            {badgeSources.length > 0 ? (
+              <FlatList
+                data={badgeSources}
+                renderItem={({ item }) => (
+                  <Image source={item} style={styles.badge} />
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal={true}
+                style={styles.badgeList}
+                showsHorizontalScrollIndicator={false}
+              />
+              ) : (
+                <Text style={{alignSelf:'flex-start'}}>Boo! Không sở hữu huy hiệu</Text>
+              )}
+          </View>
+        </View>
+        <View style={styles.divider}/>
+        <View>
+          <TouchableOpacity onPress={() => handleCooperation("member")} style={[styles.logoutContainer, styles.cooperateContainer]}>
+            <Text style={[styles.logoutText, {color:'#2EAC48'}]}>Đăng ký gói Prenium </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setIsUpdateModalVisible(false)}
-          >
-            <MaterialIcons name="close" size={25} color="black" />
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Cửa hàng </Text>
           </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+        <View style={styles.divider}/>
+        <View>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Hợp tác </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Từ thiện </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.divider}/>
+        <View>
+          <TouchableOpacity onPress={() => {setIsUpdateModalVisible(true)}} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Thông tin thêm</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
+            <Text style={styles.logoutText}>Hỗ trợ </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={googleSignOut} style={styles.logoutContainer}>
+            <Text style={[styles.logoutText, { color:'red'}]}>Đăng xuất </Text>
+          </TouchableOpacity>
+        </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isUpdateModalVisible}
+          onRequestClose={() => setIsUpdateModalVisible(false)}
+        >
+          <View style={styles.subModalContainer}>
+            <Text style={styles.subModalTitle}>Thông tin người dùng</Text>
+            <Image source={avatar ? { uri: avatar } : {uri:defaultAvatar}} style={[styles.imageAvatar, {width: 100, height: 100}]} />
+            <KeyboardAvoidingView style={{marginTop: 5}}>
+              <TextInput style={styles.textInput} value={email} editable={false}></TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Họ và tên'
+                onChangeText={(text) => setRealNameSub(text)} 
+              >{realName?realName:''}</TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Số điện thoại'
+                inputMode='numeric'
+                onChangeText={(text) => setPhoneSub(text)}
+              >{phone?phone:''}</TextInput>
+              <TextInput
+                style={[styles.textInput, {backgroundColor:"#fff"}]}
+                placeholder='Địa chỉ'
+                onChangeText={(text) => setAddressSub(text)}
+              >{address?address:''}</TextInput>
+
+            </KeyboardAvoidingView>
+            <TouchableOpacity style={[styles.logoutContainer, {backgroundColor:'#39a89b', alignItems:'center', marginTop: 15}]} onPress={()=>updateInfo()}>
+              <Text style={[styles.logoutText]}>Cập nhật</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsUpdateModalVisible(false)}
+            >
+              <MaterialIcons name="close" size={25} color="black" />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </LinearGradient>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  imageBackground: {
     flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  mainContainer:{
     alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: '#fafaf7',
+    borderRadius: 25,
+    width: '100%',
+    height: '88%',
+    alignSelf: 'flex-end',
+    marginTop: '20%'
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom:5,
   },
-  image: {
-    width: 200, 
-    height: 200, 
-    marginBottom: 20,
+  imageAvatar: {
+    width: 100, 
+    height: 100, 
+    marginBottom: 10,
+    marginRight:20,
     borderRadius:100,
+    top:-35,
   },
   logoutContainer: {
-    backgroundColor: '#cf3119',
-    paddingVertical: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 5,
     paddingHorizontal: 20,
     borderRadius: 20,
-    marginTop: 20,
-  },
-  logoContainer:{
-    width: 150,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 10,
+    width:320,
+    height:47,
+    alignItems:'flex-start',
+    justifyContent:'center',
+    borderWidth:1,
+    borderColor:'#a6a6a6'
   },
   logo: {
     width: '100%',
@@ -235,48 +294,18 @@ const styles = StyleSheet.create({
     opacity:1
   },
   logoutText:{
-    fontWeight: 'bold',
-    fontSize: 20,
-    color: '#ffffff',
+    fontWeight: '500',
+    fontSize: 15,
+    color: '#000',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logoutIcon: {
-    marginLeft: 10,
-    color: 'white',
-  },
-  settingButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxHeight: '80%',
+    
   },
   closeButton: {
     position: 'absolute',
     top: 20,
     right: 20,
-  },
-  settingsItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  settingsItemText: {
-    fontSize: 18,
   },
   subModalContainer: {
     flex: 1,
@@ -287,7 +316,7 @@ const styles = StyleSheet.create({
   subModalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginBottom: 40,
   },
   textInput:{
     backgroundColor:'#f2f7f7',
@@ -297,7 +326,30 @@ const styles = StyleSheet.create({
     color:'black',
     minWidth: 300,
     margin:15
-  }
+  },
+  badgeList:{
+    width:'85%',
+    marginRight:5,
+  },
+  badge:{
+    width:35,
+    height:35,
+    borderRadius:100,
+    marginRight:5
+  },
+  badgeTitle:{
+    fontWeight:'bold',
+    marginVertical:0,
+    fontSize:18
+  },
+  divider:{
+    backgroundColor:'#fff',
+    width:390,
+    height:2,
+    marginBottom:15,
+    alignSelf:'center',
+    marginTop:5,
+},
 });
 
 export default ProfileScreen;

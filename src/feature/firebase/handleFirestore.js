@@ -15,6 +15,14 @@ const getUserDocumentRef = () => {
     return null;
 }
 
+const getDocumentRef = async(collectionName) => {
+    try {
+        return await firestore().collection(collectionName).get()
+    } catch (error) {
+        console.error("handleFirestore:" , error)
+    }
+}
+
 // Lấy thông tin từ Firestore của người dùng hiện tại
 const getUserInfo = async () => {
     const userRef = getUserDocumentRef();
@@ -26,18 +34,18 @@ const getUserInfo = async () => {
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
-            throw error; // Ném lỗi để bên ngoài có thể xử lý
+            throw error; 
         }
     }
     return null;
 }
 
 // Cập nhật thông tin của người dùng hiện tại trong Firestore
-const updateUserInfo = async (userData) => {
+const updateUserInfo = (...userData) => {
     const userRef = getUserDocumentRef();
     if (userRef) {
         try {
-            await userRef.update(userData);
+            userRef.update(...userData);
             return true; // Trả về true nếu cập nhật thành công
         } catch (error) {
             console.error('Error updating user info:', error);
@@ -61,5 +69,4 @@ const setUserInfo = async (userData) => {
     }
     return false; // Trả về false nếu không thể thiết lập
 }
-
-export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo };
+export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef };

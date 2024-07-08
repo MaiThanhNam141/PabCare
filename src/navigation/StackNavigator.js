@@ -5,16 +5,26 @@ import QuizzScreen from "../screens/QuizzScreen";
 import MiniApp from "../screens/MiniApp";
 import LoginScreen from "../screens/LoginScreen";
 
-import ChatAI from "../component/ChatAI";
-import Focus from "../component/Focus";
-import Todo from "../component/Todo";
-import Diary from "../component/Diary";
-import Quizz from "../component/Quiz";
+import ChatAI from "../component/OtherScreen/ChatAI";
+
+import Focus from "../component/MiniApp/Focus";
+import Todo from "../component/MiniApp/Todo";
+import Diary from "../component/MiniApp/Diary";
+import Mood from "../component/MiniApp/Mood";
+import BMITest from "../component/MiniApp/BMITest"
+import BmiResultScreen from "../component/MiniApp/BmiResultScreen"
+import Music from "../component/MiniApp/Music";
+import GoldenSleep from "../component/MiniApp/GoldenSleep";
+
+import Quizz from "../component/QuizzScreen/Quiz";
+import EQQuiz from "../component/QuizzScreen/EQQuiz";
+import BDIQuiz from "../component/QuizzScreen/BDIQuiz";
 
 import React, {useEffect, useContext} from "react";
 import auth from '@react-native-firebase/auth'
 
 import { UserContext } from "../feature/context/UserContext";
+import Membership from "../component/OtherScreen/Membership";
 
 const Stack = createStackNavigator()
 
@@ -30,28 +40,19 @@ const MainStackNavigator = () =>{
             }}>
             <Stack.Screen name="homescreen" component={HomeScreen}/>
             <Stack.Screen name="chatai" component={ChatAI} />
-                
+            <Stack.Screen name="member" component={Membership} />
         </Stack.Navigator>
     )
 }
 
 
 const ProfileStackNavigator = () =>{
-    const {userLoggedIn, setUserLoggedIn} = useContext(UserContext);
-
-    useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged(user => {
-            setUserLoggedIn(!!user);
-        });
-
-        return unsubscribe;
-    }, [setUserLoggedIn]);
+    const {userLoggedIn, loading} = useContext(UserContext);
+    if(loading) return null
     return(
         <Stack.Navigator
             screenOptions={{
-                headerStyle: {
-                    backgroundColor: "#91c4f8"
-                },
+                headerStyle: {backgroundColor: "#91c4f8"},
                 headerShown: false
             }}>
             {userLoggedIn ? (
@@ -59,6 +60,8 @@ const ProfileStackNavigator = () =>{
             ) : (
                 <Stack.Screen name="loginscreen" component={LoginScreen} />
             )}
+
+            <Stack.Screen name="member" component={Membership} />
         </Stack.Navigator>
     )
 }
@@ -75,6 +78,8 @@ const QuizzStackNavigator = () => {
             }}>
             <Stack.Screen name="quizzscreen" component={QuizzScreen} />
             <Stack.Screen name="quiz" component={Quizz} />
+            <Stack.Screen name="bdi" component={BDIQuiz} />
+            <Stack.Screen name="eq" component={EQQuiz} />
         </Stack.Navigator>
     )
 }
@@ -93,6 +98,11 @@ const MiniAppStackNavigator = () => {
             <Stack.Screen name="focus" component={Focus} />
             <Stack.Screen name="todo" component={Todo} />
             <Stack.Screen name="diary" component={Diary} />
+            <Stack.Screen name="mood" component={Mood} />
+            <Stack.Screen name="bmi" component={BMITest} />
+            <Stack.Screen name="bmiresult" component={BmiResultScreen} />
+            <Stack.Screen name="music" component={Music} />
+            <Stack.Screen name="goldensleep" component={GoldenSleep} />
         </Stack.Navigator>
     )
 }
