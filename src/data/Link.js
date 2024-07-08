@@ -15,6 +15,8 @@ export const streakOff = require('../../assets/Icons/streakOff.jpg');
 export const congrat = require('../../assets/congrat.jpg');
 
 export const Disc = require('../../assets/Icons/Discc.jpg');
+export const Play = require('../../assets/Icons/play.jpg');
+export const Stop = require('../../assets/Icons/stop.jpg');
 
 export const HomeScreenIcon = {
     member: require('../../assets/Icons/member.jpg'),
@@ -44,3 +46,5 @@ export const QuizzScreenIcon = {
     bdi: require('../../assets/Icons/BDI.jpg'),
     disc: require('../../assets/Icons/DISC.jpg'),
 };
+
+export const CHANNEL_ID = "channelId";

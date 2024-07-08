@@ -3,7 +3,8 @@ import { Text, View, StyleSheet, ImageBackground, Image, TouchableOpacity, Permi
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { goldensleep, goldenSleepBackGround } from '../../data/Link';
-import PushNotification from 'react-native-push-notification'
+import PushNotification from 'react-native-push-notification';
+import { CHANNEL_ID } from '../../data/Link';
 
 const GoldenSleep = () => {
     const [selectHour, setSelectHour] = useState(0);
@@ -16,18 +17,22 @@ const GoldenSleep = () => {
     const handleAlarm = async () => {
         try {
             const notificationTime = new Date();
-            notificationTime.setHours(hours + 7); 
+            notificationTime.setHours(notificationTime.getHours() + hours + 7); 
             notificationTime.setMinutes(minutes);
             notificationTime.setSeconds(0);
             notificationTime.setMilliseconds(0);
             
             PushNotification.localNotificationSchedule({
+                channelId: CHANNEL_ID,
                 title: 'Báo thức',
                 message: 'Get up pls',
                 date: notificationTime,
-                allowWhileIdle: true, 
+                allowWhileIdle: true,
+                playSound: true,
+                soundName: 'default',
+                repeatType: 'none', 
             });
-            console.log("OK");
+            console.log("Notification scheduled at:", notificationTime);
         } catch (error) {
             console.error("Send messaging error: ", error);
         }
@@ -44,8 +49,8 @@ const GoldenSleep = () => {
     useEffect(() => {
         const requestUserPermission = async () => {
             try {
-                await PushNotification.cancelAllLocalNotifications();
                 PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+                await PushNotification.cancelAllLocalNotifications();
             } catch (error) {
                 console.error("GoldenSleep.requestUserPermission Error ", error);
             }

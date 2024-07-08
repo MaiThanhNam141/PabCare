@@ -182,7 +182,7 @@ const ProfileScreen = ({navigation}) => {
         </View>
         <View style={styles.divider}/>
         <View>
-          <TouchableOpacity onPress={handleCooperation} style={styles.logoutContainer}>
+          <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>
             <Text style={styles.logoutText}>Hợp tác </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleDonation} style={styles.logoutContainer}>

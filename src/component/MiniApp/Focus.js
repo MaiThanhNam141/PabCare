@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Congrat from './Congrat';
 import { focusBG, HomeScreenIcon, defaultAvatar, focusInbucator, streakOn, streakOff } from '../../data/Link';
-import { Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
+import { Vibration, Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
 import { getUserInfo, updateUserInfo } from '../../feature/firebase/handleFirestore';
 
 const screen = Dimensions.get("window");
@@ -37,7 +37,7 @@ const Focus = () => {
   const [selectHour, setSelectHour] = useState("0");
   const [selectMinute, setSelectMinute] = useState("30");
   const [selectSecond] = useState("0");
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [logoUser, setLogoUser] = useState('')
   const [displayName, setDisplayName] = useState('');
   const [coin, setCoin] = useState(0)
@@ -57,15 +57,23 @@ const Focus = () => {
           setDisplayName(userData.displayName || '');
           setCoin(userData?.coin  || 0);
           setFocusStreak(userData?.streak || 0);
-          setLastDateFocus(userData?.lastDateFocus || 0)
+          setLastDateFocus(userData?.lastDateFocus.toDate()|| 0)
           setLoading(false);
         }
         
       }
       fetchData()
+      const millisecondsInOneDay = 86400000; 
+      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
+      if(isOneDayAgo>2){
+        setFocusStreak(0)
+      }
     } catch (error) {
       Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
       console.error("Focus ", error)
+    }
+    finally {
+      setLoading(false)
     }
   }, [])
 
@@ -89,17 +97,27 @@ const Focus = () => {
   const completeFocusSession = () => {
     try {
       stop();
-      setCoin(prev => prev + tempCoin)
-      setFocusStreak(prev => prev + 1)
+      Vibration.vibrate(1000);
+      setCoin(prev => prev + tempCoin);
+      setFocusStreak(prev => prev + 1);
 
       const newCoin = coin + tempCoin;
       const newFocusStreak = focusStreak + 1;
 
-      if( lastDate !== currentTimeStamp)
+      switch (isOneDayAgo) {
+        case 0: updateUserInfo({ coin: newCoin });
+          break;
+        case 1: updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
+          break;
+        default: updateUserInfo({ coin: newCoin, streak: 1, lastDateFocus: currentTimeStamp });
+          break;
+      }
+
+      if( isOneDayAgo )
         updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
       else updateUserInfo({ coin: newCoin, lastDateFocus: currentTimeStamp });
 
-      setModalVisible(true);
+      // setModalVisible(true);
     } catch (error) {
       console.error("completeFocusSession: ", error);
     }
