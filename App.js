@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useContext } from 'react';
 import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
+import { MusicProvider } from './src/feature/context/MusicContext';
 import { Animated, View, Image, SafeAreaView, StatusBar, Text, TouchableOpacity, StyleSheet, ToastAndroid } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -9,42 +10,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { GOOGLE_API_CLIENT } from '@env';
-import Sound from 'react-native-sound';
 
 const App = () => {
     const [loading, setLoading] = useState(true);
     const [firstTime, setFirstTime] = useState(false);
-
     const fadeAnim = useRef(new Animated.Value(1)).current;
     const translateYAnim = useRef(new Animated.Value(0)).current;
-
     const logo = useMemo(() => require('./assets/Icons/Logo.png'), []);
     const room = useMemo(() => require('./assets/room.png'), []);
-
-    useEffect(() => {
-      Sound.setCategory("Playback");
-  
-      const audio = new Sound(require('./assets/Music/Track1.mp3'), (error) => {
-        if (error) {
-          console.log("Error playing audio", error);
-          return;
-        }
-        const playAudio = () => {
-          audio.play((success) => {
-            if (success) {
-              playAudio();
-            } else {
-              console.log("Failed to play the audio");
-            }
-          });
-        };
-        playAudio(); // Bắt đầu phát nhạc
-      });
-  
-      return () => {
-        audio.release(); // Giải phóng tài nguyên âm thanh khi component bị unmount
-      };
-    }, []);
 
     useEffect(() => {
         GoogleSignin.configure({
@@ -157,9 +130,11 @@ const App = () => {
                 </View>
             ) : (
                 <NavigationContainer>
-                <UserProvider>
-                    <BottomTabNavigation />
-                </UserProvider>
+                  <UserProvider>
+                    <MusicProvider>
+                      <BottomTabNavigation />
+                    </MusicProvider>
+                  </UserProvider>
                 </NavigationContainer>
             )}
             </View>

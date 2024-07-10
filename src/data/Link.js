@@ -17,6 +17,8 @@ export const congrat = require('../../assets/congrat.jpg');
 export const Disc = require('../../assets/Icons/Discc.jpg');
 export const Play = require('../../assets/Icons/play.jpg');
 export const Stop = require('../../assets/Icons/stop.jpg');
+export const Clock = require('../../assets/Icons/clock.png');
+export const tenseconds = require('../../assets/Icons/10sc.png');
 
 export const HomeScreenIcon = {
     member: require('../../assets/Icons/member.jpg'),
@@ -24,7 +26,8 @@ export const HomeScreenIcon = {
     professors: require('../../assets/Icons/professors.jpg'),
     book: require('../../assets/Icons/book.jpg'),
     charity: require('../../assets/Icons/charity.jpg'),
-    coin: require('../../assets/Icons/coin.jpg')
+    coin: require('../../assets/Icons/coin.jpg'),
+    welcome: require('../../assets/Welcome.png')
 };
 
 export const goldenSleepBackGround = require('../../assets/goldenSleep.jpg');
@@ -46,5 +49,13 @@ export const QuizzScreenIcon = {
     bdi: require('../../assets/Icons/BDI.jpg'),
     disc: require('../../assets/Icons/DISC.jpg'),
 };
+
+export const Songs = {
+    Track1: require('../../assets/Music/Track1.mp3'),
+    MikoAlarm: require('../../assets/Music/MikoAlarm.mp3'),
+    WindyHill: require('../../assets/Music/WindyHill.mp3'),
+    ATownWithAnOceanView: require('../../assets/Music/ATownWithAnOceanView.mp3'),
+    yoyoyo: require('../../assets/Music/yoyoyo.mp3'),
+}
 
 export const CHANNEL_ID = "channelId";

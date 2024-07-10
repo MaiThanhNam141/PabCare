@@ -1,38 +1,88 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, ImageBackground, Image, TouchableOpacity, PermissionsAndroid } from 'react-native';
+import { Text, View, StyleSheet, ImageBackground, Image, TouchableOpacity, PermissionsAndroid, ActivityIndicator } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { goldensleep, goldenSleepBackGround } from '../../data/Link';
+import { goldensleep, goldenSleepBackGround, logo } from '../../data/Link';
 import PushNotification from 'react-native-push-notification';
 import { CHANNEL_ID } from '../../data/Link';
+import { showNotifications } from '../../feature/notification.android';
+
+const currentTime = new Date();
 
 const GoldenSleep = () => {
-    const [selectHour, setSelectHour] = useState(0);
-    const [selectMinute, setSelectMinute] = useState(0);
+    const [selectHour, setSelectHour] = useState(currentTime.getHours());
+    const [selectMinute, setSelectMinute] = useState(currentTime.getMinutes());
     const [periodic, setPeriodic] = useState(5);
     const [hours, setHour] = useState(0);
     const [minutes, setMinute] = useState(0);
     const [showTimePicker, setShowTimePicker] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    let isNextDay = false;
+
+    const messages = [
+        'Hãy thức dậy và bắt đầu ngày mới nào!',
+        'Chúc bạn một ngày làm việc hiệu quả!',
+        'Đừng quên uống nước!',
+        'Hãy dành thời gian cho bản thân!',
+        'Chúc bạn có một ngày vui vẻ!',
+        'Hãy tiếp tục cố gắng!',
+        'Bạn đang làm rất tốt!',
+        'Đừng bao giờ bỏ cuộc!',
+        'Bạn có thể làm được bất cứ điều gì bạn muốn!',
+        'Hãy luôn mỉm cười!',
+        'Hãy lan tỏa năng lượng tích cực!',
+        'Hãy trân trọng từng khoảnh khắc!',
+        'Hãy sống hết mình!',
+        'Hãy luôn hướng về phía trước!',
+        'Bạn là người đặc biệt!',
+        'Hãy tin tưởng vào bản thân!',
+        'Bạn xứng đáng được hạnh phúc!',
+        'Hãy tận hưởng cuộc sống!',
+        'Chúc bạn luôn thành công!',
+        'Ngủ quá giờ trưa, tao đố mày thành công được!'
+    ];
 
     const handleAlarm = async () => {
         try {
+            PushNotification.cancelAllLocalNotifications();
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            const randomMessage = messages[randomIndex];
+
             const notificationTime = new Date();
-            notificationTime.setHours(notificationTime.getHours() + hours + 7); 
+            notificationTime.setHours(hours); 
             notificationTime.setMinutes(minutes);
             notificationTime.setSeconds(0);
             notificationTime.setMilliseconds(0);
-            
+
+            const lastDayOfMonth = new Date(notificationTime.getFullYear(), notificationTime.getMonth() + 1, 0).getDate();
+            if(isNextDay){
+                if (notificationTime.getDate() === lastDayOfMonth) {
+                    notificationTime.setDate(1);
+                    notificationTime.setMonth(notificationTime.getMonth() + 1);
+                    
+                    if (notificationTime.getMonth() === 0) { // Tháng 12
+                        notificationTime.setFullYear(notificationTime.getFullYear() + 1);
+                    }
+                }
+                else {
+                    notificationTime.setDate(notificationTime.getDate()+1);
+                }
+            }
             PushNotification.localNotificationSchedule({
                 channelId: CHANNEL_ID,
-                title: 'Báo thức',
-                message: 'Get up pls',
+                title: 'Dậy đi bạn ơi!',
+                message: randomMessage,
                 date: notificationTime,
                 allowWhileIdle: true,
                 playSound: true,
                 soundName: 'default',
-                repeatType: 'none', 
+                repeatType: 'none',
+                vibrate: true,
+                vibration: 5000,
+                bigLargeIcon: logo,
             });
-            console.log("Notification scheduled at:", notificationTime);
+            console.log("Notification scheduled at:", notificationTime.getHours(), " : ", notificationTime.getMinutes());
+            showNotifications("Đặt báo thức thành công!", "Báo thức bắt đầu vào ", notificationTime.getHours(), " : ", notificationTime.getMinutes())
         } catch (error) {
             console.error("Send messaging error: ", error);
         }
@@ -49,10 +99,16 @@ const GoldenSleep = () => {
     useEffect(() => {
         const requestUserPermission = async () => {
             try {
-                PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-                await PushNotification.cancelAllLocalNotifications();
+                PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+                    PermissionsAndroid.PERMISSIONS.REQUEST_START_IN_BACKGROUND,
+                    PermissionsAndroid.PERMISSIONS.VIBRATE,
+                );
             } catch (error) {
                 console.error("GoldenSleep.requestUserPermission Error ", error);
+            }
+            finally {
+                setIsLoading(false);
             }
             
         };
@@ -65,13 +121,15 @@ const GoldenSleep = () => {
         let totalMinutes = periodic * periodicTimes + timeToSleep + parseInt(selectHour) * 60 + parseInt(selectMinute);
         let hours = Math.floor(totalMinutes / 60);
         let minutes = totalMinutes % 60;
-        if (hours >= 24)
+        if (hours >= 24){
             hours -= 24;
+            isNextDay = true;
+        }
         setHour(hours);
         setMinute(minutes);
     }, [selectHour, selectMinute, periodic]);
 
-    const onTimeChange = (event, selectedTime) => {
+    const onTimeChange = (_, selectedTime) => {
         if (selectedTime) {
             setShowTimePicker(!showTimePicker);
             setSelectHour(selectedTime.getHours());
@@ -81,6 +139,7 @@ const GoldenSleep = () => {
 
     return (
         <ImageBackground source={goldenSleepBackGround} style={styles.container}>
+            {isLoading && <ActivityIndicator size={'large'} color={'#87bc9d'} />}
             <View style={styles.gifContainer}>
                 <Image source={goldensleep} style={styles.gifImage} resizeMode='contain' />
             </View>

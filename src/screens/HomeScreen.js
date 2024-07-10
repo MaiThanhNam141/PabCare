@@ -64,6 +64,7 @@ const HomeScreen = ({ navigation }) => {
     return (
         <ImageBackground source={imageBG} style={styles.imageBackground}>
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
+            <Image source={HomeScreenIcon.welcome} style={styles.imageWelcome}/>
                 <TouchableOpacity
                     style={styles.chatbotContainer}
                     onPress={() => goToScreen("chatai")}
@@ -146,6 +147,14 @@ const styles = StyleSheet.create({
     imageBackground: {
         flex: 1,
         resizeMode: 'contain',
+    },
+    imageWelcome: {
+        resizeMode:'cover', 
+        alignSelf:'center', 
+        height:50, 
+        overflow:'hidden', 
+        top: -55, 
+        position: "absolute",
     },
     container: {
         justifyContent: 'space-evenly',
