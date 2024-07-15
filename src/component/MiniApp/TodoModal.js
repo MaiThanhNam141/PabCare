@@ -52,7 +52,7 @@ const TodoModal = (props) => {
                     <MaterialIcons
                         name={item.completed ? 'check-box' : 'check-box-outline-blank'}
                         size={28}
-                        color={list.color ? list.color : '#87bc9d'}
+                        color={list?.color || '#87bc9d'}
                         style={{ width: 32 }}
                     />
                 </TouchableOpacity>
@@ -68,7 +68,7 @@ const TodoModal = (props) => {
                 {item.completed?
                     (<TouchableOpacity onPress={() => deleteTodo(index)} style={{width: 27,height: 27,}}>
                         <View style={styles.deleteButton}>
-                            <MaterialIcons name='delete' size={28} color={list.color ? list.color : '#87bc9d'} />
+                            <MaterialIcons name='delete' size={28} color={list?.color || '#87bc9d'} />
                         </View>
                     </TouchableOpacity>)
                     :(null)
@@ -81,87 +81,19 @@ const TodoModal = (props) => {
         <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
             <SafeAreaView style={styles.container}>
                 <View style={styles.headerTitle}>
-                    <View style={[styles.divider, { backgroundColor: list.color}]} />
-                    <Text style={[styles.title, { backgroundColor: list.color}]}>{date ? vietsubName : list.name}</Text>
-                    <View style={[styles.divider, { backgroundColor: list.color}]} />
+                    <View style={[styles.divider, { backgroundColor: list?.color || '#87bc9d'}]} />
+                    <Text style={[styles.title, { backgroundColor: list?.color || '#87bc9d'}]}>{date ? vietsubName : list.name}</Text>
+                    <View style={[styles.divider, { backgroundColor: list?.color || '#87bc9d'}]} />
                 </View>
 
                 <View style={[styles.section, { flex: 4, marginVertical: 10, marginRight: 10 }]}>
-                    {user ? (
-                        date === 'Today' ? (
-                            list.date === 'Today' ? (
-                                !list.todos?.length ? (
-                                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <Text style={styles.helloUser}>Xin chào, {user}</Text>
-                                            <Image source={AIImage} style={{ width: 55, height: 55 }} />
-                                        </View>
-                                        <Text style={styles.reminder}>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
-                                    </View>
-                                ) : (
-                                    <FlatList
-                                        data={list.todos}
-                                        renderItem={({ item, index }) => renderTodo({ item, index })}
-                                        keyExtractor={(item, index) => index.toString()}
-                                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-                                        showsVerticalScrollIndicator={false}
-                                    />
-                                )
-                            ) : (
-                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={styles.helloUser}>Xin chào, {user}</Text>
-                                        <Image source={AIImage} style={{ width: 55, height: 55 }} />
-                                    </View>
-                                    <Text style={styles.reminder}>Bạn muốn khởi động bằng việc gì ngày hôm nay?</Text>
-                                </View>
-                            )
-                        ) : date === 'Tomorrow' ? (
-                            list.date === 'Tomorrow' ? (
-                                !list.todos.length ? (
-                                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <Text styles={styles.helloUser}>Xin chào, {user}</Text>
-                                            <Image source={AIImage} style={{ width: 55, height: 55 }} />
-                                        </View>
-                                        <Text style={styles.reminder}>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
-                                    </View>
-                                ) : (
-                                    <FlatList
-                                        data={list.todos}
-                                        renderItem={({ item, index }) => renderTodo({ item, index })}
-                                        keyExtractor={(item, index) => index.toString()}
-                                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-                                        showsVerticalScrollIndicator={false}
-                                    />
-                                )
-                            ) : (
-                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text styles={styles.helloUser}>Xin chào, {user}</Text>
-                                        <Image source={AIImage} style={{ width: 55, height: 55 }} />
-                                    </View>
-                                    <Text style={styles.reminder}>Lên kế hoạch cho ngày mai vào hôm nay là một ý tưởng sáng suốt đó!</Text>
-                                </View>
-                            )
-                        ) : (
-                            <FlatList
-                                data={list.todos}
-                                renderItem={({ item, index }) => renderTodo({ item, index })}
-                                keyExtractor={(item, index) => index.toString()}
-                                contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-                                showsVerticalScrollIndicator={false}
-                            />
-                        )
-                    ) : (
-                        <FlatList
-                            data={list.todos}
-                            renderItem={({ item, index }) => renderTodo({ item, index })}
-                            keyExtractor={(item, index) => index.toString()}
-                            contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-                            showsVerticalScrollIndicator={false}
-                        />
-                    )}
+                    <FlatList
+                        data={list.todos}
+                        renderItem={({ item, index }) => renderTodo({ item, index })}
+                        keyExtractor={(item, index) => index.toString()}
+                        contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
+                        showsVerticalScrollIndicator={false}
+                    />
                 </View>
 
 
@@ -174,7 +106,7 @@ const TodoModal = (props) => {
                         placeholderTextColor={'#ffffff'}
                     />
                     <TouchableOpacity style={styles.addTodo} onPress={addTodo}>
-                        <MaterialIcons name='reply' size={35} color={list.color ? list.color : '#87bc9d'}/>
+                        <MaterialIcons name='reply' size={35} color={list?.color || '#87bc9d'}/>
                     </TouchableOpacity>
                 </View>
                 

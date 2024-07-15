@@ -2,6 +2,8 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useState } from 'react';
 
+let initdate = new Date();
+
 const useFirestoreList = () => {
   const [ref, setRef] = useState(null);
 
@@ -26,18 +28,6 @@ const useFirestoreList = () => {
       }
     } catch (error) {
      console.error("updateList nè:",error)
-    }
-  };
-
-  const updateRoutine = async (routine) => {
-    try {
-      if (ref) {
-        await ref.doc("Routine").update(routine);
-      } else {
-        console.error("Firestore reference is not initialized.");
-      }
-    } catch (error) {
-     console.error("updateRoutine nè:",error)
     }
   };
 
@@ -124,7 +114,6 @@ const useFirestoreList = () => {
 
   const getRoutine = async() => {
     try {
-      let initdate = new Date();
       const user = auth().currentUser;
       const listRef = firestore().collection('users').doc(user.uid).collection('lists');
       const snapshot = await listRef.get()
@@ -137,7 +126,21 @@ const useFirestoreList = () => {
       .map(doc => ({ id: doc.id, ...doc.data() }))
       .find(list => list.date === 'Tomorrow');
 
-      routineListTomorrow || await listRef.doc(`Routine ${initdate}`).set({ "color":"#87bc9d", "routine": true,"initdate" :initdate,"lastDate" : initdate, "todos" : [], "date" : "Tomorrow"})
+      routineListTomorrow || await listRef.doc(`Tomorrow`).set({ 
+        "routine": true,
+        "initdate": initdate,
+        "lastDate": initdate, 
+        "todos": [], 
+        "date": "Tomorrow"
+      });
+
+      routineListToday || await listRef.doc(`Today`).set({ 
+        "routine": true,
+        "initdate": initdate,
+        "lastDate": initdate, 
+        "todos": [], 
+        "date": "Today"
+      });
 
       return routineListToday;
 
@@ -147,6 +150,6 @@ const useFirestoreList = () => {
     }
   }
 
-  return { addList, updateList, getLists, deleteList, getRoutine, updateRoutine };
+  return { addList, updateList, getLists, deleteList, getRoutine };
 };
 export default useFirestoreList;

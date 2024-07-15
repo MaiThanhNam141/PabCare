@@ -57,21 +57,22 @@ const styles = StyleSheet.create({
     },
     label: {
         color: 'black',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "600",
     },
     valueText: {
         color: "black",
-        fontSize: 50,
+        fontSize: 45,
         fontWeight: "600",
         marginBottom: '5%',
-        paddingBottom: 40
+        paddingBottom: 30
     },
     btn: {
         backgroundColor: '#faf8f7',
         borderRadius: 100,
         alignItems: 'center',
-        padding: 10,
+        paddingHorizontal: 10,
+        paddingVertical:5,
         borderLeftWidth:1,
     },
     btnGroup: {

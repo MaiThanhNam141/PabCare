@@ -3,25 +3,24 @@ import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, ActivityIndi
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TodoList from './TodoList.js';
 import AddListModal from './AddListModal.js';
-import TodoModal from './TodoModal.js';
 import useFirestoreList from '../../feature/firebase/useFirestoreList.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from "react-native-linear-gradient";
 import { Today, Tomorrow } from '../../data/Link.js';
+import TodoRoutine from './TodoRoutine.js';
 
 const Todo = () => {
   let initdate = new Date();
 
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [lists, setLists] = useState([]);
-  const [routine, setRoutine] = useState({ "color":"#87bc9d", "routine": true,"initdate" :initdate, "lastDate" : initdate, "todos" : [], "date" : "Tomorrow"}) 
   const [date, setDate] = useState('Today')
   const [showRoutineModalVisible, setShowRoutineModalVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
 
-  const { addList, updateList, getLists, deleteList, getRoutine, updateRoutine } = useFirestoreList()
+  const { addList, updateList, getLists, deleteList, getRoutine } = useFirestoreList()
 
   useEffect(() => {
     const initializeFirebase = async () => {
@@ -50,9 +49,7 @@ const Todo = () => {
       setLists(lists);
       setLoading(false);
 
-      const routine = await getRoutine();
-      setRoutine(routine);
-
+      getRoutine();
     } catch (error) {
       console.error("Error fetching lists in Todo:", error);
     }
@@ -111,16 +108,6 @@ const Todo = () => {
     }
   };
 
-  const updateRoutineFirestore = async (routinePara) => {
-    try {
-      setRoutine(routinePara)
-      await updateRoutine(routinePara);
-    } catch (error) {
-      console.error("Error updating list:", error);
-      ToastAndroid.show("Cập nhật todo thất bại", ToastAndroid.SHORT);
-    }
-  }
-
   const handleRoutine = (day) => {
     try {
       day !== 'today' ? setDate('Tomorrow') : setDate('Today');
@@ -145,11 +132,9 @@ const Todo = () => {
         <AddListModal closeModal={toggleAddTodoModal} addList={addListFireStore} />
       </Modal>
       <Modal animationType='slide' visible={showRoutineModalVisible} onRequestClose={() => setShowRoutineModalVisible(false)}>
-        <TodoModal 
-          list={routine} 
+        <TodoRoutine 
           date={date} 
           user={user}
-          updateList={updateRoutineFirestore} 
         />
       </Modal>
       <View style={{ flexDirection: 'row'}}>
@@ -214,7 +199,7 @@ const styles = StyleSheet.create({
     fontSize:22,
     alignSelf:'flex-start',
     marginLeft:10,
-    marginBottom:-40,
+    marginBottom:-28,
   },
   addList: {
     paddingVertical: 25,
@@ -223,7 +208,7 @@ const styles = StyleSheet.create({
     margin: 10,
     alignItems: "center",
     justifyContent:'center',
-    width: 170,
+    width: 150,
     height: 120,
     borderWidth: 3,
     backgroundColor: '#fafaf7',

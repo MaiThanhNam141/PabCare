@@ -15,10 +15,17 @@ const MusicProvider = ({ children }) => {
   const [currentSongContext, setCurrentSongContext] = useState(null);
   const [isPlayingSong, setIsPlayingSong] = useState(true);
   const [roll, setRoll] = useState(false);
+  const [remainingSongs, setRemainingSongs] = useState([...songs]);
 
   const rollSongs = () => {
-    const filteredSongs = songs.filter(song => song.title !== currentSongContext.title);
-    return filteredSongs[Math.floor(Math.random() * filteredSongs.length)];
+    if(!remainingSongs.length){
+      setRemainingSongs([...songs]);
+    }
+    const filteredSongs = remainingSongs.filter(song => song.title !== currentSongContext.title);
+    const randomSong = filteredSongs[Math.floor(Math.random() * filteredSongs.length)];
+
+    setRemainingSongs(prev => prev.filter(song => song.title !== randomSong.title));
+    return randomSong;
   }
 
   useEffect(() => {
@@ -33,16 +40,16 @@ const MusicProvider = ({ children }) => {
     const getFavor = async () => {
       const snapshot = await getUserInfo();
       if (snapshot) {
-        const index = snapshot.favor || 0;
+        const title = snapshot.favor || "Track1";
+        const index = songs.findIndex(song => song.title === title);
         setCurrentSongContext(songs[index]);
       }
     }
     getFavor();
   }, []);
 
-  // Ensure currentSongContext is set before rendering children
   if (currentSongContext === null) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (

@@ -242,12 +242,13 @@ const styles = StyleSheet.create({
         color: '#153d2e',
         fontSize: 11,
         fontWeight: '500',
+        letterSpacing:-0.3
     },
     coinContainer: {
         backgroundColor: '#3a915e',
         paddingVertical: 5,
         paddingRight: 10,
-        paddingLeft: 40,
+        paddingLeft: 30,
         borderRadius: 50,
         justifyContent: 'center',
         alignItems: 'center',
@@ -259,12 +260,12 @@ const styles = StyleSheet.create({
         fontSize: 10,
     },
     quickstartMenu: {
-        width: 410,
+        width: "100%",
         marginBottom: 10,
         marginHorizontal: 0,
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'flex-start',
     },
     menuItem: {
@@ -272,14 +273,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginLeft: 10,
-        width: '21%',
+        width: '19%',
         marginTop: 5,
         marginBottom: 15,
     },
     menuItemImage: {
         borderRadius: 10,
-        width: 50,
-        height: 50,
+        width: 45,
+        height: 45,
         resizeMode: 'center',
         borderWidth: 4,
         borderColor: '#153d2e',
@@ -351,8 +352,8 @@ const styles = StyleSheet.create({
     renderImage: {
         marginBottom: 26,
         marginTop: 13,
-        alignSelf: 'flex-start',
-        marginLeft: 15,
+        alignSelf: 'center',
+        width:300
     },
     coinImage: {
         resizeMode: 'center',

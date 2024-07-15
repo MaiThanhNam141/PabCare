@@ -59,21 +59,23 @@ const TodoList = (props) => {
 const styles = StyleSheet.create({
     listContainer: {
         paddingVertical: 25,
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
         borderRadius: 16,
         margin: 10,
         alignItems: "center",
-        width: 170,
+        width: 150,
         height: 120,
         borderWidth: 3,
         backgroundColor: '#fafaf7'
     },
     listTitle: {
-        fontWeight: "bold",
-        fontSize: 16,
+        fontWeight: "600",
+        fontSize: 15,
         marginBottom: 5,
         color: "black",
-        marginTop:5
+        marginTop:5,
+        letterSpacing:-0.3,
+        textAlign:'center'
     },
     count: {
         fontSize: 12,

@@ -14,8 +14,8 @@ export default RenderSliderImage = props => {
           circleLoop={true}
           images={props.images}
           borderRadius={20}
-          parentWidth={360}
-          sliderBoxHeight={180}
+          parentWidth={300}
+          sliderBoxHeight={170}
       />
       </View>
     )

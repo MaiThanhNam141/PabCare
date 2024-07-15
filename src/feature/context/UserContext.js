@@ -6,7 +6,7 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
-
+    
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(user => {
             setUserLoggedIn(user);

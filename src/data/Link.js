@@ -8,11 +8,12 @@ export const gemini = require('../../assets/gemini.png');
 export const Today = require('../../assets/Icons/Today.jpg');
 export const Tomorrow = require('../../assets/Icons/Tomorrow.jpg');
 
-export const focusBG = require('../../assets/focus-bg.gif');
+export const focusBG = require('../../assets/focus.gif');
 export const focusInbucator = require('../../assets/Icons/incubator.jpg');
 export const streakOn = require('../../assets/Icons/streakOn.jpg');
 export const streakOff = require('../../assets/Icons/streakOff.jpg');
 export const congrat = require('../../assets/congrat.jpg');
+export const pabmind = require('../../assets/PABMIND.png');
 
 export const Disc = require('../../assets/Icons/Discc.jpg');
 export const Play = require('../../assets/Icons/play.jpg');

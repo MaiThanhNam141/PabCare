@@ -5,15 +5,18 @@ import { Clock, Disc, Play, Stop, tenseconds } from '../../data/Link';
 import { MusicContext } from '../../feature/context/MusicContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { updateUserInfo, getUserInfo } from '../../feature/firebase/handleFirestore';
 
 const Music = () => {
-  const { currentSongContext, setCurrentSongContext, isPlayingSong, setIsPlayingSong, setRoll } = useContext(MusicContext);
+  const { currentSongContext, isPlayingSong, setIsPlayingSong, setRoll } = useContext(MusicContext);
   const spinValue = useRef(new Animated.Value(0)).current;
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [favor, setFavor] = useState(false);
+  const [favor, setFavor] = useState(true);
   const [selectHour, setSelectHour] = useState(3);
   const [selectMinute, setSelectMinute] = useState(0);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [position, setPosition] = useState(0);
+  const soundRef = useRef(null);
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -29,7 +32,7 @@ const Music = () => {
         easing: Easing.linear,
       })
     );
-    
+
     if (isPlayingSong) {
       spinAnimation.start();
     } else {
@@ -42,14 +45,56 @@ const Music = () => {
     };
   }, [isPlayingSong, spinValue]);
 
+  useEffect(() => {
+    if (favor)
+      updateUserInfo({ favor: currentSongContext.title });
+  }, [favor, currentSongContext.title]);
+
+  useEffect(() => {
+    const getFavor = async () => {
+      try {
+        const snapshot = await getUserInfo();
+        if (snapshot) {
+          const title = snapshot.favor || "Track1";
+          if (title === currentSongContext.title) {
+            setFavor(true);
+          } else {
+            setFavor(false);
+          }
+        }
+      } catch (error) {
+        setFavor(false);
+        Alert.alert("Lỗi", "error");
+        console.log(error);
+      }
+    };
+    getFavor();
+  }, [currentSongContext]);
+
   const togglePlayPause = () => {
     if (isButtonDisabled)
       return Alert.alert("Lỗi", "Bạn bấm quá nhanh sẽ gây ra lỗi");
+    
+    if (isPlayingSong) {
+      soundRef.current?.getCurrentTime((seconds) => {
+        setPosition(seconds);
+      });
+      soundRef.current?.pause();
+    } else {
+      if (soundRef.current) {
+        soundRef.current.setCurrentTime(position);
+        soundRef.current.play((success) => {
+          if (!success) {
+            console.log("Failed to play the audio");
+          }
+        });
+      }
+    }
     setIsPlayingSong(!isPlayingSong);
     setIsButtonDisabled(true);
     setTimeout(() => {
       setIsButtonDisabled(false);
-    }, 700)
+    }, 700);
   };
 
   const toggleRoll = () => {
@@ -59,8 +104,8 @@ const Music = () => {
     setIsButtonDisabled(true);
     setTimeout(() => {
       setIsButtonDisabled(false);
-    }, 700)
-  }
+    }, 700);
+  };
 
   const onTimeChange = (_, selectedTime) => {
     setShowTimePicker(false);
@@ -135,7 +180,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   titleSongContainer: {
-    marginTop: 140,
+    marginTop: 80,
     padding: 12,
     alignSelf: 'flex-start',
     marginHorizontal: 15,
@@ -151,7 +196,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: "100%",
     height: 300,
-    marginTop: 100
+    marginTop: 90
   },
   nextButton: {
     borderWidth: 2,

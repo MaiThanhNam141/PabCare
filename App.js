@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useMemo, useRef, useContext } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
 import { MusicProvider } from './src/feature/context/MusicContext';
 import { Animated, View, Image, SafeAreaView, StatusBar, Text, TouchableOpacity, StyleSheet, ToastAndroid } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
@@ -122,10 +121,6 @@ const App = () => {
                 </View>
                 <TouchableOpacity style={styles.buttonLogin} onPress={loginButton}>
                     <Text style={styles.loginTitle}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.closeButton} onPress={() => setFirstTime(false)}>
-                    <Text>Skip</Text>
-                    <MaterialIcons name="close" size={25} color="black" />
                 </TouchableOpacity>
                 </View>
             ) : (
