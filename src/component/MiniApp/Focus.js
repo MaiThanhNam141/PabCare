@@ -1,7 +1,6 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import Congrat from './Congrat';
-import { focusBG, HomeScreenIcon, defaultAvatar, focusInbucator, streakOn, streakOff } from '../../data/Link';
+import { focusBG, HomeScreenIcon, focusInbucator, streakOn, streakOff, pabmind } from '../../data/Link';
 import { Vibration, Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
 import { getUserInfo, updateUserInfo } from '../../feature/firebase/handleFirestore';
 
@@ -16,13 +15,6 @@ const getRemaining = (time) => {
   return { hours: formatNumber(hours), minutes: formatNumber(minutes), seconds: formatNumber(seconds) };
 };
 
-const createArray = (length) => {
-  const arr = Array.from({ length }, (_, i) => i.toString());
-  return arr;
-};
-const AVAILABLE_HOURS = createArray(24);
-const AVAILABLE_MINUTES = createArray(60);
-
 const timerParts = [
   { image: require('../../../assets/pikachu-mega.png'), label: 'Part 1' },
   { image: require('../../../assets/pikachu.png'), label: 'Part 2' },
@@ -34,55 +26,47 @@ const timerParts = [
 const Focus = () => {
   const [remainingSeconds, setRemainingSeconds] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
-  const [selectHour, setSelectHour] = useState("0");
-  const [selectMinute, setSelectMinute] = useState("30");
-  const [selectSecond] = useState("0");
-  // const [modalVisible, setModalVisible] = useState(false);
-  const [logoUser, setLogoUser] = useState('')
-  const [displayName, setDisplayName] = useState('');
-  const [coin, setCoin] = useState(0)
-  const [focusStreak, setFocusStreak] = useState(0)
-  const [lastDateFocus, setLastDateFocus] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [selectedDate, setSelectedDate] = useState(new Date(0, 0, 0, 0, 30));
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [coin, setCoin] = useState(0);
+  const [focusStreak, setFocusStreak] = useState(0);
+  const [lastDateFocus, setLastDateFocus] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const currentTimeStamp = new Date();
   currentTimeStamp.setHours(0, 0, 0, 0);
 
-  useEffect(()=>{
+  useEffect(() => {
     try {
-      const fetchData = async() => {
+      const fetchData = async () => {
         const userData = await getUserInfo();
-        if(userData){
-          setLogoUser(userData.photoURL || defaultAvatar);
-          setDisplayName(userData.displayName || '');
-          setCoin(userData?.coin  || 0);
+        if (userData) {
+          setCoin(userData?.coin || 0);
           setFocusStreak(userData?.streak || 0);
-          setLastDateFocus(userData?.lastDateFocus.toDate()|| 0)
+          setLastDateFocus(userData?.lastDateFocus?.toDate() || 0);
           setLoading(false);
         }
-        
-      }
-      fetchData()
-      const millisecondsInOneDay = 86400000; 
+      };
+      fetchData();
+      const millisecondsInOneDay = 86400000;
       const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
-      if(isOneDayAgo>2){
-        setFocusStreak(0)
+      if (isOneDayAgo > 2) {
+        setFocusStreak(0);
       }
     } catch (error) {
       Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
-      console.error("Focus ", error)
+      console.error("Focus ", error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-  }, [])
+  }, []);
 
   let interval = null;
   let tempCoin = 0;
 
   useEffect(() => {
     if (remainingSeconds === 0) {
-      completeFocusSession()
+      completeFocusSession();
     }
   }, [remainingSeconds]);
 
@@ -104,27 +88,41 @@ const Focus = () => {
       const newCoin = coin + tempCoin;
       const newFocusStreak = focusStreak + 1;
 
+      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / 86400000);
+
       switch (isOneDayAgo) {
-        case 0: updateUserInfo({ coin: newCoin });
+        case 0:
+          updateUserInfo({ coin: newCoin });
           break;
-        case 1: updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
+        case 1:
+          updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
           break;
-        default: updateUserInfo({ coin: newCoin, streak: 1, lastDateFocus: currentTimeStamp });
+        default:
+          updateUserInfo({ coin: newCoin, streak: 1, lastDateFocus: currentTimeStamp });
           break;
       }
 
-      if( isOneDayAgo )
+      if (isOneDayAgo) {
         updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
-      else updateUserInfo({ coin: newCoin, lastDateFocus: currentTimeStamp });
+      } else {
+        updateUserInfo({ coin: newCoin, lastDateFocus: currentTimeStamp });
+      }
 
-      // setModalVisible(true);
     } catch (error) {
       console.error("completeFocusSession: ", error);
     }
+  };
+  const run = () => {
+    if (!isRunning && selectedDate) {
+      start();
+    } else {
+      setShowTimePicker(true);
+    }
   }
-
   const start = () => {
-    setRemainingSeconds(parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10));
+    const hours = selectedDate.getHours();
+    const minutes = selectedDate.getMinutes();
+    setRemainingSeconds(hours * 3600 + minutes * 60);
     setIsRunning(true);
 
     interval = setInterval(() => {
@@ -133,42 +131,34 @@ const Focus = () => {
   };
 
   const stop = () => {
-    if (interval)
-      clearInterval(interval);
+    if (interval) clearInterval(interval);
     interval = null;
     setRemainingSeconds(0);
     setIsRunning(false);
   };
 
-  const renderPickers = () => (
-    <View style={styles.pickerContainer}>
-      <Picker
-        style={styles.picker}
-        selectedValue={selectHour}
-        onValueChange={(itemValue) => {
-          setSelectHour(itemValue);
-        }}
-        
-        mode="dropdown"
-      >
-        {AVAILABLE_HOURS.map((value) => (
-          <Picker.Item key={value} label={value} value={value} style={styles.pickerItem}  />
-        ))}
-      </Picker>
-      <Text style={styles.pickerItemSemiColon}>:</Text>
-      <Picker
-        style={styles.picker}
-        selectedValue={selectMinute}
-        onValueChange={(itemValue) => {
-          setSelectMinute(itemValue);
-        }}
-        mode="dropdown">
-        {
-          AVAILABLE_MINUTES.map(value => (
-            <Picker.Item key={value} label={value} value={value} style={styles.pickerItem} />
-          ))
-        }
-      </Picker>
+  const onTimeChange = (_, selectedDate) => {
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+    }
+    setShowTimePicker(false);
+  };
+
+  const renderTimePicker = () => (
+    <View>
+      {showTimePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="time"
+          is24Hour={true}
+          display="spinner"
+          onChange={onTimeChange}
+          themeVariant="light"
+        />
+      )}
+      <TouchableOpacity onPress={run} style={styles.button}>
+        <Text style={styles.buttonText}>Bắt đầu</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -179,20 +169,20 @@ const Focus = () => {
 
   const CoinPerSeconds = (totalTime) => {
     const coinPredict = Math.floor(totalTime / 60);
-    return coinPredict
-  }
+    return coinPredict;
+  };
 
   const renderTimer = () => {
     const { hours, minutes, seconds } = getRemaining(remainingSeconds);
-    const totalTime = parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10);
+    const totalTime = selectedDate.getHours() * 3600 + selectedDate.getMinutes() * 60;
     const currentPart = Math.min(timerParts.length - 1, getCurrentTimerPart(totalTime, remainingSeconds));
-  
-    tempCoin = CoinPerSeconds(totalTime)
-    
+
+    tempCoin = CoinPerSeconds(totalTime);
+
     return (
       <View style={styles.timerContainer}>
         {timerParts[currentPart] && (
-          <View style={{width: 190, height: 190, justifyContent:'center'}}>
+          <View style={{ width: 190, height: 190, justifyContent: 'center' }}>
             <Image source={focusInbucator} style={styles.inbucatorImage} />
             <Image source={timerParts[currentPart].image} style={styles.timerImage} />
           </View>
@@ -201,62 +191,39 @@ const Focus = () => {
       </View>
     );
   };
-  
-  if(loading)
+
+  if (loading)
     return (
-    <View style={styles.containerGif}>
-      <ActivityIndicator color={'#87bc9d'} size={'large'}/>
-    </View>
-    )
+      <View style={styles.containerGif}>
+        <ActivityIndicator color={'#87bc9d'} size={'large'} />
+      </View>
+    );
 
   return (
     <ImageBackground source={focusBG} style={styles.containerGif}>
       <StatusBar barStyle={"light-content"} />
       <View style={styles.titleContainer}>
-
-      <View style={styles.header}>
-        <Image source={{uri: logoUser || defaultAvatar}} style={styles.logo} />
-        <Text style={styles.userNameText}>{displayName}</Text>
-      </View>
-
-      <View style={{flexDirection:'row', marginTop:10}}>
-        <View style={[styles.coinContainer, {backgroundColor:'transparent'}]}>
-          <Text style={[styles.cointext, {color: "#87bc9d"}]}>{focusStreak}</Text>
-          { focusStreak ? 
-            <Image source={streakOn} style={styles.coinImage} /> 
-            :<Image source={streakOff} style={styles.coinImage} />
-          }
+        <View style={styles.header}>
+          <Image source={pabmind} style={styles.logo} />
+          <Text style={styles.userNameText}>PABMIND</Text>
         </View>
-
-        <View style={styles.coinContainer}>
-          <Text style={styles.cointext}>{coin}</Text>
-          <Image source={HomeScreenIcon.coin} style={styles.coinImage} />
-        </View>
-
-      </View>
-
-    </View>
-      {
-        isRunning ? (
-          renderTimer()
-        ) : (
-          renderPickers()
-        )
-      }
-      {
-        isRunning ? (
-          // <TouchableOpacity onPress={stop} style={[styles.button, {borderColor:'#F3601A'}]}>
-          //   <Text style={[styles.buttonText, {color: '#F3601A'}]}>Dừng</Text>
-          // </TouchableOpacity>
-          null
-        ) : (
-          <View>
-            <TouchableOpacity onPress={start} style={styles.button}>
-              <Text style={styles.buttonText}>Bắt đầu</Text>
-            </TouchableOpacity>
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+          <View style={[styles.coinContainer, { backgroundColor: 'transparent' }]}>
+            <Text style={[styles.cointext, { color: "#87bc9d" }]}>{focusStreak}</Text>
+            {focusStreak ?
+              <Image source={streakOn} style={styles.coinImage} />
+              : <Image source={streakOff} style={styles.coinImage} />
+            }
           </View>
-        )
-      }
+          <View style={styles.coinContainer}>
+            <Text style={styles.cointext}>{coin}</Text>
+            <Image source={HomeScreenIcon.coin} style={styles.coinImage} />
+          </View>
+        </View>
+      </View>
+      <View>
+        {isRunning ? renderTimer() : renderTimePicker()}
+      </View>
     </ImageBackground>
   );
 };
@@ -265,7 +232,7 @@ const styles = StyleSheet.create({
   containerGif:{
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     width:screen.width,
     resizeMode:'contain'
   },
@@ -369,7 +336,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection:'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'flex-start',
     marginBottom: 0,
   },  
@@ -385,7 +352,7 @@ const styles = StyleSheet.create({
   userNameText:{
     color:'#87bc9d',
     fontWeight:'700',
-    marginLeft:5
+    marginLeft:5,
   },
 });
 

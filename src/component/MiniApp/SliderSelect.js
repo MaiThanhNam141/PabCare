@@ -42,14 +42,14 @@ const styles = StyleSheet.create({
     },
     label: {
         color: 'black',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "600",
     },
     valueText: {
         color: "black",
-        fontSize: 60,
-        fontWeight: "600",
-        marginBottom: '2%',
+        fontSize: 50,
+        fontWeight: "700",
+        marginBottom: '1%',
         borderWidth:0
     }
 });

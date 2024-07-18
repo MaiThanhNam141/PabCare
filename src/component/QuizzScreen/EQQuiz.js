@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Alert, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import EQ from '../../data/EQ';
 import EQ2 from '../../data/EQ2';
 import { updateUserInfo } from '../../feature/firebase/handleFirestore';
+import { showNotifications } from '../../feature/notification.android';
 
 const EQQuiz = ({ navigation }) => {
   const allQuestion = EQ;
@@ -40,10 +41,10 @@ const EQQuiz = ({ navigation }) => {
     }).start();
   };
 
-  const saveResult = async (score) => {
+  const saveResult = (score) => {
     try {
       setLoading(true);
-      await updateUserInfo({ eq: score });
+      updateUserInfo({ eq: score });
     } catch (error) {
       console.log(error);
       Alert.alert("Lỗi", "Hãy kiểm tra lại hệ thống mạng");
@@ -207,6 +208,11 @@ const EQQuiz = ({ navigation }) => {
     let indexRM = calculateResult(points.RelationshipManagement);
 
     const total = points.EmotionalAwareness + points.EmotionalManagement + points.SocialEmotionalAwareness + points.RelationshipManagement;
+    
+    if(total > 160){
+      setTimeout(() => showNotifications("Admin messaging", "Are you hack?"), 500 );
+      setTimeout(() => Linking.openURL('mailto://maithanhnam141@gmail.com&subject=FBI Warning: Maximum EQ is 160. How can you get this? &body=body'), 2000);
+    }
 
     return {
       EA: answer.EmotionalAwareness[indexEA],

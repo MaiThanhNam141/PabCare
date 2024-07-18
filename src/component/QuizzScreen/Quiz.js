@@ -50,16 +50,18 @@ const Quizz = ({navigation}) => {
     const userDoc = await userRef.get()
     try {
       if (!userDoc.exists || !userDoc.data().userType) {
-        await userRef.set({ userType: [type] }, { merge: true });
+        userRef.set({ userType: [type] }, { merge: true });
       } else {
-        await userRef.update({
+        userRef.update({
           userType: firebase.firestore.FieldValue.arrayUnion(type)
         });
       }
-      navigation.goBack()
     } catch (error) {
       console.log(error)
       Alert.alert("Lỗi", "Hãy kiểm tra lại hệ thống mạng")
+    }
+    finally {
+      navigation.goBack();
     }
   }
 

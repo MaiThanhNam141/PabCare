@@ -36,11 +36,11 @@ const Mood = () => {
     { id: 4, name: '😍' }
   ];
 
-  const submitEmotions = async (date, emoji) => {
+  const submitEmotions = (date, emoji) => {
     try {
       const userDocRef = getUserDocumentRef();
       if (userDocRef) {
-        await userDocRef.collection('calendar').doc(date).set({ emoji });
+        userDocRef.collection('calendar').doc(date).set({ emoji });
       }
     } catch (error) {
       console.error("Mood.submitEmotions Error: ", error);

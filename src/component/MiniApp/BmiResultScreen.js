@@ -25,7 +25,7 @@ const BmiResultScreen = ({ route, navigation }) => {
     // Styles
     const rangeHeaderStyle = {
         color: resultHash[bmiData].color, 
-        fontSize: 26,
+        fontSize: 24,
         textTransform: 'uppercase',
         fontWeight: 'bold',
         letterSpacing: 2
@@ -55,7 +55,7 @@ const BmiResultScreen = ({ route, navigation }) => {
                         {resultHash[bmiData].text}
                     </Text>
                     <Text style={[styles.description, {marginTop:0}]}>
-                        Cân nặng bạn nên hướng tới:{weight} 
+                        Cân nặng nên hướng tới:<Text style={{fontWeight:'bold'}}>{weight}</Text>
                     </Text>
                 </View>
 
@@ -108,33 +108,33 @@ const styles = StyleSheet.create({
     },
     btnTextStyle: {
         color: "white",
-        fontSize: 20,
+        fontSize: 18,
         textTransform: 'uppercase'
     },
     value: {
         color: "white",
-        fontSize: 90,
+        fontSize: 88,
         fontWeight: '700',
-        marginVertical: '10%'
+        marginVertical: '7%'
     },
     rangeLabel: {
         color: '#8E8E98',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "600",
         letterSpacing: 0.75
     },
     rangeText: {
         color: 'white',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "600",
         letterSpacing: 0.75,
         marginTop: '3%'
     },
     description: {
         color: 'white',
-        fontSize: 20,
+        fontSize: 18,
         letterSpacing: 0.75,
-        marginTop: '15%',
+        marginTop: '13%',
         textAlign: 'center'
     }
 });

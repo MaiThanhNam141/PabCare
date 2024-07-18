@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
+import { ActivityIndicator, View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -100,6 +100,7 @@ const ProfileScreen = ({navigation}) => {
     return (
       <View style={{flex:1}}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <ActivityIndicator size={'large'} color='#87bc9d'/>
       </View>
     )
   }
@@ -277,12 +278,12 @@ const styles = StyleSheet.create({
   },
   logoutContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 5,
+    paddingVertical: 3,
     paddingHorizontal: 20,
     borderRadius: 20,
-    marginBottom: 10,
-    width:320,
-    height:47,
+    marginBottom: 7,
+    width: 300,
+    height:45,
     alignItems:'flex-start',
     justifyContent:'center',
     borderWidth:1,

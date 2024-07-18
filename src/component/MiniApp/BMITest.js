@@ -53,7 +53,7 @@ const BMITest = ({ navigation }) => {
                     />
                 </View>
 
-                <View style={{ marginVertical: '3%' }}>
+                <View style={{ marginVertical: '2%' }}>
                     <SliderSelect onValueChange={(value) => handleChange('height', value)} />
                 </View>
 
@@ -71,7 +71,7 @@ const BMITest = ({ navigation }) => {
                     />
                 </View>
 
-                <View style={{ marginTop: '5%' }}>
+                <View style={{ marginTop: '4%' }}>
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.btnStyle}
@@ -104,11 +104,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        padding: 15,
+        paddingVertical: 10,
+        paddingHorizontal:15,
     },
     btnTextStyle:{
         color: "white",
-        fontSize: 22,
+        fontSize: 20,
         textTransform: 'uppercase',
     }
 });

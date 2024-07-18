@@ -11,14 +11,15 @@ import { CHANNEL_ID } from './src/data/Link';
 
 PushNotification.createChannel(
   {
-    channelId: CHANNEL_ID, // (required)
-    channelName: "My channel", // (required)
-    channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
-    soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
-    importance: 4, // (optional) default: 4. Int value of the Android notification importance
-    vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+    channelId: CHANNEL_ID, 
+    channelName: "Pabcare", 
+    channelDescription: "Notifications", 
+    soundName: "default", 
+    importance: 4, 
+    vibrate: true,
+    vibrationPattern: [0, 500, 200, 500],
   },
-  (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+  (created) => console.log(`createChannel returned '${created}'`)
 );
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).

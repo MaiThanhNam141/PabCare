@@ -69,4 +69,21 @@ const setUserInfo = async (userData) => {
     }
     return false; // Trả về false nếu không thể thiết lập
 }
-export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef };
+
+const getRoutineFirebase = (routineType) => {
+    try {
+        const user = getCurrentUser()
+        return firestore().collection("users").doc(user.uid).collection("lists").doc(routineType);
+    } catch (error) {
+        console.log("getRoutineFirebase Error: ", error);
+    }
+}
+
+const updateRoutineFirebase = (todos, type) => {
+   try {
+     getRoutineFirebase(type).update(todos)
+   } catch (error) {
+    console.log("updateRoutineFirebase: ", error);
+   }
+}
+export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef, getRoutineFirebase, updateRoutineFirebase };

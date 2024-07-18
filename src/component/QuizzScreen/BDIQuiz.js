@@ -35,10 +35,10 @@ const BDIQuiz = ({navigation}) => {
     }).start();
   };
 
-  const saveResult = async(rate) => {
+  const saveResult = (rate) => {
     try {
         setLoading(true);
-        await updateUserInfo({BDIRateID: rate})
+        updateUserInfo({BDIRateID: rate})
     } catch (error) {
         console.log(error)
         Alert.alert("Lỗi", "Hãy kiểm tra lại hệ thống mạng")

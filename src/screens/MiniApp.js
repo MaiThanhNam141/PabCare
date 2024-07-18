@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ImageBackground, TouchableOpacity, Alert, Image } from 'react-native';
 import { imageBG, miniAppIcon } from '../data/Link';
+import { showNotifications } from '../feature/notification.android';
 
 const MiniApp = ({ navigation }) => {
   const goToScreen = (screenName) => {
     if (screenName === 'diary') {
-      Alert.alert('Lỗi', "Tính năng đang phát triển");
+      showNotifications("Diary", "Coming soon")
       return;
     }
     navigation.navigate(screenName);

@@ -6,15 +6,12 @@ import { imageBG, QuizzScreenIcon } from '../data/Link';
 const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [userGender, setUserGender] = useState('');
-  const [userInfo, setUserInfo] = useState('');
-  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = await getUserInfo();
         setUserGender(user.gender || '');
-        setUserInfo(user || '')
       } catch (error) {
         ToastAndroid.show("Hãy thử đăng nhập lại!", ToastAndroid.SHORT)
       }
@@ -27,25 +24,25 @@ const QuizzScreen = ({ navigation }) => {
   }
 
   const renderData = [
-    { id: 1, title: 'MBTI TEST', questions: 52, link:QuizzScreenIcon.mbti},
-    { id: 2, title: 'EQ TEST', questions: 40, link:QuizzScreenIcon.eq},
-    { id: 3, title: 'BDI TEST', questions: 21, link:QuizzScreenIcon.bdi},
-    { id: 4, title: 'DISC TEST', questions: '???', link:QuizzScreenIcon.disc},
+    { id: 1, title: 'MBTI TEST', questions: 52, link: QuizzScreenIcon.mbti },
+    { id: 2, title: 'EQ TEST', questions: 40, link: QuizzScreenIcon.eq },
+    { id: 3, title: 'BDI TEST', questions: 21, link: QuizzScreenIcon.bdi },
+    { id: 4, title: 'DISC TEST', questions: '???', link: QuizzScreenIcon.disc },
   ];
 
   const renderTest = ({ item }) => {
     const alignmentStyle = item.id % 2 === 0 ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' };
     return (
       <TouchableOpacity
-        style={styles.quizItem}
+        style={[styles.quizItem, alignmentStyle]}
         onPress={() => handleQuizSelection(item)}
-      > 
+      >
         <>
           <Image source={item.link} style={styles.quizImage}></Image>
           <View style={styles.quizImageOverlay} />
         </>
-        <Text style={[alignmentStyle ,styles.quizTitle]}>{item.title}</Text>
-        <View style={[alignmentStyle, {backgroundColor:'#fff', borderRadius:5, marginHorizontal:15}]}>
+        <Text style={[styles.quizTitle, alignmentStyle]}>{item.title}</Text>
+        <View style={[alignmentStyle, { backgroundColor: '#fff', borderRadius: 5, marginHorizontal: 15 }]}>
           <Text style={styles.quizNumber}>{item.questions}</Text>
         </View>
       </TouchableOpacity>
@@ -64,7 +61,7 @@ const QuizzScreen = ({ navigation }) => {
         goToScreen('bdi')
         break;
       case 4:
-        Alert.alert('Lỗi',"Tính năng đang phát triển")
+        Alert.alert('Lỗi', "Tính năng đang phát triển")
         break;
       default:
         goToScreen(selectedQuiz.title)
@@ -77,24 +74,16 @@ const QuizzScreen = ({ navigation }) => {
     if (userGender === '') {
       ToastAndroid.show('Vui lòng chọn giới tính', ToastAndroid.SHORT);
     } else {
-      updateUserInfo({ gender: userGender })
-        .then(() => {
-          navigation.navigate('quiz');
-        })
-        .catch((error) => {
-          console.log('Cập nhật dữ liệu thất bại:', error);
-        });
+      try {
+        updateUserInfo({ gender: userGender })
+      } catch (error) {
+        console.log("QuizzScreen: ", error);
+      }
+      finally {
+        navigation.navigate('quiz');
+      }
     }
   };
-
-  const renderUserType = () => {
-    return userInfo?.userType?.map((type, index) => (
-      <Text key={index} style={styles.userTypeText}>
-        <Text style={{fontWeight:'300'}}>Kiểu:</Text> {type}{' '}
-        <Text style={{fontWeight:'300'}}>ở lần thử:</Text> {index + 1}
-      </Text>
-    ));
-};
 
   return (
     <View style={styles.container}>
@@ -103,15 +92,13 @@ const QuizzScreen = ({ navigation }) => {
           <View style={styles.title}>
             <Text style={styles.titleText}>ALL TEST</Text>
           </View>
-          {/* <TouchableOpacity style={styles.totalResult} onPress={()=>setShowUserInfoModal(true)}>
-            <Text style={styles.totalResultText}>Tổng hợp các kết quả</Text>
-          </TouchableOpacity> */}
           <FlatList
             data={renderData}
             renderItem={renderTest}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.flatListContainer}
             numColumns={1}
+            showsVerticalScrollIndicator={false}
           />
 
           {userGender === '' && (
@@ -153,28 +140,6 @@ const QuizzScreen = ({ navigation }) => {
               </View>
             </Modal>
           )}
-           <Modal
-            visible={showUserInfoModal} 
-            animationType="slide"
-            transparent={true}
-            onRequestClose={() => setShowUserInfoModal(false)}
-          >
-            <View style={styles.userInfoModalContainer}>
-              <View style={styles.userInfoModalContent}>
-                <Text style={styles.userInfoModalTitle}>Thông tin người dùng</Text>
-                <View style={styles.userTypeContainer}>
-                  {renderUserType()}
-                </View>
-                <Text>{userInfo.BDIRateID}</Text>
-                <TouchableOpacity
-                  style={[styles.submitButton, { backgroundColor: '#f20f2d' }]}
-                  onPress={() => setShowUserInfoModal(false)}
-                >
-                  <Text style={styles.submitText}>Đóng</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
         </View>
       </ImageBackground>
     </View>
@@ -199,37 +164,36 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '85%',
     alignSelf: 'flex-end',
-    marginTop: '20%'
+    marginTop: '20%',
   },
   flatListContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    width: '100%',
+    width: '90%',
   },
   quizItem: {
-    width: 333, 
-    height: 113, 
-    marginHorizontal: 10, 
-    marginVertical:5,
+    width: 300, 
+    height: 100, 
+    marginVertical: 8,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth:1,
-    borderColor:'#87bc9d'
+    borderWidth: 1,
+    borderColor: '#87bc9d'
   },
   quizTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: 'white',
-    marginHorizontal:15
+    marginHorizontal: 15
   },
-  quizNumber:{
-    fontWeight:'700',
-    fontSize:15,
-    paddingVertical:3,
-    paddingHorizontal:35,
-    color:'black',
+  quizNumber: {
+    fontWeight: '700',
+    fontSize: 15,
+    paddingVertical: 3,
+    paddingHorizontal: 35,
+    color: 'black',
   },
   modalContainer: {
     flex: 1,
@@ -286,63 +250,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  title:{
-    padding:5,
-    margin:10,
-    // marginBottom:10,
-    alignItems:'center',
-    marginTop:30
-  },
-  titleText:{
-    fontWeight:'900',
-    fontSize:23,
-    color:'#87bc9d'
-  },
-  totalResult:{
-    borderColor:'green',
-    borderWidth:1,
-    width:340,
-    height:80,
-    alignItems:'center',
-    justifyContent:'center'
-  },
-  totalResultText:{
-    fontSize:25,
-    textAlign:'center',
-    fontWeight:'600'
-  },
-  userInfoModalContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  title: {
+    padding: 5,
+    margin: 10,
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginTop: 30
   },
-  userInfoModalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
+  titleText: {
+    fontWeight: '900',
+    fontSize: 23,
+    color: '#87bc9d',
+    marginBottom: 5
   },
-  userInfoModalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  userTypeContainer: {
-    marginVertical: 10,
-  },
-  userTypeText:{
-    fontWeight:'bold',
-    textAlign:'center',
-  },
-  quizImage:{
-    width:330,
-    height:110,
-    borderRadius:15,
-    resizeMode:'cover',
-    overflow:'hidden',
-    position:'absolute',
+  quizImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 15,
+    resizeMode: 'cover',
+    overflow: 'hidden',
+    position: 'absolute',
     top: 0,
     left: 0,
   },
@@ -352,8 +278,8 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    borderRadius:15,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+    borderRadius: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
 });
 
