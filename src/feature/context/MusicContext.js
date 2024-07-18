@@ -38,11 +38,15 @@ const MusicProvider = ({ children }) => {
 
   useEffect(() => {
     const getFavor = async () => {
-      const snapshot = await getUserInfo();
-      if (snapshot) {
-        const title = snapshot.favor || "Track1";
-        const index = songs.findIndex(song => song.title === title);
-        setCurrentSongContext(songs[index]);
+      try {
+        const snapshot = await getUserInfo();
+        if (snapshot) {
+          const title = snapshot.favor || "Track1";
+          const index = songs.findIndex(song => song.title === title);
+          setCurrentSongContext(songs[index]);
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
       }
     }
     getFavor();
