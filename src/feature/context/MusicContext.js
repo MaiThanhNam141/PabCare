@@ -21,8 +21,10 @@ const MusicProvider = ({ children }) => {
     if(!remainingSongs.length){
       setRemainingSongs([...songs]);
     }
-    const filteredSongs = remainingSongs.filter(song => song.title !== currentSongContext.title);
-    const randomSong = filteredSongs[Math.floor(Math.random() * filteredSongs.length)];
+    const randomSong = remainingSongs[Math.floor(Math.random() * remainingSongs.length)];
+    if (randomSong.title === currentSongContext.title) {
+      return rollSongs();
+    }
 
     setRemainingSongs(prev => prev.filter(song => song.title !== randomSong.title));
     return randomSong;
