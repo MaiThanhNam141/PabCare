@@ -133,26 +133,9 @@ const Music = () => {
         <Text style={styles.titleSongText}>{currentSongContext?.title || "No song playing"}</Text>
       </View>
       <View style={styles.buttonSettingContainer}>
-        <TouchableOpacity style={styles.buttonSetting}>
-          <Image source={tenseconds} style={[styles.buttonSettingitems, { marginRight: 0 }]} />
-        </TouchableOpacity>
         <TouchableOpacity style={styles.buttonSetting} onPress={() => setFavor(!favor)}>
           <MaterialIcons name="star" size={32} color={favor ? "yellow" : "black"} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowTimePicker(!showTimePicker)} style={[styles.buttonSetting, { backgroundColor: "transparent", width: 80, marginLeft: 40 }]}>
-          <Image source={Clock} style={[styles.buttonSettingitems, { width: 50, height: 50 }]} />
-          <Text style={styles.timerText}>{selectHour.toString().padStart(2, '0')}:{selectMinute.toString().padStart(2, '0')}</Text>
-        </TouchableOpacity>
-        {showTimePicker && (
-          <DateTimePicker
-            value={new Date(0, 0, 0, selectHour, selectMinute)}
-            mode="time"
-            is24Hour={true}
-            display="spinner"
-            onChange={onTimeChange}
-            themeVariant="light"
-          />
-        )}
       </View>
     </LinearGradient>
   );
@@ -227,19 +210,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row'
   },
-  buttonSettingitems: {
-    width: 30,
-    height: 30,
-    overflow: 'hidden',
-    resizeMode: 'contain',
-  },
-  timerText: {
-    color: 'white',
-    fontWeight: '600',
-    width: 60,
-    height: 20,
-    marginLeft: 15
-  }
 });
 
 export default Music;

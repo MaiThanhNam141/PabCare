@@ -91,12 +91,13 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: "#bce0e3",
         flex: 1,
-        padding: '3%'
+        padding: '3%',
     },
     inner: {
         backgroundColor: "#bce0e3",
         flex: 1,
-        padding: 10
+        padding: 10,
+        justifyContent:'space-between'
     },
     btnStyle:{
         backgroundColor:'#D83456',

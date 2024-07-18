@@ -7,6 +7,7 @@ import { AIImage, imageBG, defaultAvatar, HomeScreenIcon } from "../data/Link";
 import LinearGradient from "react-native-linear-gradient";
 import { UserContext } from "../feature/context/UserContext";
 import Mood from "../component/MiniApp/Mood";
+import { showNotifications } from "../feature/notification.android";
 
 const HomeScreen = ({ navigation }) => {
     const [moodModalVisible, setMoodModalVisible] = useState(false);
@@ -54,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const onDevelopment = () => {
-        Alert.alert("Thông báo", "Coming soon");
+        showNotifications("Pabcare", "Chức năng sẽ sớm được ra mắt!");
     };
 
     const toggleMoodModalVisible = () => {
@@ -64,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
     return (
         <ImageBackground source={imageBG} style={styles.imageBackground}>
             <LinearGradient colors={['#FCFCFC', '#3A915E']} style={styles.container}>
-            <Image source={HomeScreenIcon.welcome} style={styles.imageWelcome}/>
+                <Image source={HomeScreenIcon.welcome} style={styles.imageWelcome} />
                 <TouchableOpacity
                     style={styles.chatbotContainer}
                     onPress={() => goToScreen("chatai")}
@@ -136,8 +137,8 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const quickstartItems = [
-    { text: 'Thẻ thành viên', icon: HomeScreenIcon.member, namespace:'member' },
-    { text: 'Tư vấn', icon: HomeScreenIcon.advise, namespace:'' },
+    { text: 'Thẻ thành viên', icon: HomeScreenIcon.member, namespace:'' },
+    { text: 'Tư vấn', icon: HomeScreenIcon.advise, namespace:'member' },
     { text: 'Các chuyên gia', icon: HomeScreenIcon.professors, namespace:'' },
     { text: 'Sách', icon: HomeScreenIcon.book, namespace:'' },
     { text: 'Từ thiện', icon: HomeScreenIcon.charity, namespace:'' }
@@ -147,13 +148,15 @@ const styles = StyleSheet.create({
     imageBackground: {
         flex: 1,
         resizeMode: 'contain',
+        justifyContent:'space-between'
     },
     imageWelcome: {
         resizeMode:'cover', 
         alignSelf:'center', 
-        height:50, 
-        overflow:'hidden', 
-        top: -55, 
+        height:55, 
+        width:100,
+        overflow:'visible', 
+        top: -60, 
         position: "absolute",
     },
     container: {
@@ -237,6 +240,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         borderRadius: 100,
         height: 40,
+        alignContent:'space-between'
     },
     moodText: {
         color: '#153d2e',
@@ -267,6 +271,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
+        alignContent:'space-between',
     },
     menuItem: {
         flexDirection: 'column',

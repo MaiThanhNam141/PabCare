@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Alert, ScrollView, Image } from 'react-native';
+import { Dimensions, View, Text, TouchableOpacity, StyleSheet, Modal, ToastAndroid, FlatList, ImageBackground, Image } from 'react-native';
 import { updateUserInfo, getUserInfo } from '../feature/firebase/handleFirestore';
 import { imageBG, QuizzScreenIcon } from '../data/Link';
+import { showNotifications } from '../feature/notification.android';
+
+const screen = Dimensions.get('window');
 
 const QuizzScreen = ({ navigation }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
@@ -61,7 +64,7 @@ const QuizzScreen = ({ navigation }) => {
         goToScreen('bdi')
         break;
       case 4:
-        Alert.alert('Lỗi', "Tính năng đang phát triển")
+        showNotifications("Pabcare", "Tính năng đang phát triển!");
         break;
       default:
         goToScreen(selectedQuiz.title)
@@ -86,82 +89,75 @@ const QuizzScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={imageBG} style={styles.imageBackground}>
-        <View style={styles.mainContainer}>
-          <View style={styles.title}>
-            <Text style={styles.titleText}>ALL TEST</Text>
-          </View>
-          <FlatList
-            data={renderData}
-            renderItem={renderTest}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.flatListContainer}
-            numColumns={1}
-            showsVerticalScrollIndicator={false}
-          />
-
-          {userGender === '' && (
-            <Modal
-              visible={showGenderModal}
-              animationType="slide"
-              transparent={true}
-              onRequestClose={() => setShowGenderModal(false)}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalTitle}>Chọn giới tính của bạn</Text>
-                  <View style={styles.genderButtonsContainer}>
-                    <TouchableOpacity
-                      style={[styles.genderButton, userGender === 'male' && styles.selectedGender]}
-                      onPress={() => setUserGender('male')}
-                    >
-                      <Text style={[styles.genderText, userGender === 'male' && styles.selectedText]}>Nam</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.genderButton, userGender === 'female' && styles.selectedGender]}
-                      onPress={() => setUserGender('female')}
-                    >
-                      <Text style={[styles.genderText, userGender === 'female' && styles.selectedText]}>Nữ</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.submitButton} onPress={handleSubmitMBTI}>
-                      <Text style={styles.submitText}>Xác nhận</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.submitButton, { backgroundColor: '#f20f2d' }]}
-                      onPress={() => setShowGenderModal(false)}
-                    >
-                      <Text style={styles.submitText}>Hủy</Text>
-                    </TouchableOpacity>
-                  </View>
+    <ImageBackground source={imageBG} style={styles.imageBackground}>
+      <View style={styles.mainContainer}>
+        <View style={styles.title}>
+          <Text style={styles.titleText}>ALL TEST</Text>
+        </View>
+        <FlatList
+          data={renderData}
+          renderItem={renderTest}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.flatListContainer}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+        />
+        {userGender === '' && (
+          <Modal
+            visible={showGenderModal}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setShowGenderModal(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Chọn giới tính của bạn</Text>
+                <View style={styles.genderButtonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.genderButton, userGender === 'male' && styles.selectedGender]}
+                    onPress={() => setUserGender('male')}
+                  >
+                    <Text style={[styles.genderText, userGender === 'male' && styles.selectedText]}>Nam</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.genderButton, userGender === 'female' && styles.selectedGender]}
+                    onPress={() => setUserGender('female')}
+                  >
+                    <Text style={[styles.genderText, userGender === 'female' && styles.selectedText]}>Nữ</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.buttonRow}>
+                  <TouchableOpacity style={styles.submitButton} onPress={handleSubmitMBTI}>
+                    <Text style={styles.submitText}>Xác nhận</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.submitButton, { backgroundColor: '#f20f2d' }]}
+                    onPress={() => setShowGenderModal(false)}
+                  >
+                    <Text style={styles.submitText}>Hủy</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-            </Modal>
-          )}
-        </View>
-      </ImageBackground>
-    </View>
+            </View>
+          </Modal>
+        )}
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   imageBackground: {
     flex: 1,
-    resizeMode: 'cover',
+    alignItems:'center',
     justifyContent: 'center',
   },
   mainContainer: {
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingHorizontal: 20,
     backgroundColor: '#fafaf7',
     borderRadius: 25,
-    width: '100%',
+    width: screen.width,
     height: '85%',
     alignSelf: 'flex-end',
     marginTop: '20%',
@@ -170,17 +166,16 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'space-around',
     alignItems: 'center',
-    width: '90%',
+    alignSelf:'center',
+    width: screen.width,
   },
   quizItem: {
-    width: 300, 
-    height: 100, 
-    marginVertical: 8,
+    width: screen.width/1.2, 
+    height: screen.height/8, 
     borderRadius: 15,
-    alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#87bc9d'
+    borderColor: '#87bc9d',
   },
   quizTitle: {
     fontSize: 28,

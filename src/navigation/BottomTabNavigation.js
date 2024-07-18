@@ -1,4 +1,4 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { MainStackNavigator, ProfileStackNavigator, QuizzStackNavigator, MiniAppStackNavigator } from "./StackNavigator";
@@ -7,7 +7,7 @@ import { UserContext } from "../feature/context/UserContext";
 import { MusicContext } from "../feature/context/MusicContext";
 import Sound from 'react-native-sound';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 const BottomTabNavigation = () => {
   const { userLoggedIn, loading } = useContext(UserContext);
@@ -65,7 +65,6 @@ const BottomTabNavigation = () => {
   ];
 
   if (loading) {
-    console.log("Loading");
     return null;
   }; 
 
@@ -77,15 +76,22 @@ const BottomTabNavigation = () => {
     return {};
   };
 
+  const isSwipeEnabled = (route) => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+    return !hiddenRoutes.includes(routeName.toLowerCase());
+  };
+
   return (
     <Tab.Navigator
       initialRouteName={userLoggedIn ? 'HomeScreen' : 'ProfileScreen'}
+      tabBarPosition="bottom"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: "black",
         tabBarInactiveTintColor: "gray",
         tabBarHideOnKeyboard: true,
+        swipeEnabled: isSwipeEnabled(route),
         tabBarStyle: {
           borderTopLeftRadius: 10,
           borderTopRightRadius: 10,
@@ -94,33 +100,37 @@ const BottomTabNavigation = () => {
           height: 49,
           ...getTabBarStyle(route)
         },
+        tabBarIconStyle: {
+          width: 25,
+          height: 25,
+        }
       })}
     >
       <Tab.Screen name='HomeScreen' component={MainStackNavigator}
         options={{
-          tabBarIcon: ({ size, color }) => (
-            <MaterialIcons name="home" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="home" size={25} color={color} />
           )
         }}
       />
       <Tab.Screen name='QuizzScreen' component={QuizzStackNavigator}
         options={{
-          tabBarIcon: ({ size, color }) => (
-            <MaterialIcons name="quiz" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="quiz" size={25} color={color} />
           )
         }}
       />
       <Tab.Screen name='MiniApp' component={MiniAppStackNavigator}
         options={{
-          tabBarIcon: ({ size, color }) => (
-            <MaterialIcons name="list-alt" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="list-alt" size={25} color={color} />
           )
         }}
       />
       <Tab.Screen name='ProfileScreen' component={ProfileStackNavigator}
         options={{
-          tabBarIcon: ({ size, color }) => (
-            <MaterialIcons name="account-circle" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="account-circle" size={25} color={color} />
           )
         }}
       />

@@ -26,7 +26,7 @@ const timerParts = [
 const Focus = () => {
   const [remainingSeconds, setRemainingSeconds] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date(0, 0, 0, 0, 30));
+  const [selectedDate, setSelectedDate] = useState(new Date(0, 0, 0, 0, 23));
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [coin, setCoin] = useState(0);
   const [focusStreak, setFocusStreak] = useState(0);
@@ -112,13 +112,7 @@ const Focus = () => {
       console.error("completeFocusSession: ", error);
     }
   };
-  const run = () => {
-    if (!isRunning && selectedDate) {
-      start();
-    } else {
-      setShowTimePicker(true);
-    }
-  }
+
   const start = () => {
     const hours = selectedDate.getHours();
     const minutes = selectedDate.getMinutes();
@@ -144,6 +138,12 @@ const Focus = () => {
     setShowTimePicker(false);
   };
 
+  const formatSelectedTime = (date) => {
+    const hours = formatNumber(date.getHours());
+    const minutes = formatNumber(date.getMinutes() + 7);
+    return `${hours}:${minutes}`;
+  };
+
   const renderTimePicker = () => (
     <View>
       {showTimePicker && (
@@ -156,9 +156,13 @@ const Focus = () => {
           themeVariant="light"
         />
       )}
-      <TouchableOpacity onPress={run} style={styles.button}>
+      <TouchableOpacity onPress={start} style={styles.button}>
         <Text style={styles.buttonText}>Bắt đầu</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.button}>
+        <Text style={styles.buttonText}>Chọn giờ</Text>
+      </TouchableOpacity>
+      <Text style={styles.selectedTimeText}>{formatSelectedTime(selectedDate)}</Text>
     </View>
   );
 
@@ -229,26 +233,26 @@ const Focus = () => {
 };
 
 const styles = StyleSheet.create({
-  containerGif:{
+  containerGif: {
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    width:screen.width,
-    resizeMode:'contain'
+    width: screen.width,
+    resizeMode: 'contain'
   },
   button: {
-    width:150,
-    height:150,
+    width: 150,
+    height: 150,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
     margin: 50,
     backgroundColor: 'rgba(135, 188, 157, 0.8)',
-    borderColor:'#87bc9d',
-    borderWidth:1
+    borderColor: '#87bc9d',
+    borderWidth: 1
   },
   buttonText: {
-    fontSize: 30,
+    fontSize: 28,
     color: "#DDDDDD"
   },
   timerText: {
@@ -262,13 +266,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     backgroundColor: "#5BA8A0",
   },
-
   pickerItem: {
     color: "#fff",
     backgroundColor: "#94B447",
     fontSize: 20,
   },
-
   pickerItemSemiColon: {
     color: "#fff",
     fontSize: 20,
@@ -278,7 +280,7 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: screen.height/2.5,
+    marginTop: screen.height / 2.5,
   },
   timerContainer: {
     alignItems: 'center',
@@ -288,71 +290,80 @@ const styles = StyleSheet.create({
   timerImage: {
     width: 120,
     height: 120,
-    overflow:'hidden',
-    resizeMode:'center',
-    alignSelf:'center',
+    overflow: 'hidden',
+    resizeMode: 'center',
+    alignSelf: 'center',
   },
-  inbucatorImage:{
-    width:190,
-    height:190,
-    borderRadius:100,
-    overflow:'hidden',
-    resizeMode:'contain',
-    position:'absolute',
+  inbucatorImage: {
+    width: 190,
+    height: 190,
+    borderRadius: 100,
+    overflow: 'hidden',
+    resizeMode: 'contain',
+    position: 'absolute',
     top: 0,
-    left:0
+    left: 0
   },
-  titleContainer:{
-    height:45,
-    width:screen.width-10,
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'flex-start',
-    marginTop:5,
-    alignSelf:'flex-start'
+  titleContainer: {
+    height: 45,
+    width: screen.width - 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginTop: 5,
+    alignSelf: 'flex-start'
   },
-  coinContainer:{
-    backgroundColor:'#3a915e',
-    paddingVertical:5,
-    paddingRight:10,
-    paddingLeft:40,
-    borderRadius:50,
-    justifyContent:'center',
-    alignItems:'center',
-    flexDirection:'row'
+  coinContainer: {
+    backgroundColor: '#3a915e',
+    paddingVertical: 5,
+    paddingRight: 10,
+    paddingLeft: 40,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
-  cointext:{
-    color:'#ffffff',
-    fontWeight:'800',
-    fontSize:11
+  cointext: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 11
   },
-  coinImage:{
-    resizeMode:'center',
-    borderRadius:100,
-    overflow:'hidden',
-    width:20,
-    height:20,
-    marginLeft:3
+  coinImage: {
+    resizeMode: 'center',
+    borderRadius: 100,
+    overflow: 'hidden',
+    width: 20,
+    height: 20,
+    marginLeft: 3
   },
   header: {
-    flexDirection:'row',
+    flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     marginBottom: 0,
-  },  
+  },
   logo: {
     width: 40,
     height: 40,
     resizeMode: "contain",
-    alignSelf:'center',
-    borderRadius:100,
-    marginLeft:15,
-    marginVertical:6
+    alignSelf: 'center',
+    borderRadius: 100,
+    marginLeft: 15,
+    marginVertical: 6
   },
-  userNameText:{
-    color:'#87bc9d',
-    fontWeight:'700',
-    marginLeft:5,
+  userNameText: {
+    color: '#87bc9d',
+    fontWeight: '700',
+    marginLeft: 5,
+  },
+  selectedTimeText: {
+    fontSize: 40,
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 10,
+    borderWidth:2,
+    borderRadius:30,
+    paddingVertical:10
   },
 });
 
