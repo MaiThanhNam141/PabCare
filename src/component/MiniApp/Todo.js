@@ -4,10 +4,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TodoList from './TodoList.js';
 import AddListModal from './AddListModal.js';
 import useFirestoreList from '../../feature/firebase/useFirestoreList.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from "react-native-linear-gradient";
 import { Today, Tomorrow } from '../../data/Link.js';
 import TodoRoutine from './TodoRoutine.js';
+import { getUserInfo } from '../../feature/firebase/handleFirestore.js';
 
 const Todo = () => {
   let initdate = new Date();
@@ -25,10 +25,9 @@ const Todo = () => {
   useEffect(() => {
     const initializeFirebase = async () => {
       try {
-        const userData = await AsyncStorage.getItem('user');
+        const userData = await getUserInfo();
         if (userData) {
-          const user = JSON.parse(userData);
-          setUser(user.displayName);
+          setUser(userData.displayName);
         }
       } catch (error) {
         console.error("Error get user in Todo:", error);

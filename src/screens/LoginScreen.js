@@ -3,20 +3,14 @@ import { View, Text, StyleSheet, ImageBackground, ToastAndroid, ActivityIndicato
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
-import { GOOGLE_API_CLIENT } from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import { imageBG, logo } from '../data/Link';
 
 const LoginScreen = () => {
-  GoogleSignin.configure({
-    webClientId: GOOGLE_API_CLIENT,
-  });
-
   const { setUserLoggedIn } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
 
-  async function onGoogleButtonPress() {
+  const onGoogleButtonPress = async() => {
     try {
       setLoading(true);
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
@@ -36,17 +30,8 @@ const LoginScreen = () => {
             photoURL: user.photoURL,
           };
   
-          await Promise.all([
-            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
-            AsyncStorage.setItem('user', JSON.stringify(user)),
-            userRef.set(userDocData),
-          ]);
-        } else {
-          await Promise.all([
-            // AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
-            AsyncStorage.setItem('user', JSON.stringify(user)),
-          ]);
-        }
+          await userRef.set(userDocData);
+        } 
         setUserLoggedIn(true);
         setLoading(false);
         ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
@@ -90,6 +75,7 @@ const LoginScreen = () => {
       </ImageBackground>
     </View>
   );
+
 };
 
 const styles = StyleSheet.create({

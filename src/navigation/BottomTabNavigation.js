@@ -58,7 +58,7 @@ const BottomTabNavigation = () => {
       }
     };
   }, [isPlayingSong, roll]);
-
+  
   const hiddenRoutes = [
     'loginscreen', 'focus', 'todo', 'diary', 'mood', 'bmi', 'music', 
     'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'member'

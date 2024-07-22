@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext} from 'react';
 import { ActivityIndicator, View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from "react-native-linear-gradient";
@@ -27,41 +26,48 @@ const ProfileScreen = ({navigation}) => {
   const [loading, setLoading] = useState(true)
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
-  const {setUserLoggedIn} = useContext(UserContext)
+  const {userLoggedIn, setUserLoggedIn} = useContext(UserContext)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const firestoreDataPromise = await getUserInfo()
-        if (firestoreDataPromise) {
-          setDisplayName(firestoreDataPromise.displayName || '');
-          setAvatar(firestoreDataPromise.photoURL || '');
-          setEmail(firestoreDataPromise.email || '');
-          setRealName(firestoreDataPromise.fullName || '');
-          setPhone(firestoreDataPromise.phone || '');
-          setAddress(firestoreDataPromise.address || '');
-          setUserType(firestoreDataPromise.userType || [])
+        const snapshot = await getUserInfo()
+        if (snapshot) {
+          setDisplayName(snapshot.displayName || '');
+          setAvatar(snapshot.photoURL || '');
+          setEmail(snapshot.email || '');
+          setRealName(snapshot.fullName || '');
+          setPhone(snapshot.phone || '');
+          setAddress(snapshot.address || '');
+          setUserType(snapshot.userType || [])
           setLoading(false)
-          return;
-        } else {
-          const userData = await AsyncStorage.getItem('user');
-          const user = JSON.parse(userData) || {};
-          if(user){
-            setDisplayName(user.displayName || '');
-            setAvatar(user.photoURL || '');
-            setEmail(user.email || '');
-          }
         }
-
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data and setting loading state:", error);
+        ToastAndroid.show("Lỗi mạng!", ToastAndroid.SHORT);
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [navigation]);
+  }, []);
+
+  const fetchUserTypeData = () => {
+    const snapshot = getUserInfo()
+    if (snapshot) {
+      setUserType(snapshot.userType || [])
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+        if (userLoggedIn) {
+            fetchUserTypeData();
+        }
+    });
+
+    return unsubscribe;
+}, [navigation, userLoggedIn]);
 
   const userTypeToBadgeMap = {
     ISTJ: require('../../assets/MBTI/ISTJ.jpg'),
@@ -86,13 +92,14 @@ const ProfileScreen = ({navigation}) => {
 
   const googleSignOut = async () => {
     try {
-      await GoogleSignin.signOut();
-      await auth().signOut();
-      await AsyncStorage.removeItem('user')
+      await Promise.all([
+        GoogleSignin.signOut(), 
+        auth().signOut(), 
+      ])
       setUserLoggedIn(false)
       setLoading(false)
     } catch (error) {
-      console.error(error);
+      console.error("Hello: ", error);
     }
   };
   

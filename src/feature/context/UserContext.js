@@ -6,14 +6,22 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
-    
     useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged(user => {
-            setUserLoggedIn(user);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
+        try {
+            const unsubscribe = auth().onAuthStateChanged(user => {
+                if(user){
+                    setUserLoggedIn(user);
+                    setLoading(false);
+                }
+                else {
+                    setUserLoggedIn(false);
+                    setLoading(false)
+                }
+            });
+            return () => unsubscribe();
+        } catch (error) {
+            console.log("UserContext: ", error);
+        }
     }, []);
 
     return (

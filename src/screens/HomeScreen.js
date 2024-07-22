@@ -19,35 +19,66 @@ const HomeScreen = ({ navigation }) => {
     const [eq, setEQ] = useState("???");
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderImages, setSliderImages] = useState([]);
+
     const { userLoggedIn } = useContext(UserContext);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [userData, snapshot] = await Promise.all([
-                    getUserInfo(),
-                    getDocumentRef('SliderImages')
-                ]);
-                if (userData) {
-                    setCoin(userData?.coin || 0);
-                    setDisplayName(userData.displayName || 'Pabcare user');
-                    setBMI(userData?.bmi || '???');
-                    setEQ(userData?.eq || '???');
-                    setLogoUser(userData.photoURL || defaultAvatar);
-                    const userType = userData?.userType;
-                    setType(userType ? userType[userType.length - 1] : '???');
-                }
-                if (snapshot) {
-                    const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    const imageUrls = images.map(image => image.link);
-                    setSliderImages(imageUrls);
-                }
-            } catch (error) {
-                console.error("HomeScreen: Lỗi khi fetch dữ liệu và set loading:", error);
+    const fetchSliderImages = async () => {
+        try {
+            const snapshot = await getDocumentRef('SliderImages');
+            if (snapshot) {
+                const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const imageUrls = images.map(image => image.link);
+                setSliderImages(imageUrls);
             }
-        };
+        } catch (error) {
+            console.error("HomeScreen: Lỗi khi fetch slider images:", error);
+        }
+    };
 
-        fetchData();
+    const fetchUserDetails = async () => {
+        try {
+            const userData = await getUserInfo();
+            if (userData) {
+                setLogoUser(userData.photoURL || defaultAvatar);
+                setDisplayName(userData.displayName || 'Pabcare user');
+            }
+        } catch (error) {
+            console.error("HomeScreen: Lỗi khi fetch user details:", error);
+        }
+    };
+
+    const fetchUserData = async () => {
+        try {
+            const userData = await getUserInfo();
+            if (userData) {
+                setCoin(userData?.coin || 0);
+                setType(userData?.userType ? userData.userType[userData.userType.length - 1] : '???');
+                setBMI(userData?.bmi || '???');
+                setEQ(userData?.eq || '???');
+            }
+        } catch (error) {
+            console.error("HomeScreen: Lỗi khi fetch user data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSliderImages();
+    }, []);
+
+    useEffect(() => {
+        if (userLoggedIn) {
+            fetchUserDetails();
+        }
+    }, [userLoggedIn]);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (userLoggedIn) {
+                fetchUserData();
+            }
+        });
+
+        return unsubscribe;
     }, [navigation, userLoggedIn]);
 
     const goToScreen = (route) => {
