@@ -35,6 +35,8 @@ const ChatAI = () => {
   
   const sendMessage = async () => {
     Keyboard.dismiss();
+    if( newMessage.trim().length < 5)
+        return ToastAndroid.show("Tin nhắn quá ngắn!", ToastAndroid.SHORT);
     try {
       const userMessage = { id: Math.random().toString(), text: newMessage, sender: "You", avatar: null };
       setMessages(prevMessages => [...prevMessages, userMessage]);

@@ -3,139 +3,126 @@ import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
 import { MusicProvider } from './src/feature/context/MusicContext';
-import { Animated, View, Image, SafeAreaView, StatusBar, Text, TouchableOpacity, StyleSheet, ToastAndroid } from 'react-native';
+import { Animated, View, Image, SafeAreaView, StatusBar, StyleSheet, ToastAndroid } from 'react-native';
+import { getCurrentUser } from './src/feature/firebase/handleFirestore';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import { GOOGLE_API_CLIENT } from '@env';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const App = () => {
-    const [loading, setLoading] = useState(true);
-    const [firstTime, setFirstTime] = useState(false);
-    const fadeAnim = useRef(new Animated.Value(1)).current;
-    const translateYAnim = useRef(new Animated.Value(0)).current;
-    const logo = useMemo(() => require('./assets/Icons/Logo.png'), []);
-    const room = useMemo(() => require('./assets/room.png'), []);
+  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const translateYAnim = useRef(new Animated.Value(0)).current;
+  const logo = useMemo(() => require('./assets/Icons/Logo.png'), []);
 
-    useEffect(() => {
-        GoogleSignin.configure({
-          webClientId: GOOGLE_API_CLIENT,
-        });
-
-        const start = async () => {
-        setTimeout(() => {
-            fadeOutAndMoveUp();
-            setTimeout(() => setLoading(false), 2500);
-        }, 450);
-        const checkFirstTime = await AsyncStorage.getItem('isFirstTime');
-        setFirstTime(!checkFirstTime);
-        };
-        start();
-    }, [GOOGLE_API_CLIENT]);
-
-    const fadeOutAndMoveUp = () => {
-        Animated.parallel([
-        Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 2500,
-            useNativeDriver: true,
-        }),
-        Animated.timing(translateYAnim, {
-            toValue: -150,
-            duration: 2500,
-            useNativeDriver: true,
-        }),
-        ]).start();
+  useEffect(() => {
+    const checkUserExist = async () => {
+      GoogleSignin.configure({
+        webClientId: GOOGLE_API_CLIENT,
+      });
+      const isUserExist = await getCurrentUser();
+      if (isUserExist) {
+        setIsLoggedIn(true);
+      } else {
+        onGoogleButtonPress();
+      }
     };
-
-    const loginButton = async () => {
-        try {
-        setLoading(true);
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        const { idToken } = await GoogleSignin.signIn();
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-        await auth().signInWithCredential(googleCredential);
-
-        const user = auth().currentUser;
-        if (user) {
-            const userRef = firestore().collection('users').doc(user.uid);
-            const userDoc = await userRef.get();
-
-            if (!userDoc.exists) {
-            const userDocData = {
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-            };
-
-            await Promise.all([
-                AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
-                AsyncStorage.setItem('user', JSON.stringify(user)),
-                userRef.set(userDocData),
-            ]);
-            } else {
-            await Promise.all([
-                AsyncStorage.setItem('isFirstTime', JSON.stringify(false)),
-                AsyncStorage.setItem('user', JSON.stringify(user)),
-            ]);
-            }
-            setFirstTime(false);
-            ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
-        } else {
-            ToastAndroid.show('Không thể lấy thông tin người dùng', ToastAndroid.SHORT);
-        }
-        } catch (error) {
-        if (error.code === statusCodes.IN_PROGRESS) {
-            ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT);
-        } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-            ToastAndroid.show('Điện thoại không có Google PlayServices', ToastAndroid.SHORT);
-        } else {
-            console.log("Login error: ", error.message);
-            ToastAndroid.show('Đăng nhập không thành công', ToastAndroid.SHORT);
-        }
-        } finally {
-        setLoading(false);
-        }
+    const start = async () => {
+      setTimeout(() => {
+        fadeOutAndMoveUp();
+        setTimeout(() => setLoading(false), 2500);
+      }, 450);
     };
+    checkUserExist();
+    start();
+  }, []);
 
+  const fadeOutAndMoveUp = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 2500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateYAnim, {
+        toValue: -150,
+        duration: 2500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const { idToken } = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredential);
+
+      const user = auth().currentUser;
+      if (user) {
+        const userRef = firestore().collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+          const userDocData = {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          };
+
+          await userRef.set(userDocData);
+        }
+        setIsLoggedIn(true);
+        ToastAndroid.show('Đăng nhập thành công', ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show('Không thể lấy thông tin người dùng', ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      if (error.code === statusCodes.IN_PROGRESS) {
+        ToastAndroid.show('Đang load đợi xíu', ToastAndroid.SHORT);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        ToastAndroid.show('Điện thoại không có Google PlayServices', ToastAndroid.SHORT);
+      } else {
+        console.log("Login error: ", error.message);
+        ToastAndroid.show('Đăng nhập không thành công', ToastAndroid.SHORT);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      onGoogleButtonPress();
+    }
+  }, [loading, isLoggedIn]);
+
+  if (loading) {
     return (
-        <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#16afc7" />
-        {loading ? (
-            <View style={styles.centered}>
-            <Animated.View style={[styles.logoContainer, { opacity: fadeAnim, transform: [{ translateY: translateYAnim }] }]}>
-                <Image source={logo} style={styles.logo} resizeMode="contain" />
-            </Animated.View>
-            </View>
-        ) : (
-            <View style={styles.mainContainer}>
-            {firstTime ? (
-                <View style={styles.welcomeContainer}>
-                <Image source={logo} style={[styles.image, { width: 100, height: 100 }]} />
-                <Image source={room} style={styles.image} />
-                <View style={styles.textDecription}>
-                    <Text style={styles.welcomeTitle}>Let's start!</Text>
-                    <Text style={[styles.welcomeTitle, { fontSize: 17 }]}>Trung tâm dịch vụ Tâm lý Tổng hợp PABCARE</Text>
-                    <Text>Đừng để tiêu cực và những điều dối trá ăn mòn cuộc sống của bạn. Chúng tôi ở đây để hỗ trợ bạn tốt hơn!</Text>
-                </View>
-                <TouchableOpacity style={styles.buttonLogin} onPress={loginButton}>
-                    <Text style={styles.loginTitle}>Login</Text>
-                </TouchableOpacity>
-                </View>
-            ) : (
-                <NavigationContainer>
-                  <UserProvider>
-                    <MusicProvider>
-                      <BottomTabNavigation />
-                    </MusicProvider>
-                  </UserProvider>
-                </NavigationContainer>
-            )}
-            </View>
-        )}
-        </SafeAreaView>
+        <View style={styles.centered}>
+          <Animated.View style={[styles.logoContainer, { opacity: fadeAnim, transform: [{ translateY: translateYAnim }] }]}>
+            <Image source={logo} style={styles.logo} resizeMode="contain" />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
     );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#16afc7" />
+      <NavigationContainer>
+        <UserProvider>
+          <MusicProvider>
+            {isLoggedIn && <BottomTabNavigation />}
+          </MusicProvider>
+        </UserProvider>
+      </NavigationContainer>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -157,46 +144,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 300,
     height: 300,
-  },
-  welcomeContainer: {
-    flex: 1,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: 'rgba(230, 255, 255, 1)',
-  },
-  welcomeTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 25,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    flexDirection: 'row',
-  },
-  image: {
-    width: 340,
-    height: 220,
-    marginBottom: 20,
-    borderRadius: 10,
-  },
-  textDecription: {
-    margin: 5,
-  },
-  buttonLogin: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    margin: 5,
-    minWidth: 350,
-    minHeight: 15,
-    alignItems: 'center',
-  },
-  loginTitle: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 22,
   },
 });
 

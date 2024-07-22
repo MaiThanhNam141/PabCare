@@ -48,6 +48,7 @@ const MusicProvider = ({ children }) => {
           setCurrentSongContext(songs[index]);
         }
       } catch (error) {
+        setCurrentSongContext(songs[0])
         console.error("Error fetching user info:", error);
       }
     }
