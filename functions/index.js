@@ -18,6 +18,6 @@ exports.updateTodos = functions.https.onRequest(async (req, res) => {
         await updateTodos(userId);
         res.status(200).send('Todos updated successfully.');
     } catch (error) {
-        res.status(500).send('Error updating todos: ' + error);
+        res.status(500).send('Error updating todos: ' + error.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"));
     }
 });
