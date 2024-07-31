@@ -81,7 +81,8 @@ const getRoutineFirebase = (routineType) => {
 
 const updateRoutineFirebase = (todos, type) => {
    try {
-     getRoutineFirebase(type).update(todos)
+     const date = new Date()
+     getRoutineFirebase(type).update({todos: todos, lastDate: date})
    } catch (error) {
     console.log("updateRoutineFirebase: ", error);
    }

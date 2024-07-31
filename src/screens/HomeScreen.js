@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { View, StyleSheet, Image, Modal, TouchableOpacity, Text, ImageBackground, Alert } from "react-native";
+import React, { useEffect, useState, useContext, useCallback } from "react";
+import { View, StyleSheet, Image, Modal, TouchableOpacity, Text, ImageBackground } from "react-native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RenderSliderImage from "../component/OtherScreen/RenderSliderImage";
 import { getDocumentRef, getUserInfo } from "../feature/firebase/handleFirestore";
@@ -18,22 +18,23 @@ const HomeScreen = ({ navigation }) => {
     const [bmi, setBMI] = useState("???");
     const [eq, setEQ] = useState("???");
     const [modalVisible, setModalVisible] = useState(false);
-    const [sliderImages, setSliderImages] = useState([]);
+    const [sliderImages, setSliderImages] = useState({ imageUrls: [], links: [] });
 
     const { userLoggedIn } = useContext(UserContext);
 
-    const fetchSliderImages = async () => {
+    const fetchSliderImages = useCallback(async () => {
         try {
             const snapshot = await getDocumentRef('SliderImages');
             if (snapshot) {
                 const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const imageUrls = images.map(image => image.link);
-                setSliderImages(imageUrls);
+                const imageUrls = images.map(image => image.urlImages);
+                const links = images.map(image => image.link);
+                setSliderImages({imageUrls, links});
             }
         } catch (error) {
             console.error("HomeScreen: Lỗi khi fetch slider images:", error);
         }
-    };
+    },[]);
 
     const fetchUserDetails = async () => {
         try {
@@ -125,7 +126,7 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                 </View>
                 <View style={styles.renderImage}>
-                    <RenderSliderImage images={sliderImages} />
+                    <RenderSliderImage images={sliderImages.imageUrls} links={sliderImages.links}/>
                 </View>
                 <View style={styles.quickstartMenu}>
                     {quickstartItems.map((item, index) => (

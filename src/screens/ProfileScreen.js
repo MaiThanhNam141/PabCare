@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext} from 'react';
-import { ActivityIndicator, View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, ToastAndroid, ImageBackground, FlatList } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { UserContext } from '../feature/context/UserContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from "react-native-linear-gradient";
-import { defaultAvatar, logo, imageBG } from '../data/Link';
+import { defaultAvatar, imageBG, loadingScreen } from '../data/Link';
 import { getUserInfo, getUserDocumentRef } from '../feature/firebase/handleFirestore';
 
 const ProfileScreen = ({navigation}) => {
@@ -105,10 +105,7 @@ const ProfileScreen = ({navigation}) => {
   
   if (loading) {
     return (
-      <View style={{flex:1}}>
-        <Image source={logo} style={styles.logo} resizeMode="contain" />
-        <ActivityIndicator size={'large'} color='#87bc9d'/>
-      </View>
+      <ImageBackground source={loadingScreen} style={{flex:1}}/>
     )
   }
 

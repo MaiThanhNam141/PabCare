@@ -1,3 +1,5 @@
+import React, {useContext} from "react";
+
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from '../screens/HomeScreen'
 import ProfileScreen from'../screens/ProfileScreen'
@@ -19,9 +21,8 @@ import GoldenSleep from "../component/MiniApp/GoldenSleep";
 import Quizz from "../component/QuizzScreen/Quiz";
 import EQQuiz from "../component/QuizzScreen/EQQuiz";
 import BDIQuiz from "../component/QuizzScreen/BDIQuiz";
+import DISCQuiz from "../component/QuizzScreen/DISCQuiz";
 
-import React, {useEffect, useContext} from "react";
-import auth from '@react-native-firebase/auth'
 
 import { UserContext } from "../feature/context/UserContext";
 import Membership from "../component/OtherScreen/Membership";
@@ -36,7 +37,9 @@ const MainStackNavigator = () =>{
                 headerStyle:{
                     backgroundColor:"#91c4f8"
                 },
-                headerShown:false
+                headerShown:false,
+                gestureEnabled:true,
+                gestureDirection:"horizontal-inverted"
             }}>
             <Stack.Screen name="homescreen" component={HomeScreen}/>
             <Stack.Screen name="chatai" component={ChatAI} />
@@ -53,7 +56,10 @@ const ProfileStackNavigator = () =>{
         <Stack.Navigator
             screenOptions={{
                 headerStyle: {backgroundColor: "#91c4f8"},
-                headerShown: false
+                headerShown: false,
+                gestureEnabled:true,
+                gestureDirection:"horizontal-inverted"
+
             }}>
             {userLoggedIn ? (
                 <Stack.Screen name="profilescreen" component={ProfileScreen} />
@@ -74,12 +80,15 @@ const QuizzStackNavigator = () => {
                 headerStyle:{
                     backgroundColor:"#91c4f8"
                 },
-                headerShown:false
+                headerShown:false,
+                gestureEnabled:true,
+                gestureDirection:"horizontal-inverted",
             }}>
             <Stack.Screen name="quizzscreen" component={QuizzScreen} />
             <Stack.Screen name="quiz" component={Quizz} />
             <Stack.Screen name="bdi" component={BDIQuiz} />
             <Stack.Screen name="eq" component={EQQuiz} />
+            <Stack.Screen name="disc" component={DISCQuiz} />
         </Stack.Navigator>
     )
 }
@@ -92,7 +101,9 @@ const MiniAppStackNavigator = () => {
                 headerStyle:{
                     backgroundColor:"#91c4f8"
                 },
-                headerShown:false
+                headerShown:false,
+                gestureEnabled:true,
+                gestureDirection:"horizontal-inverted"
             }}>
             <Stack.Screen name="miniapp" component={MiniApp} />
             <Stack.Screen name="focus" component={Focus} />

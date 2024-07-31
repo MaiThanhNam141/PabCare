@@ -1,6 +1,7 @@
 export const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/1698813888606-2.jpg';
 export const logo = require('../../assets/Icons/Logo.png');
 export const imageBG = require('../../assets/bg-image.jpg');
+export const loadingScreen = require('../../assets/loading.gif');
 
 export const AIImage = require('../../assets/Icons/AIIcon.jpg');
 export const gemini = require('../../assets/gemini.png');
@@ -18,8 +19,6 @@ export const pabmind = require('../../assets/PABMIND.png');
 export const Disc = require('../../assets/Icons/Discc.jpg');
 export const Play = require('../../assets/Icons/play.jpg');
 export const Stop = require('../../assets/Icons/stop.jpg');
-export const Clock = require('../../assets/Icons/clock.png');
-export const tenseconds = require('../../assets/Icons/10sc.png');
 
 export const HomeScreenIcon = {
     member: require('../../assets/Icons/member.jpg'),

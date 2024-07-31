@@ -1,8 +1,8 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { focusBG, HomeScreenIcon, focusInbucator, streakOn, streakOff, pabmind } from '../../data/Link';
-import { Vibration, Dimensions, StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
+import { Vibration, Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageBackground, Alert, ActivityIndicator } from 'react-native';
 import { getUserInfo, updateUserInfo } from '../../feature/firebase/handleFirestore';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const screen = Dimensions.get("window");
 
@@ -26,43 +26,43 @@ const timerParts = [
 const Focus = () => {
   const [remainingSeconds, setRemainingSeconds] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date(0, 0, 0, 0, 23));
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectHour, setSelectHour] = useState(0);
+  const [selectMinute, setSelectMinute] = useState(30);
+  const [selectSecond, _] = useState(0);
   const [coin, setCoin] = useState(0);
   const [focusStreak, setFocusStreak] = useState(0);
   const [lastDateFocus, setLastDateFocus] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const currentTimeStamp = new Date();
-  currentTimeStamp.setHours(0, 0, 0, 0);
+  const intervalRef = useRef(null);
+  let tempCoin = 0;
 
   useEffect(() => {
-    try {
-      const fetchData = async () => {
+    const fetchData = async () => {
+      try {
         const userData = await getUserInfo();
         if (userData) {
           setCoin(userData?.coin || 0);
           setFocusStreak(userData?.streak || 0);
           setLastDateFocus(userData?.lastDateFocus?.toDate() || 0);
-          setLoading(false);
         }
-      };
-      fetchData();
-      const millisecondsInOneDay = 86400000;
-      const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
-      if (isOneDayAgo > 2) {
-        setFocusStreak(0);
+      } catch (error) {
+        Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        console.error("Focus ", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      Alert.alert("Lỗi!", "Đã xảy ra lỗi trong quá trình lấy thông tin người dùng. Vui lòng đăng nhập lại.");
-      console.error("Focus ", error);
-    } finally {
-      setLoading(false);
+    };
+    fetchData();
+
+    const currentTimeStamp = new Date();
+    currentTimeStamp.setHours(0, 0, 0, 0);
+    const millisecondsInOneDay = 86400000;
+    const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / millisecondsInOneDay);
+    if (isOneDayAgo > 2) {
+      setFocusStreak(0);
     }
   }, []);
-
-  let interval = null;
-  let tempCoin = 0;
 
   useEffect(() => {
     if (remainingSeconds === 0) {
@@ -72,8 +72,8 @@ const Focus = () => {
 
   useEffect(() => {
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     };
   }, []);
@@ -83,11 +83,11 @@ const Focus = () => {
       stop();
       Vibration.vibrate(1000);
       setCoin(prev => prev + tempCoin);
-      setFocusStreak(prev => prev + 1);
 
       const newCoin = coin + tempCoin;
       const newFocusStreak = focusStreak + 1;
-
+      const currentTimeStamp = new Date();
+      currentTimeStamp.setHours(0, 0, 0, 0);
       const isOneDayAgo = Math.floor((currentTimeStamp - lastDateFocus) / 86400000);
 
       switch (isOneDayAgo) {
@@ -95,74 +95,85 @@ const Focus = () => {
           updateUserInfo({ coin: newCoin });
           break;
         case 1:
+          setFocusStreak(prev => prev + 1);
           updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
           break;
         default:
+          setFocusStreak(1);
           updateUserInfo({ coin: newCoin, streak: 1, lastDateFocus: currentTimeStamp });
           break;
       }
-
-      if (isOneDayAgo) {
-        updateUserInfo({ coin: newCoin, streak: newFocusStreak, lastDateFocus: currentTimeStamp });
-      } else {
-        updateUserInfo({ coin: newCoin, lastDateFocus: currentTimeStamp });
-      }
-
     } catch (error) {
       console.error("completeFocusSession: ", error);
     }
   };
 
   const start = () => {
-    const hours = selectedDate.getHours();
-    const minutes = selectedDate.getMinutes();
-    setRemainingSeconds(hours * 3600 + minutes * 60);
+    setRemainingSeconds(parseInt(selectHour, 10) * 3600 + parseInt(selectMinute, 10) * 60 + parseInt(selectSecond, 10));
     setIsRunning(true);
 
-    interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setRemainingSeconds(prevSeconds => prevSeconds - 1);
     }, 1000);
   };
 
   const stop = () => {
-    if (interval) clearInterval(interval);
-    interval = null;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = null;
     setRemainingSeconds(0);
     setIsRunning(false);
   };
 
-  const onTimeChange = (_, selectedDate) => {
-    if (selectedDate) {
-      setSelectedDate(selectedDate);
+  const add = () => {
+    let newMinute = parseInt(selectMinute, 10) + 15;
+    let newHour = parseInt(selectHour, 10);
+
+    if (newMinute >= 60) {
+      newMinute = newMinute % 60;
+      newHour = newHour + 1;
     }
-    setShowTimePicker(false);
+
+    setSelectMinute(formatNumber(newMinute));
+    setSelectHour(formatNumber(newHour));
   };
 
-  const formatSelectedTime = (date) => {
-    const hours = formatNumber(date.getHours());
-    const minutes = formatNumber(date.getMinutes() + 7);
-    return `${hours}:${minutes}`;
+  const subtract = () => {
+    let newMinute = parseInt(selectMinute, 10) - 15;
+    let newHour = parseInt(selectHour, 10);
+
+    if (newHour === 0 && newMinute === 0) 
+      return;
+    if (newMinute < 0) {
+      newMinute = 60 + newMinute;
+      newHour = newHour - 1;
+    }
+
+    setSelectMinute(formatNumber(newMinute));
+    setSelectHour(formatNumber(newHour));
   };
 
   const renderTimePicker = () => (
-    <View>
-      {showTimePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="time"
-          is24Hour={true}
-          display="spinner"
-          onChange={onTimeChange}
-          themeVariant="light"
-        />
-      )}
+    <View style={{justifyContent:'space-between'}}>
+      <View style={{flexDirection:'row', alignItems:'center', width: screen.width-10, justifyContent:'center'}}>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={styles.btn}
+          onPress={subtract}
+        >
+          <MaterialIcons name="remove" size={40} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.selectedTimeText}>{formatNumber(selectHour)}:{formatNumber(selectMinute)}</Text>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={styles.btn}
+          onPress={add}
+        >
+          <MaterialIcons name="add" size={40} color="white" />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity onPress={start} style={styles.button}>
         <Text style={styles.buttonText}>Bắt đầu</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.button}>
-        <Text style={styles.buttonText}>Chọn giờ</Text>
-      </TouchableOpacity>
-      <Text style={styles.selectedTimeText}>{formatSelectedTime(selectedDate)}</Text>
     </View>
   );
 
@@ -178,7 +189,7 @@ const Focus = () => {
 
   const renderTimer = () => {
     const { hours, minutes, seconds } = getRemaining(remainingSeconds);
-    const totalTime = selectedDate.getHours() * 3600 + selectedDate.getMinutes() * 60;
+    const totalTime = selectHour * 3600 + selectMinute * 60;
     const currentPart = Math.min(timerParts.length - 1, getCurrentTimerPart(totalTime, remainingSeconds));
 
     tempCoin = CoinPerSeconds(totalTime);
@@ -205,7 +216,6 @@ const Focus = () => {
 
   return (
     <ImageBackground source={focusBG} style={styles.containerGif}>
-      <StatusBar barStyle={"light-content"} />
       <View style={styles.titleContainer}>
         <View style={styles.header}>
           <Image source={pabmind} style={styles.logo} />
@@ -244,6 +254,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 100,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     margin: 50,
@@ -258,29 +269,6 @@ const styles = StyleSheet.create({
   timerText: {
     color: "#fff",
     fontSize: 40,
-  },
-  picker: {
-    flex: 1,
-    maxWidth: 140,
-    marginLeft: 0,
-    color: "#fff",
-    backgroundColor: "#5BA8A0",
-  },
-  pickerItem: {
-    color: "#fff",
-    backgroundColor: "#94B447",
-    fontSize: 20,
-  },
-  pickerItemSemiColon: {
-    color: "#fff",
-    fontSize: 20,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  pickerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: screen.height / 2.5,
   },
   timerContainer: {
     alignItems: 'center',
@@ -311,7 +299,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginTop: 5,
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
   },
   coinContainer: {
     backgroundColor: '#3a915e',
@@ -361,10 +349,18 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginTop: 10,
-    borderWidth:2,
     borderRadius:30,
     paddingVertical:10
   },
+  btn: {
+    backgroundColor: 'rgba(135, 188, 157, 0.8)',
+    borderRadius: 100,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical:10,
+    borderLeftWidth:1,
+    marginHorizontal:15,
+},
 });
 
 export default Focus;

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Alert, ScrollView, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import EQ from '../../data/EQ';
 import EQ2 from '../../data/EQ2';
 import { updateUserInfo } from '../../feature/firebase/handleFirestore';
-import { showNotifications } from '../../feature/notification.android';
 
 const EQQuiz = ({ navigation }) => {
   const allQuestion = EQ;
@@ -18,6 +17,8 @@ const EQQuiz = ({ navigation }) => {
     SocialEmotionalAwareness: 0,
     RelationshipManagement: 0,
   });
+  const [tempPoint, setTempPoint] = useState(0);
+  const [tempType, setTempType] = useState('');
   const [loading, setLoading] = useState(false);
   const [progress] = useState(new Animated.Value(0));
 
@@ -27,6 +28,12 @@ const EQQuiz = ({ navigation }) => {
   });
 
   const handleNext = () => {
+    setPoints(prevPoints => ({
+      ...prevPoints,
+      [tempType]: prevPoints[tempType] + tempPoint
+    }));
+    setTempPoint(0);
+    setTempType('');
     if (currentQuestionIndex === allQuestion.length - 1) {
       setShowScoreModal(true);
     } else {
@@ -78,10 +85,9 @@ const EQQuiz = ({ navigation }) => {
     setCurrentOptionSelected(selectedOption);
     if (correctOption) {
       const { type, point } = correctOption;
-      setPoints({
-        ...points,
-        [type]: points[type] + point
-      });
+
+      setTempPoint(point);
+      setTempType(type);
       setShowNextButton(true);
     } else {
       console.error('Không tìm thấy đáp án phù hợp.');
@@ -159,34 +165,26 @@ const EQQuiz = ({ navigation }) => {
         </View>
         <View>
           <View style={styles.infoRow}>
-            <Text style={styles.resultTextTitle}>Emotional Awareness:</Text>
             <Text style={styles.resultTextContent}>{personality.EA.comment}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.resultTextTitle}>Emotional Management:</Text>
             <Text style={styles.resultTextContent}>{personality.EM.comment}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.resultTextTitle}>Social Emotional Awareness:</Text>
             <Text style={styles.resultTextContent}>{personality.SEA.comment}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.resultTextTitle}>Relationship Management:</Text>
             <Text style={styles.resultTextContent}>{personality.RM.comment}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.retryButton} onPress={restart}>
-          <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
-        </TouchableOpacity>
-        {!loading ?
-          <TouchableOpacity style={[styles.retryButton, { backgroundColor: '#F46A23' }]} onPress={() => saveResult(userPersonality().EQ)}>
-            <Text style={[styles.text, styles.retryButtonText, { color: 'white' }]}>Lưu</Text>
+        <View style={{marginTop:10}}>
+          <TouchableOpacity style={styles.retryButton} onPress={restart}>
+            <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
           </TouchableOpacity>
-          :
-          <View>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        }
+          {!loading ?
+            <TouchableOpacity style={[styles.retryButton, { backgroundColor: '#F46A23' }]} onPress={() => saveResult(userPersonality().EQ)}>
+              <Text style={[styles.text, styles.retryButtonText, { color: 'white' }]}>Lưu</Text>
+            </TouchableOpacity>
+            :
+            <View>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          }
+        </View>
       </View>
     );
   };
@@ -208,11 +206,6 @@ const EQQuiz = ({ navigation }) => {
     let indexRM = calculateResult(points.RelationshipManagement);
 
     const total = points.EmotionalAwareness + points.EmotionalManagement + points.SocialEmotionalAwareness + points.RelationshipManagement;
-    
-    if(total > 160){
-      setTimeout(() => showNotifications("Admin messaging", "Are you hack?"), 500 );
-      setTimeout(() => Linking.openURL('mailto://maithanhnam141@gmail.com&subject=FBI Warning: Maximum EQ is 160. How can you get this? &body=body'), 2000);
-    }
 
     return {
       EA: answer.EmotionalAwareness[indexEA],
@@ -264,11 +257,12 @@ const styles = StyleSheet.create({
   text: {
     color: 'black',
     fontSize: 14,
-    fontWeight: '400'
+    fontWeight: '400',
+    textAlign:'justify'
   },
   questionText: {
     color: '#2b2b24',
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   progressBarContainer: {
@@ -288,7 +282,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#39453b',
     backgroundColor: '#0a97cf',
-    height: 85,
+    minHeight: 85,
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -321,7 +315,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#edf0ef'
   },
   modalContent: {
@@ -332,9 +326,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   modalTitle: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#62c87b'
   },
   scoreContainer: {
@@ -358,16 +352,17 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   returnContainer: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    marginHorizontal:10,
+    paddingVertical:10,
   },
   eqContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   eqText: {
     fontWeight: 'bold',
-    fontSize: 30,
+    fontSize: 28,
     textAlign: 'center',
   },
   infoRow: {
@@ -381,7 +376,8 @@ const styles = StyleSheet.create({
   },
   resultTextContent: {
     fontWeight: '400',
-    fontSize: 16,
+    fontSize: 14,
+    textAlign:'justify',
   },
   scrollViewContainer: {
     flexGrow: 1,

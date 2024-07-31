@@ -61,7 +61,7 @@ const BottomTabNavigation = () => {
   
   const hiddenRoutes = [
     'loginscreen', 'focus', 'todo', 'diary', 'mood', 'bmi', 'music', 
-    'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'member'
+    'goldensleep', 'bmiresult', 'chatai', 'quiz', 'bdi', 'eq', 'member', 'disc'
   ];
 
   if (loading) {

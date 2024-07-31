@@ -30,7 +30,7 @@ const QuizzScreen = ({ navigation }) => {
     { id: 1, title: 'MBTI TEST', questions: 52, link: QuizzScreenIcon.mbti },
     { id: 2, title: 'EQ TEST', questions: 40, link: QuizzScreenIcon.eq },
     { id: 3, title: 'BDI TEST', questions: 21, link: QuizzScreenIcon.bdi },
-    { id: 4, title: 'DISC TEST', questions: '???', link: QuizzScreenIcon.disc },
+    { id: 4, title: 'DISC TEST', questions: 20, link: QuizzScreenIcon.disc },
   ];
 
   const renderTest = ({ item }) => {
@@ -64,7 +64,7 @@ const QuizzScreen = ({ navigation }) => {
         goToScreen('bdi')
         break;
       case 4:
-        showNotifications("Pabcare", "Tính năng đang phát triển!");
+        goToScreen('disc')
         break;
       default:
         goToScreen(selectedQuiz.title)
