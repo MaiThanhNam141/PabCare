@@ -1,58 +1,36 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
 import { MusicProvider } from './src/feature/context/MusicContext';
-import { Animated, View, Image, SafeAreaView, StatusBar, StyleSheet, ToastAndroid } from 'react-native';
+import { Easing, Animated, SafeAreaView, StyleSheet, ToastAndroid, ImageBackground, Dimensions, TouchableOpacity, Text } from 'react-native';
 import { getCurrentUser } from './src/feature/firebase/handleFirestore';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { GOOGLE_API_CLIENT } from '@env';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { loadingScreen } from './src/data/Link'; 
+import { shadow } from 'react-native-paper';
+
+const screen = Dimensions.get("window");
 
 const App = () => {
-  const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const translateYAnim = useRef(new Animated.Value(0)).current;
-  const logo = useMemo(() => require('./assets/Icons/Logo.png'), []);
 
   useEffect(() => {
     const checkUserExist = async () => {
       GoogleSignin.configure({
         webClientId: GOOGLE_API_CLIENT,
       });
-      const isUserExist = await getCurrentUser();
+      const isUserExist = getCurrentUser();
       if (isUserExist) {
         setIsLoggedIn(true);
       } else {
         onGoogleButtonPress();
       }
     };
-    const start = async () => {
-      setTimeout(() => {
-        fadeOutAndMoveUp();
-        setTimeout(() => setLoading(false), 2500);
-      }, 450);
-    };
     checkUserExist();
-    start();
   }, []);
-
-  const fadeOutAndMoveUp = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 2500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateYAnim, {
-        toValue: -150,
-        duration: 2500,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
 
   const onGoogleButtonPress = async () => {
     try {
@@ -93,27 +71,59 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (!loading && !isLoggedIn) {
+    if (!isLoggedIn) {
       onGoogleButtonPress();
     }
-  }, [loading, isLoggedIn]);
+  }, [isLoggedIn]);
 
-  if (loading) {
+  const borderColorAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderColorAnim, {
+          toValue: 2,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.circle,
+        }),
+        Animated.timing(borderColorAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.circle,
+        }),
+        Animated.timing(borderColorAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.circle,
+        })
+      ])
+    ).start();
+  }, [borderColorAnim]);
+
+  const borderColorInterpolation = borderColorAnim.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: ['#ff0080', '#00f0ff', '#00ff0f'], 
+  });
+
+  const animatedStyle = {
+    borderColor: borderColorInterpolation,
+  };
+
+  if (!isLoggedIn) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#16afc7" />
-        <View style={styles.centered}>
-          <Animated.View style={[styles.logoContainer, { opacity: fadeAnim, transform: [{ translateY: translateYAnim }] }]}>
-            <Image source={logo} style={styles.logo} resizeMode="contain" />
-          </Animated.View>
-        </View>
-      </SafeAreaView>
+      <ImageBackground source={loadingScreen} style={styles.loadingImage} resizeMethod='auto'>
+        <TouchableOpacity style={[styles.button, animatedStyle]} onPress={onGoogleButtonPress}>
+          <Text style={styles.buttonText}>Đăng Nhập</Text>
+        </TouchableOpacity>
+      </ImageBackground>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#16afc7" />
       <NavigationContainer>
         <UserProvider>
           <MusicProvider>
@@ -137,13 +147,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoContainer: {
-    opacity: 1,
-    transform: [{ translateY: 0 }],
+  loadingImage: {
+    flex:1,
+    width: 'auto',
+    height: screen.height,
+    alignItems:'center',
+    justifyContent:'flex-end',
   },
-  logo: {
-    width: 300,
-    height: 300,
+  button: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    marginBottom:150,
+    borderWidth:2,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

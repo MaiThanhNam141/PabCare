@@ -31,30 +31,6 @@ const useFirestoreList = () => {
     }
   };
 
-  const renewListRoutine = async (routineListTomorrowID, currentTimeStamp, routineListTodayID) => {
-    try {
-      if(routineListTodayID) {
-        await ref.doc(routineListTodayID).delete();
-      }
-      const renewListRef = await ref.doc(routineListTomorrowID);
-      const renewSnapshot = await renewListRef.get();
-
-      if (renewSnapshot.exists) {
-        const updatedTodos = renewSnapshot.data().todos.map(todo => ({
-          ...todo,
-          completed: false
-        }));
-
-        await renewListRef.update({ todos: updatedTodos, date: "Today", lastDate:  currentTimeStamp});
-      } else {
-        console.log("Document does not exist");
-      }
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const getLists = async () => {
     try {
       const user = auth().currentUser;
@@ -69,24 +45,10 @@ const useFirestoreList = () => {
         const routineListIndexToday = lists.findIndex(list => list?.date === 'Today');
 
         if (routineListIndexTomorrow !== -1 && routineListIndexToday === -1) {
-          const routineList = lists[routineListIndexTomorrow];
-          const initdate = routineList.initdate.toDate();
-          initdate.setHours(0, 0, 0, 0);
-
-          if (initdate < currentTimeStamp) {
-            await renewListRoutine(routineList.id, currentTimeStamp, 0);
-          }
           lists.splice(routineListIndexTomorrow, 1);
         }
         
         if (routineListIndexTomorrow !== -1 && routineListIndexToday !== -1) {
-          const routineList = lists[routineListIndexTomorrow];
-          const initdate = routineList.initdate.toDate();
-          initdate.setHours(0, 0, 0, 0);
-
-          if (initdate < currentTimeStamp && !routineList.todos?.length) {
-            await renewListRoutine(routineList.id, currentTimeStamp, routineListIndexToday);
-          }
           lists.splice(routineListIndexTomorrow, 1);
           lists.splice(routineListIndexToday, 1);
         }

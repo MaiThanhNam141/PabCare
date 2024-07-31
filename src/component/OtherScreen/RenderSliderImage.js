@@ -1,22 +1,28 @@
 import React from 'react'
-import { View } from 'react-native'
+import { View, Linking } from 'react-native'
 import {SliderBox} from 'react-native-image-slider-box'
 
 export default RenderSliderImage = props => {
-    return (
-      <View style={{width:200}}>
-        <SliderBox
-          dotColor="transparent"
-          inactiveDotColor="transparent"
-          imageLoadingColor="white"
-          autoplay={true}
-          autoplayInterval={7000}
-          circleLoop={true}
-          images={props.images}
-          borderRadius={20}
-          parentWidth={300}
-          sliderBoxHeight={170}
+  const onCurrentImagePressed = index => {
+    const link = props.links[index];
+    Linking.openURL(link);
+  }
+
+  return (
+    <View style={{width:200}}>
+      <SliderBox
+        dotColor="transparent"
+        inactiveDotColor="transparent"
+        imageLoadingColor="white"
+        autoplay={true}
+        autoplayInterval={7000}
+        circleLoop={true}
+        images={props.images}
+        borderRadius={20}
+        parentWidth={300}
+        sliderBoxHeight={170}
+        onCurrentImagePressed={index => onCurrentImagePressed(index)}
       />
-      </View>
-    )
+    </View>
+  )
 }

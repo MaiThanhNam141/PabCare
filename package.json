@@ -1,5 +1,5 @@
 {
-  "name": "Pabcare",
+  "name": "pabcare",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -16,7 +16,9 @@
     "@react-native-community/slider": "^4.5.2",
     "@react-native-firebase/app": "^20.1.0",
     "@react-native-firebase/auth": "^20.1.0",
+    "@react-native-firebase/crashlytics": "^20.1.0",
     "@react-native-firebase/firestore": "^20.1.0",
+    "@react-native-firebase/functions": "^20.1.0",
     "@react-native-firebase/messaging": "^20.1.0",
     "@react-native-google-signin/google-signin": "^11.0.0",
     "@react-native-picker/picker": "^2.6.1",

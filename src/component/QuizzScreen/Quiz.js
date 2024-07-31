@@ -11,7 +11,9 @@ const Quizz = ({navigation}) => {
   const [currentOptionSelected, setCurrentOptionSelected] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [userGender, setUserGender] = useState('')
+  const [userGender, setUserGender] = useState('');
+  const [tempPoint, setTempPoint] = useState(0);
+  const [tempType, setTempType] = useState('');
   const [points, setPoints] = useState({
     E: 0,
     I: 0,
@@ -31,6 +33,14 @@ const Quizz = ({navigation}) => {
   });
 
   const handleNext = () => {
+    setPoints(prevPoints => ({
+      ...prevPoints,
+      [tempType]: prevPoints[tempType] + tempPoint
+    }));
+    
+    setTempPoint(0);
+    setTempType('');
+
     if (currentQuestionIndex === allQuestion.length - 1) {
       setShowScoreModal(true);
     } else {
@@ -101,10 +111,10 @@ const Quizz = ({navigation}) => {
     setCurrentOptionSelected(selectedOption);
     if (correctOption) {
       const { type, point } = correctOption;
-      setPoints({
-        ...points,
-        [type]: points[type] + point
-      });
+      
+      setTempPoint(point);
+      setTempType(type);
+
       setShowNextButton(true);
     } else {
       console.error('Không tìm thấy đáp án phù hợp.');
@@ -151,8 +161,8 @@ const Quizz = ({navigation}) => {
             style={[
               styles.answerContainer,
               {
-                borderColor: option === currentOptionSelected ? '#0be32f' : '#e1e3e1',
-                backgroundColor: option === currentOptionSelected ? '#0be32f' : '#e1e3e1',
+                borderColor: option === currentOptionSelected ? '#87bc9d' : '#e1e3e1',
+                backgroundColor: option === currentOptionSelected ? '#87bc9d' : '#e1e3e1',
               }
             ]}
           >
@@ -167,7 +177,7 @@ const Quizz = ({navigation}) => {
     if (showNextButton) {
         return (
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={[styles.text, styles.nextButtonText]}>Next</Text>
+            <Text style={[styles.text, styles.nextButtonText]}>Tiếp</Text>
         </TouchableOpacity>
         );
     }
@@ -289,11 +299,12 @@ const styles = StyleSheet.create({
   text: {
     color: 'black',
     fontSize: 14,
-    fontWeight:'400'
+    fontWeight:'400',
+    textAlign:'justify'
   },
   questionText: {
     color: '#2b2b24',
-    fontSize: 30,
+    fontSize: 28,
     fontWeight:'bold',
 
   },
@@ -301,7 +312,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 15,
     borderRadius: 20,
-    backgroundColor: '#3f403f',
+    backgroundColor: '#98bc9d',
     marginBottom: 20,
   },
   progressBar: {
@@ -313,7 +324,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#39453b',
     backgroundColor: '#0a97cf',
-    height: 85,
+    minHeight: 85,
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',

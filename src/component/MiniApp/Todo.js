@@ -7,7 +7,7 @@ import useFirestoreList from '../../feature/firebase/useFirestoreList.js';
 import LinearGradient from "react-native-linear-gradient";
 import { Today, Tomorrow } from '../../data/Link.js';
 import TodoRoutine from './TodoRoutine.js';
-import { getUserInfo } from '../../feature/firebase/handleFirestore.js';
+import { getCurrentUser, getUserInfo } from '../../feature/firebase/handleFirestore.js';
 
 const Todo = () => {
   let initdate = new Date();
@@ -20,7 +20,7 @@ const Todo = () => {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
 
-  const { addList, updateList, getLists, deleteList, getRoutine } = useFirestoreList()
+  const { addList, updateList, getLists, deleteList, getRoutine } = useFirestoreList();
 
   useEffect(() => {
     const initializeFirebase = async () => {
@@ -28,6 +28,18 @@ const Todo = () => {
         const userData = await getUserInfo();
         if (userData) {
           setUser(userData.displayName);
+          const snapshot = getCurrentUser();
+          const userId = snapshot.uid;
+          const fetchData = async () => {
+              try {
+                  const response = await fetch(`https://us-central1-pabcare-9633d.cloudfunctions.net/updateTodos?userId=${userId}`);
+                  const data = await response.text();
+                  console.log(data);
+              } catch (error) {
+                  console.error('Error updating routines in UseEffect:', error);
+              }
+          };
+          fetchData();
         }
       } catch (error) {
         console.error("Error get user in Todo:", error);
@@ -39,8 +51,7 @@ const Todo = () => {
 
   useEffect(()=>{
     getListsFromFirestore();
-  }, [reload])
-
+  }, [reload]);
 
   const getListsFromFirestore = async () => {
     try {
