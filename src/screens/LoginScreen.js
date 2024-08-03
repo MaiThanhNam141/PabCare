@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ToastAndroid, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ToastAndroid, ActivityIndicator, Dimensions } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
 import { UserContext } from '../feature/context/UserContext';
-import { imageBG, logo } from '../data/Link';
+import { signInbackground } from '../data/Link';
+
+const screen = Dimensions.get("window")
 
 const LoginScreen = () => {
   const { setUserLoggedIn } = useContext(UserContext);
@@ -54,65 +56,40 @@ const LoginScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View>
         <ActivityIndicator size="large" color="#24A6D9" />
       </View>
     );
   }
 
   return (
-    <View style={styles.backgroundContainer}>
-      <ImageBackground source={imageBG} style={styles.imageBackground}>
-        <View style={styles.container}>
-          <View style={styles.logoContainer}>
-            <Image source={logo} style={styles.logo} resizeMode="contain" />
+    <ImageBackground source={signInbackground} style={styles.loadingImage} resizeMethod='scale'>
+          <View style={{justifyContent:'flex-start'}}>
+            <Text style={styles.signInText}>Đăng nhập</Text>
+            <Text style={[styles.signInText, {fontSize: 14, fontWeight: '400', marginTop:0}]}>Đăng nhập để tiếp tục</Text>
           </View>
-          <View style={{alignItems:'center'}}>
-            <Text style={styles.titleText}>Đăng nhập</Text>
-            <GoogleSigninButton size={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={onGoogleButtonPress} />
-          </View>
-        </View>
+        <GoogleSigninButton size={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={onGoogleButtonPress}/>
       </ImageBackground>
-    </View>
   );
 
 };
 
 const styles = StyleSheet.create({
-  backgroundContainer: {
-    flex: 1,
-    overflow: 'hidden',
+  loadingImage: {
+    flex:1,
+    height:screen.height,
+    width:screen.width,
+    alignSelf:'center',
+    alignItems:'center',
+    justifyContent:'space-around',
+    resizeMode:'repeat',
   },
-  container: {
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#fafaf7',
-    borderRadius: 25,
-    width: '100%',
-    height: '85%',
-    alignSelf: 'flex-end',
-    marginTop:'20%'
-  },
-  imageBackground: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    width: 300,
-    height: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '100%',
-    height: '100%',
-  },
-  titleText: {
-    fontSize: 28,
-    marginVertical: 10,
-    fontWeight: 'bold',
+  signInText: {
+    marginTop: 160,
+    fontWeight:'bold',
+    fontSize:34,
+    color:'#3a915e',
+    textAlign:'center'
   },
 });
 

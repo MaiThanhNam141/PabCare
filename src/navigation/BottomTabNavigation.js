@@ -22,7 +22,7 @@ const BottomTabNavigation = () => {
         soundRef.current.release();
       }
       Sound.setCategory("Playback");
-      const newAudio = new Sound(currentSongContext.file, (error) => {
+      const newAudio = new Sound(currentSongContext?.file, (error) => {
         if (error) {
           console.log("Error playing audio", error);
           return;

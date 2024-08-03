@@ -18,15 +18,17 @@ const MusicProvider = ({ children }) => {
   const [remainingSongs, setRemainingSongs] = useState([...songs]);
 
   const rollSongs = () => {
-    if(!remainingSongs.length){
-      setRemainingSongs([...songs]);
-    }
     const randomSong = remainingSongs[Math.floor(Math.random() * remainingSongs.length)];
-    if (randomSong.title === currentSongContext.title) {
+    if (randomSong?.title === currentSongContext?.title) {
       return rollSongs();
     }
 
-    setRemainingSongs(prev => prev.filter(song => song.title !== randomSong.title));
+    if(remainingSongs.length === 0){
+      setRemainingSongs([...songs]);
+    }
+    else {
+      setRemainingSongs(prev => prev.filter(song => song?.title !== randomSong?.title));
+    }
     return randomSong;
   }
 
@@ -44,7 +46,7 @@ const MusicProvider = ({ children }) => {
         const snapshot = await getUserInfo();
         if (snapshot) {
           const title = snapshot.favor || "Track1";
-          const index = songs.findIndex(song => song.title === title);
+          const index = songs.findIndex(song => song?.title === title);
           setCurrentSongContext(songs[index]);
         }
       } catch (error) {

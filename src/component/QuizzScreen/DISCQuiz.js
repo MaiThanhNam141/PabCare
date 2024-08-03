@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Animated, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import DISCQ from '../../data/DISCQ';
-import EQ2 from '../../data/EQ2';
+import DISC2 from '../../data/DISC2';
 import { updateUserInfo } from '../../feature/firebase/handleFirestore';
 
 const DISCQuiz = ({ navigation }) => {
   const allQuestion = DISCQ;
-  const answer = EQ2;
+  const answer = DISC2;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentOptionSelected, setCurrentOptionSelected] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
@@ -158,21 +158,15 @@ const DISCQuiz = ({ navigation }) => {
   };
 
   const renderPersonalityInfo = () => {
-    // const personality = userPersonality();
+    const personality = userPersonality();
     return (
       <View style={styles.returnContainer}>
-        {/* <View style={styles.eqContainer}>
-          <Text style={styles.eqText}>EQ: {personality.EQ}</Text>
+        <View style={styles.eqContainer}>
+          <Text style={styles.eqText}>Kiểu: {personality.type}</Text>
         </View>
-        <View>
-          <View style={styles.infoRow}>
-            <Text style={styles.resultTextContent}>{personality.EA.comment}</Text>
-            <Text style={styles.resultTextContent}>{personality.EM.comment}</Text>
-            <Text style={styles.resultTextContent}>{personality.SEA.comment}</Text>
-            <Text style={styles.resultTextContent}>{personality.RM.comment}</Text>
-          </View>
-        </View> */}
-        <Text>Chưa làm</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.resultTextContent}>{personality.EA.comment}</Text>
+        </View>
         <View style={{marginTop:10}}>
           <TouchableOpacity style={styles.retryButton} onPress={restart}>
             <Text style={[styles.text, styles.retryButtonText]}>Làm lại</Text>
@@ -191,30 +185,33 @@ const DISCQuiz = ({ navigation }) => {
     );
   };
 
-  const calculateResult = (points) => {
-    const thresholds = [0, 25, 35];
-    for (let i = thresholds.length - 1; i >= 0; i--) {
-      if (points > thresholds[i]) {
-        return i;
-      }
-    }
-    return 0;
-  };
-
   const userPersonality = () => {
-    let indexEA = calculateResult(points.D);
-    let indexEM = calculateResult(points.I);
-    let indexSEA = calculateResult(points.S);
-    let indexRM = calculateResult(points.C);
+    const maxPoints = [...Object.values(points)].sort();
+    const maxTypes = [];
 
-    const total = points.D + points.I + points.S + points.C;
+    for(let i = 0; i < 2; i++){
+        const currentMax = maxPoints.pop();
+        for (const type in points) {
+            if (points[type] === currentMax) {
+              maxTypes.push(type);
+              break;
+            }
+        }
+    }
 
+    let selectedPersonality = answer.find(index => 
+      index.type === maxTypes.join('') || 
+      index.type === maxTypes.slice().reverse().join('')
+    );
+
+    if(!selectedPersonality){
+      return 'Xảy ra lỗi'
+    }
     return {
-      EA: answer.D[indexEA],
-      EM: answer.I[indexEM],
-      SEA: answer.S[indexSEA],
-      RM: answer.C[indexRM],
-      EQ: total,
+      id: selectedPersonality.id,
+      type: selectedPersonality.type,
+      comment: selectedPersonality.comment,
+      advice: selectedPersonality.advice,
     };
   };
 

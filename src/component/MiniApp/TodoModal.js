@@ -138,12 +138,6 @@ const styles = StyleSheet.create({
         paddingVertical:10,
         borderRadius:35,
         backgroundColor:'#87bc9d',
-      },
-    taskCount: {
-        marginTop: 4,
-        marginBottom: 16,
-        color: "#999",
-        fontWeight: "600"
     },
     footer: {
         paddingHorizontal: 32,
@@ -160,7 +154,6 @@ const styles = StyleSheet.create({
         paddingLeft:25,
         marginLeft:-10
     },
-
     addTodo: {
         borderRadius: 4,
         padding: 16,
@@ -200,17 +193,6 @@ const styles = StyleSheet.create({
         paddingTop: 5,
         marginTop:25
     },
-    helloUser:{
-        color:'#2b7449',
-        fontSize:27,
-        fontWeight:'bold',
-        marginRight:5
-    },
-    reminder:{
-        color:'#737373',
-        fontSize:10,
-        fontWeight:'400',
-    }
 });
 
 export default TodoModal;

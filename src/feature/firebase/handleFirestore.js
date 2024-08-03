@@ -87,4 +87,28 @@ const updateRoutineFirebase = (todos, type) => {
     console.log("updateRoutineFirebase: ", error);
    }
 }
-export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef, getRoutineFirebase, updateRoutineFirebase };
+
+const getDiary = async () => {
+   try {
+        const user = getCurrentUser();
+        const diaryRef = firestore().collection('users').doc(user.uid).collection('diary');
+        const snapshot = await diaryRef.get();
+        if (snapshot) {
+            const diary = snapshot.docs.map(doc => ({id: doc.id, ...doc.data() }));
+            return diary
+        }
+   } catch (error) {
+        console.error("getDiaryFirebase: ", error)
+   }
+}
+const setDiary = (date, diaryText) => {
+   try {
+        const user = getCurrentUser();
+        firestore().collection('users').doc(user.uid).collection('diary').doc(date).set({text: diaryText});
+   } catch (error) {
+        console.error("setDiaryFirebase: ", error)
+   }
+}
+
+
+export { getCurrentUser, getUserInfo, updateUserInfo, setUserInfo, getDocumentRef, getUserDocumentRef, getRoutineFirebase, updateRoutineFirebase, getDiary, setDiary };

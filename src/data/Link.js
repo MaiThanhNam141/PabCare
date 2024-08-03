@@ -2,6 +2,12 @@ export const defaultAvatar = 'https://pabcare.com/wp-content/uploads/2023/11/169
 export const logo = require('../../assets/Icons/Logo.png');
 export const imageBG = require('../../assets/bg-image.jpg');
 export const loadingScreen = require('../../assets/loading.gif');
+export const signInbackground = require('../../assets/signin.jpg');
+
+export const note = require('../../assets/Icons/Note.png');
+export const arrow = require('../../assets/Icons/diaryArrow.png');
+export const arrowdisable = require('../../assets/Icons/diaryArrowDisable.png');
+
 
 export const AIImage = require('../../assets/Icons/AIIcon.jpg');
 export const gemini = require('../../assets/gemini.png');

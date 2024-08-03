@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import BottomTabNavigation from './src/navigation/BottomTabNavigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/feature/context/UserContext';
 import { MusicProvider } from './src/feature/context/MusicContext';
-import { Easing, Animated, SafeAreaView, StyleSheet, ToastAndroid, ImageBackground, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { SafeAreaView, StyleSheet, ToastAndroid, ImageBackground, Dimensions, Text, View } from 'react-native';
 import { getCurrentUser } from './src/feature/firebase/handleFirestore';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import { GOOGLE_API_CLIENT } from '@env';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { loadingScreen } from './src/data/Link'; 
-import { shadow } from 'react-native-paper';
+import { loadingScreen, signInbackground } from './src/data/Link'; 
 
 const screen = Dimensions.get("window");
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkUserExist = async () => {
@@ -25,8 +25,6 @@ const App = () => {
       const isUserExist = getCurrentUser();
       if (isUserExist) {
         setIsLoggedIn(true);
-      } else {
-        onGoogleButtonPress();
       }
     };
     checkUserExist();
@@ -70,60 +68,25 @@ const App = () => {
     }
   }
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      onGoogleButtonPress();
-    }
-  }, [isLoggedIn]);
-
-  const borderColorAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(borderColorAnim, {
-          toValue: 2,
-          duration: 1000,
-          useNativeDriver: true,
-          easing: Easing.circle,
-        }),
-        Animated.timing(borderColorAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-          easing: Easing.circle,
-        }),
-        Animated.timing(borderColorAnim, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-          easing: Easing.circle,
-        })
-      ])
-    ).start();
-  }, [borderColorAnim]);
-
-  const borderColorInterpolation = borderColorAnim.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: ['#ff0080', '#00f0ff', '#00ff0f'], 
-  });
-
-  const animatedStyle = {
-    borderColor: borderColorInterpolation,
-  };
+  setTimeout(() => setLoading(false), 1800)
 
   if (!isLoggedIn) {
     return (
-      <ImageBackground source={loadingScreen} style={styles.loadingImage} resizeMethod='auto'>
-        <TouchableOpacity style={[styles.button, animatedStyle]} onPress={onGoogleButtonPress}>
-          <Text style={styles.buttonText}>Đăng Nhập</Text>
-        </TouchableOpacity>
+      <ImageBackground source={loading ? loadingScreen : signInbackground} style={styles.loadingImage} resizeMethod='scale'>
+        {loading ? null :
+          <View style={{justifyContent:'flex-start'}}>
+            <Text style={styles.signInText}>Đăng nhập</Text>
+            <Text style={[styles.signInText, {fontSize: 14, fontWeight: '400', marginTop:0}]}>Đăng nhập để tiếp tục</Text>
+          </View>
+        }
+        {loading ? null : <GoogleSigninButton size={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={onGoogleButtonPress}/>}
       </ImageBackground>
     );
-  }
+}
+
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{flex:1}}>
       <NavigationContainer>
         <UserProvider>
           <MusicProvider>
@@ -136,35 +99,21 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   loadingImage: {
     flex:1,
-    width: 'auto',
-    height: screen.height,
+    height:screen.height,
+    width:screen.width,
+    alignSelf:'center',
     alignItems:'center',
-    justifyContent:'flex-end',
+    justifyContent:'space-around',
+    resizeMode:'repeat',
   },
-  button: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    marginBottom:150,
-    borderWidth:2,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  signInText: {
+    marginTop: 160,
+    fontWeight:'bold',
+    fontSize:34,
+    color:'#3a915e',
+    textAlign:'center'
   },
 });
 

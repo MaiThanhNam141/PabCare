@@ -104,6 +104,7 @@ const GoldenSleep = () => {
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           PermissionsAndroid.PERMISSIONS.REQUEST_START_IN_BACKGROUND,
           PermissionsAndroid.PERMISSIONS.VIBRATE,
+          PermissionsAndroid.PERMISSIONS.SCHEDULE_EXACT_ALARM,
         );
       } catch (error) {
         console.error("GoldenSleep.requestUserPermission Error ", error);

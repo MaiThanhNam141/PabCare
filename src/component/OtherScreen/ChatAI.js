@@ -58,121 +58,126 @@ const ChatAI = () => {
   const isCurrentUser = useCallback((sender) => sender === "You", []);
 
   return (
-      <KeyboardAvoidingView style={styles.container}>
-          <View style={styles.title}>
-              <Image source={gemini} style={styles.titleAvatar}></Image>
-          </View>
-          <FlatList
-              ref={flatListRef}
-              data={messages}
-              showsVerticalScrollIndicator={false}
-              onContentSizeChange={scrollToBottom}
-              keyExtractor={item => item.id}
-              renderItem={({ item }) => {
-                  return (
-                      <View style={[styles.messageContainer, isCurrentUser(item.sender) && styles.currentUserMessage]}>
-                          {!isCurrentUser(item.sender) && (
-                              <View style={styles.senderInfo}>
-                                  <Image style={styles.avatar} source={item?.avatar} />
-                                  <Text style={styles.senderName}>{item?.sender}</Text>
-                              </View>
-                          )}
-                          <Text>{item.text}</Text>
-                      </View>
-                  );
-              }}
-          />
-          <View style={styles.inputContainer}>
-              <TextInput
-                  style={styles.input}
-                  value={newMessage}
-                  onChangeText={setNewMessage}
-                  placeholder="Nhập tin nhắn ở đây..."
-              />
-              {loadingResponse ? (
-                  <TouchableOpacity style={styles.btnSend} disabled={true}>
-                      <ActivityIndicator size={34} color="#0EE4C4" />
-                  </TouchableOpacity>
-              ) : (
-                  <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
-                      <MaterialIcons name="send" color="#0EE4C4" size={35}/>
-                  </TouchableOpacity>
-              )}
-          </View>
-      </KeyboardAvoidingView>
+        <KeyboardAvoidingView style={{flex: 1}}>
+            <View style={styles.title}>
+                <Image source={gemini} style={styles.titleAvatar}></Image>
+            </View>
+            {
+                loadingResponse ?(
+                <View>
+                    <ActivityIndicator size={'large'} color={'#0EE4C4'}/>
+                </View>
+                ) : null
+            }
+            <FlatList
+                ref={flatListRef}
+                data={messages}
+                showsVerticalScrollIndicator={false}
+                onContentSizeChange={scrollToBottom}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => {
+                    return (
+                        <View style={[styles.messageContainer, isCurrentUser(item.sender) && styles.currentUserMessage]}>
+                            {!isCurrentUser(item.sender) && (
+                                <View style={styles.senderInfo}>
+                                    <Image style={styles.avatar} source={item?.avatar} />
+                                    <Text style={styles.senderName}>{item?.sender}</Text>
+                                </View>
+                            )}
+                            <Text style={styles.answer}>{item.text}</Text>
+                        </View>
+                    );
+                }}
+            />
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={newMessage}
+                    onChangeText={setNewMessage}
+                    placeholder="Nhập tin nhắn ở đây..."
+                />
+                {loadingResponse ? (
+                    <TouchableOpacity style={styles.btnSend} disabled={true}>
+                        <ActivityIndicator size={34} color="#0EE4C4" />
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity style={styles.btnSend} onPress={sendMessage}>
+                        <MaterialIcons name="send" color="#0EE4C4" size={35}/>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </KeyboardAvoidingView>
   );
 };
 
 export default ChatAI;
 
 const styles = StyleSheet.create({
-  container: {
-      flex: 1,
-  },
   messageContainer: {
-      padding: 10,
-      marginHorizontal: 10,
-      marginVertical: 5,
-      backgroundColor: '#e0e0e0',
-      borderRadius: 10,
-      maxWidth: '80%',
+    padding: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    maxWidth: '80%',
   },
   currentUserMessage: {
-      alignSelf: 'flex-end',
-      backgroundColor: '#b3e5fc',
+    alignSelf: 'flex-end',
+    backgroundColor: '#b3e5fc',
   },
   senderInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    maxWidth:240,
   },
   avatar: {
-      width: 30,
-      height: 30,
-      borderRadius: 100,
-      marginRight: 5,
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    marginRight: 5,
   },
   senderName: {
-      fontWeight: 'bold',
-      marginLeft: 5,
-      marginBottom: 0,
+    fontWeight: 'bold',
+    marginLeft: 5,
+    marginBottom: 0,
   },
   inputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 10,
-      borderTopWidth: 1,
-      borderTopColor: '#ccc',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
   input: {
-      flex: 1,
-      marginRight: 10,
-      padding: 10,
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 20,
-      minWidth: 300,
-  },
-  loadingContainer: {
-      alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    minWidth: 300,
   },
   btnSend: {
-      borderRadius: 45,
+    borderRadius: 45,
   },
   title: {
-      textAlign: 'center',
-      alignSelf: 'center',
-      justifyContent: 'center',
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      paddingHorizontal: 50,
-      marginBottom: 20,
-      marginTop: 25,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 50,
+    marginBottom: 20,
+    marginTop: 5,
   },
   titleAvatar: {
-      margin: 5,
-      resizeMode: 'center',
-      width: 220,
-      height: 80,
+    margin: 5,
+    resizeMode: 'center',
+    width: 220,
+    height: 80,
   },
+  answer:{
+    textAlign:'justify',
+    fontSize:14
+  }
 });

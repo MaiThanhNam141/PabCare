@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Animated, Image, Easing, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, Animated, Image, Easing, TouchableOpacity, Alert, AppState, ActivityIndicator } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Disc, Play, Stop } from '../../data/Link';
 import { MusicContext } from '../../feature/context/MusicContext';
@@ -13,7 +13,9 @@ const Music = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [favor, setFavor] = useState(true);
   const [position, setPosition] = useState(0);
+  const [loading, setLoading] = useState(true);
   const soundRef = useRef(null);
+  const favorRef = useRef(null);
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -43,30 +45,57 @@ const Music = () => {
   }, [isPlayingSong, spinValue]);
 
   useEffect(() => {
-    try {
-      if (favor && currentSongContext.title) {
-        updateUserInfo({ favor: currentSongContext.title })
+    const updateFavor = async () => {
+      try {
+        if (favor && currentSongContext?.title !== favorRef.current) {
+          updateUserInfo({ favor: currentSongContext?.title });
+          favorRef.current = currentSongContext?.title;
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [favor, currentSongContext.title]);
+    };
+
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'background') {
+        updateFavor();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+  return () => {
+    subscription.remove();  
+    updateFavor();
+  };
+  }, [favor]);
   
   useEffect(() => {
     const getFavor = async () => {
       try {
         const snapshot = await getUserInfo();
         if (snapshot) {
-          const title = snapshot.favor || "Track1";
-          setFavor(title === currentSongContext.title);
+          favorRef.current = snapshot.favor || "Track1";
         }
       } catch (error) {
         setFavor(false);
         Alert.alert("Lỗi", "Có lỗi xảy ra khi lấy thông tin người dùng.");
         console.log(error);
       }
+      finally{
+        setLoading(false);
+      }
     };
     getFavor();
+  }, []);
+
+  useEffect(() => {
+      if (currentSongContext?.title) {
+        setFavor(currentSongContext?.title === favorRef.current);
+        if(!favorRef.current){
+          setFavor(true)
+        }
+      }
   }, [currentSongContext]);
 
   const togglePlayPause = () => {
@@ -121,6 +150,14 @@ const Music = () => {
   const toggleFavor = () => {
     if (isButtonDisabled) return;
     setFavor(!favor);
+  }
+
+  if (loading){
+    return (
+      <View style={{flex:1}}>
+        <ActivityIndicator size={'large'} color={'#87bc9d'}/>
+      </View>
+    )
   }
 
   return (
